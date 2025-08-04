@@ -37,7 +37,7 @@ export default function MacDesktop() {
   // Función para obtener dimensiones de imagen - COMPLETAMENTE CORREGIDA
   const getImageDimensions = (src: string): Promise<{ width: number; height: number }> => {
     return new Promise((resolve) => {
-      const img = new Image()
+      const img = new window.Image() // Usar window.Image para acceder al constructor nativo
       img.crossOrigin = "anonymous"
 
       img.onload = function () {
@@ -98,16 +98,19 @@ export default function MacDesktop() {
 
     let position = { x: 10, y: 60 }
 
-    if (typeof window !== "undefined" && !isMobile) {
+    if (typeof window !== "undefined") {
       if (centered) {
+        // Asegurarnos de que las ventanas centradas estén realmente en el centro
         position = {
-          x: Math.max(0, (window.innerWidth - defaultSize.width) / 2),
-          y: Math.max(0, (window.innerHeight - defaultSize.height) / 2),
+          x: Math.max(0, Math.floor((window.innerWidth - defaultSize.width) / 2)),
+          y: Math.max(0, Math.floor((window.innerHeight - defaultSize.height) / 2)),
         }
-      } else {
+        console.log("Ventana centrada en:", position);
+      } else if (!isMobile) {
+        // En dispositivos no móviles, posición aleatoria para efecto cascada
         position = {
-          x: Math.random() * Math.max(0, window.innerWidth - defaultSize.width),
-          y: Math.random() * Math.max(0, window.innerHeight - defaultSize.height),
+          x: Math.floor(Math.random() * Math.max(0, window.innerWidth - defaultSize.width - 50) + 25),
+          y: Math.floor(Math.random() * Math.max(0, window.innerHeight - defaultSize.height - 100) + 50),
         }
       }
     }
@@ -139,16 +142,24 @@ export default function MacDesktop() {
 
         // Obtener dimensiones de forma segura
         const dimensions = await getImageDimensions(imagePath)
+        
+        // Aseguramos que el tamaño de la ventana se adapte exactamente a la imagen
+        // para evitar bandas negras
+        const windowDimensions = {
+          width: dimensions.width + 4, // Añadimos un pequeño padding
+          height: dimensions.height + 4, // para la ventana
+        };
 
         const content = (
-          <div className="w-full h-full flex items-center justify-center bg-black p-2">
+          <div className="w-full h-full flex items-center justify-center bg-black p-0">
             <Image
               src={imagePath || "/placeholder.svg"}
               alt={title}
               width={dimensions.width}
               height={dimensions.height}
-              className="max-w-full max-h-full object-contain"
-              style={{ imageRendering: "pixelated" }}
+              className="w-full h-full object-contain"
+              priority={true}
+              quality={100}
               onError={(e) => {
                 console.error("Error loading image in window:", imagePath)
               }}
@@ -156,7 +167,7 @@ export default function MacDesktop() {
           </div>
         )
 
-        createWindow(windowId, title, content, false, dimensions)
+        createWindow(windowId, title, content, false, windowDimensions)
       } catch (error) {
         console.error("Error creating photo window:", error)
         // Crear ventana con dimensiones por defecto si hay error
@@ -166,6 +177,7 @@ export default function MacDesktop() {
             <div className="text-white text-center">
               <p>Error cargando imagen</p>
               <p className="text-sm">{title}</p>
+              <p className="text-xs mt-2">URL: {imagePath}</p>
             </div>
           </div>
         )
@@ -177,24 +189,67 @@ export default function MacDesktop() {
   const openVirusEffect = (images: string[], projectName: string, delayBetween = 150) => {
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768
     const actualDelay = isMobile ? delayBetween * 2 : delayBetween
+    
+    // Validar que todas las URLs sean cadenas de texto válidas
+    const validImages = images.filter(url => typeof url === 'string' && url.trim() !== '');
+    
+    console.log(`Abriendo cascada de ${validImages.length} imágenes para el proyecto "${projectName}"`);
+    
+    if (validImages.length === 0) {
+      // Mostrar mensaje si no hay imágenes válidas
+      const content = (
+        <div className="w-full h-full flex items-center justify-center p-6 bg-gray-100">
+          <div className="text-center">
+            <h3 className="font-bold mb-4 text-black">No hay imágenes disponibles</h3>
+            <p className="text-gray-700">No se encontraron URLs válidas para este proyecto.</p>
+            <p className="text-gray-500 text-sm mt-2">Proyecto: {projectName}</p>
+          </div>
+        </div>
+      );
+      openCenteredWindow(`${projectName} - Sin imágenes`, content);
+      return;
+    }
 
-    images.forEach((imagePath, index) => {
+    // Abrir cada imagen con un efecto de cascada
+    validImages.forEach((imagePath, index) => {
+      // Extraer un nombre para la imagen desde la URL
       const fileName = imagePath.split("/").pop()?.split(".")[0] || `Imagen ${index + 1}`
+      // Crear ventana para cada foto con el delay correspondiente
       createPhotoWindow(imagePath, `${projectName} - ${fileName}`, index * actualDelay)
     })
   }
 
   const handleFolderClick = (folder: FileItem) => {
+    // Buscar el proyecto en Firebase
     const project = projects.find((p) => p.id === folder.id)
+    console.log("Proyecto seleccionado:", project)
 
     if (project && project.photos && project.photos.length > 0) {
+      // Extraer las URLs de las fotos del proyecto en Firebase
+      const photoUrls = project.photos.map(p => p.url)
+      console.log("URLs de fotos:", photoUrls)
+      
+      // Abrir efecto cascada con las URLs
       openVirusEffect(
-        project.photos.map((p) => p.url),
+        photoUrls,
         project.name,
         150,
       )
     } else {
       console.log("Proyecto sin fotos o no encontrado:", folder.name)
+      
+      // Mostrar una alerta si no hay fotos
+      const windowId = `error-${Date.now()}`
+      const content = (
+        <div className="w-full h-full flex items-center justify-center p-6 bg-gray-100">
+          <div className="text-center">
+            <h3 className="font-bold mb-4 text-black">No hay contenido disponible</h3>
+            <p className="text-gray-700">No se encontraron fotos para este proyecto.</p>
+            <p className="text-gray-500 text-sm mt-2">ID: {folder.id}</p>
+          </div>
+        </div>
+      )
+      openCenteredWindow(`${folder.name} - Sin contenido`, content)
     }
   }
 
@@ -204,8 +259,13 @@ export default function MacDesktop() {
 
   const handleDesignFolderClick = () => {
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768
-    const finderContent = <Finder onFileClick={handleFileClick} onFolderClick={handleFolderClick} />
-    openCenteredWindow("Explorador KIKU - Diseños", finderContent, {
+    // Configuramos el finder para mostrar específicamente la categoría de diseño
+    const FinderWithDesignCategory = () => {
+      const [initialCategory] = useState<"design" | "photography" | "general" | "all">("design");
+      return <Finder onFileClick={handleFileClick} onFolderClick={handleFolderClick} initialCategory={initialCategory} />;
+    };
+    
+    openCenteredWindow("Explorador KIKU - Diseños", <FinderWithDesignCategory />, {
       width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 900,
       height: isMobile ? Math.min(500, window.innerHeight * 0.8) : 700,
     })
@@ -213,8 +273,13 @@ export default function MacDesktop() {
 
   const handlePhotoFolderClick = () => {
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768
-    const finderContent = <Finder onFileClick={handleFileClick} onFolderClick={handleFolderClick} />
-    openCenteredWindow("Explorador KIKU - Fotografía", finderContent, {
+    // Configuramos el finder para mostrar específicamente la categoría de fotografía
+    const FinderWithPhotoCategory = () => {
+      const [initialCategory] = useState<"design" | "photography" | "general" | "all">("photography");
+      return <Finder onFileClick={handleFileClick} onFolderClick={handleFolderClick} initialCategory={initialCategory} />;
+    };
+    
+    openCenteredWindow("Explorador KIKU - Fotografía", <FinderWithPhotoCategory />, {
       width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 900,
       height: isMobile ? Math.min(500, window.innerHeight * 0.8) : 700,
     })

@@ -16,23 +16,27 @@ interface FileItem {
 interface FinderProps {
   onFileClick: (file: FileItem) => void
   onFolderClick: (folder: FileItem) => void
+  initialCategory?: "all" | "design" | "photography" | "general"
 }
 
-export default function Finder({ onFileClick, onFolderClick }: FinderProps) {
+export default function Finder({ onFileClick, onFolderClick, initialCategory = "all" }: FinderProps) {
   const { projects, loading } = useData()
   const [searchTerm, setSearchTerm] = useState("")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-  const [selectedCategory, setSelectedCategory] = useState<"all" | "design" | "photography" | "general">("all")
+  const [selectedCategory, setSelectedCategory] = useState<"all" | "design" | "photography" | "general">(initialCategory)
 
-  // Convertir proyectos a FileItems
-  const fileItems: FileItem[] = projects.map((project) => ({
-    id: project.id,
-    name: project.name,
-    type: project.type === "file" || project.type === "folder" ? project.type : "project",
-    category: project.category || "general",
-  }))
+  // Convertir proyectos a FileItems (solo los activos)
+  const fileItems: FileItem[] = projects
+    .filter(project => project.status === "active") // Solo mostrar proyectos activos
+    .map((project) => ({
+      id: project.id,
+      name: project.name,
+      type: project.type === "file" || project.type === "folder" ? project.type : "project",
+      category: project.category || "general",
+    }))
   
   console.log("Projects from Firebase:", projects);
+  console.log("Active projects shown:", fileItems.length);
 
   // Filtrar items
   const filteredItems = fileItems.filter((item) => {
@@ -149,6 +153,12 @@ export default function Finder({ onFileClick, onFolderClick }: FinderProps) {
             <FileText size={48} className="mx-auto mb-4 opacity-50" />
             <p>No se encontraron archivos</p>
             {searchTerm && <p className="text-sm mt-2">Intenta con otro término de búsqueda</p>}
+            {!searchTerm && selectedCategory !== "all" && (
+              <p className="text-sm mt-2">No hay proyectos activos en esta categoría</p>
+            )}
+            {!searchTerm && selectedCategory === "all" && fileItems.length === 0 && (
+              <p className="text-sm mt-2">No hay proyectos activos disponibles</p>
+            )}
           </div>
         ) : viewMode === "grid" ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">

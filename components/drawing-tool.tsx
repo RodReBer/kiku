@@ -60,7 +60,7 @@ export default function DrawingTool({ width = 800, height = 600, initialImage }:
 
       // Load initial image if provided
       if (initialImage) {
-        const img = new Image()
+        const img = new window.Image() // Usar window.Image para acceder al constructor nativo
         img.crossOrigin = "anonymous" // To avoid CORS issues if image is from different origin
         img.onload = () => {
           ctx.clearRect(0, 0, width, height)
