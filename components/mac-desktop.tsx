@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import RetroWindow from "./retro-window"
 import Finder from "./finder"
 import TopMenuBar from "./top-menu-bar"
+import DraggableDesktopIcon from "./draggable-desktop-icon"
 import DrawingApp from "./drawing-app"
 import { useData } from "@/context/data-context"
 
@@ -370,9 +371,32 @@ export default function MacDesktop() {
       <div className="flex-1 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 lg:gap-16 p-4 md:p-8 h-full overflow-y-auto md:overflow-hidden">
         <motion.div
           className="relative cursor-pointer group flex-shrink-0"
+          drag
+          dragMomentum={false}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={handleDesignFolderClick}
+          onMouseDown={(e) => {
+            // Guardamos la posición inicial del clic
+            const startPos = { x: e.clientX, y: e.clientY };
+            
+            const handleMouseUp = (e: MouseEvent) => {
+              // Calculamos la distancia arrastrada
+              const distanceMoved = Math.sqrt(
+                Math.pow(e.clientX - startPos.x, 2) + 
+                Math.pow(e.clientY - startPos.y, 2)
+              );
+              
+              // Solo activamos el clic si la distancia es pequeña (menos de 5 píxeles)
+              if (distanceMoved < 5) {
+                handleDesignFolderClick();
+              }
+              
+              // Limpiamos el evento
+              window.removeEventListener('mouseup', handleMouseUp);
+            };
+            
+            window.addEventListener('mouseup', handleMouseUp);
+          }}
         >
           <Image
             src="/folders/carpeta-diseno.png"
@@ -393,24 +417,36 @@ export default function MacDesktop() {
               draggable={false}
             />
           </div>
-
-          <div className="absolute bottom-4 right-4 md:bottom-[2.5rem] md:right-6">
-            <Image
-              src="/estrella-negra.png"
-              alt="Estrella Negra"
-              width={70}
-              height={70}
-              className="object-contain drop-shadow-lg w-[60px] h-[60px] md:w-[80px] md:h-[80px] lg:w-[120px] lg:h-[120px]"
-              draggable={false}
-            />
-          </div>
         </motion.div>
 
         <motion.div
           className="cursor-pointer group flex-shrink-0"
+          drag
+          dragMomentum={false}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={handlePhotoFolderClick}
+          onMouseDown={(e) => {
+            // Guardamos la posición inicial del clic
+            const startPos = { x: e.clientX, y: e.clientY };
+            
+            const handleMouseUp = (e: MouseEvent) => {
+              // Calculamos la distancia arrastrada
+              const distanceMoved = Math.sqrt(
+                Math.pow(e.clientX - startPos.x, 2) + 
+                Math.pow(e.clientY - startPos.y, 2)
+              );
+              
+              // Solo activamos el clic si la distancia es pequeña (menos de 5 píxeles)
+              if (distanceMoved < 5) {
+                handlePhotoFolderClick();
+              }
+              
+              // Limpiamos el evento
+              window.removeEventListener('mouseup', handleMouseUp);
+            };
+            
+            window.addEventListener('mouseup', handleMouseUp);
+          }}
         >
           <Image
             src="/folders/carpeta-foto.png"
@@ -424,9 +460,32 @@ export default function MacDesktop() {
 
         <motion.div
           className="cursor-pointer group flex-shrink-0"
+          drag
+          dragMomentum={false}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={handleContactFolderClick}
+          onMouseDown={(e) => {
+            // Guardamos la posición inicial del clic
+            const startPos = { x: e.clientX, y: e.clientY };
+            
+            const handleMouseUp = (e: MouseEvent) => {
+              // Calculamos la distancia arrastrada
+              const distanceMoved = Math.sqrt(
+                Math.pow(e.clientX - startPos.x, 2) + 
+                Math.pow(e.clientY - startPos.y, 2)
+              );
+              
+              // Solo activamos el clic si la distancia es pequeña (menos de 5 píxeles)
+              if (distanceMoved < 5) {
+                handleContactFolderClick();
+              }
+              
+              // Limpiamos el evento
+              window.removeEventListener('mouseup', handleMouseUp);
+            };
+            
+            window.addEventListener('mouseup', handleMouseUp);
+          }}
         >
           <Image
             src="/folders/carpeta-contacto.png"

@@ -7,7 +7,7 @@ import MacDesktop from "@/components/mac-desktop"
 import DebugPanel from "@/components/debug-panel"
 
 export default function Home() {
-  const [currentScreen, setCurrentScreen] = useState<"welcome" | "welcome" | "desktop">("welcome")
+  const [currentScreen, setCurrentScreen] = useState<"Loading" | "welcome" | "desktop">("welcome")
   const [showDebug, setShowDebug] = useState(false)
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function Home() {
     
     window.addEventListener('keydown', handleKeyDown)
     return () => {
-      clearTimeout(timer)
+      // clearTimeout(timer) - Eliminamos esto porque timer está comentado
       window.removeEventListener('keydown', handleKeyDown)
     }
   }, [])

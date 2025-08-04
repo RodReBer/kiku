@@ -116,11 +116,10 @@ Descripción: ${product.description}
             {categoryButtons.map((btn) => (
               <button
                 key={btn.category}
-                className={`w-full text-left px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all duration-200 whitespace-nowrap ${
-                  selectedCategory === btn.category
+                className={`w-full text-left px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all duration-200 whitespace-nowrap ${selectedCategory === btn.category
                     ? "bg-blue-600 text-white border-2 border-blue-800"
                     : "bg-gray-300 hover:bg-gray-100 text-black border border-gray-400"
-                }`}
+                  }`}
                 style={{ borderStyle: selectedCategory === btn.category ? "inset" : "outset" }}
                 onClick={() => setSelectedCategory(btn.category)}
               >

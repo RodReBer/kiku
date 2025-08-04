@@ -17,13 +17,9 @@ export default function DraggableDesktopIcon({ name, icon, onClick, initialX, in
   const [isDragging, setIsDragging] = useState(false)
   const dragRef = useRef<HTMLDivElement>(null)
 
-  const handleDragEnd = (event: any, info: any) => {
+  // Eliminamos este método porque no lo necesitamos con el drag de framer-motion
+  const handleDragEnd = () => {
     setIsDragging(false)
-    // Corregir el cálculo de posición para que el arrastre funcione correctamente
-    const newX = Math.max(0, Math.min(position.x + info.offset.x, (window.innerWidth || 1200) - 100))
-    const newY = Math.max(40, Math.min(position.y + info.offset.y, (window.innerHeight || 800) - 120))
-
-    setPosition({ x: newX, y: newY })
   }
 
   const handleClick = () => {
@@ -32,37 +28,32 @@ export default function DraggableDesktopIcon({ name, icon, onClick, initialX, in
     }
   }
 
+  // Ajustamos para que no sea absoluto, sino relativo
   return (
     <motion.div
       ref={dragRef}
-      className="absolute cursor-pointer select-none z-10"
-      style={{ left: position.x, top: position.y }}
+      className="cursor-pointer select-none group flex-shrink-0"
       drag
       dragMomentum={false}
       onDragStart={() => setIsDragging(true)}
       onDragEnd={handleDragEnd}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
+      onClick={handleClick}
     >
-      <div
-        className="flex flex-col items-center p-2 sm:p-3 hover:bg-blue-200 hover:bg-opacity-30 rounded transition-all duration-200 w-16 sm:w-20"
-        onClick={handleClick}
-      >
-        {/* Icono sin fondo blanco - solo transparente */}
-        <div className="mb-1 sm:mb-2 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center">
-          <Image
-            src={icon || "/placeholder.svg"}
-            alt={name}
-            width={32}
-            height={32}
-            className="pixelated sm:w-10 sm:h-10 drop-shadow-md"
-            style={{ filter: "drop-shadow(1px 1px 2px rgba(0,0,0,0.3))" }}
-          />
-        </div>
-        <span className="text-xs sm:text-sm font-bold text-white text-center leading-tight drop-shadow-lg bg-black bg-opacity-50 px-2 py-1 rounded">
+      <Image
+        src={icon || "/placeholder.svg"}
+        alt={name || "Icono"}
+        width={280}
+        height={280}
+        className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[200px] h-[200px] md:w-[280px] md:h-[280px] lg:w-[320px] lg:h-[320px]"
+        draggable={false}
+      />
+      {name && (
+        <span className="text-xs md:text-sm font-bold text-white text-center leading-tight drop-shadow-lg bg-black bg-opacity-50 px-2 py-1 rounded">
           {name}
         </span>
-      </div>
+      )}
     </motion.div>
   )
 }

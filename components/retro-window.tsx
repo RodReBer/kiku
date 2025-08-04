@@ -110,14 +110,17 @@ export default function RetroWindow({
     <AnimatePresence>
       <motion.div
         ref={windowRef}
-        className="absolute bg-gray-200 border-2 border-gray-400 shadow-lg"
+        className="absolute bg-gray-200 shadow-md"
         style={{
           left: windowStyle.x,
           top: windowStyle.y,
           width: windowStyle.width,
           height: windowStyle.height,
           zIndex,
-          borderStyle: "outset",
+          borderStyle: "solid",
+          borderWidth: "2px",
+          borderColor: "#FFFFFF #808080 #808080 #FFFFFF",
+          boxShadow: "2px 2px 5px rgba(0,0,0,0.2)",
         }}
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -125,54 +128,68 @@ export default function RetroWindow({
         transition={{ duration: 0.2 }}
         onMouseDown={() => onFocus()}
       >
-        {/* Barra de título */}
+        {/* Barra de título estilo Windows 2000 */}
         <div
-          className="window-header h-8 bg-gradient-to-r from-blue-600 to-blue-500 border-b-2 border-gray-400 flex items-center justify-between px-2 cursor-move"
-          style={{ borderStyle: "inset" }}
+          className="window-header h-7 border-b border-gray-500 flex items-center justify-between px-2 cursor-move"
+          style={{ 
+            borderStyle: "solid",
+            background: "linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)",
+            borderColor: "#D9D9D9 #434343 #434343 #D9D9D9"
+          }}
           onMouseDown={handleMouseDown}
         >
-          <span className="text-white font-bold text-sm truncate flex-1 ml-2">{title}</span>
-
-          <div className="flex space-x-1">
-            {/* Botón minimizar */}
+          <span className="text-white font-bold text-xs truncate flex-1 ml-2">{title}</span>          <div className="flex space-x-1">
+            {/* Botón minimizar estilo Windows 2000 */}
             <button
-              className="w-4 h-4 bg-yellow-400 border border-yellow-600 hover:bg-yellow-300 transition-colors"
-              style={{ borderStyle: "outset" }}
+              className="w-5 h-5 bg-gray-300 border border-gray-500 hover:bg-gray-400 transition-colors flex items-center justify-center"
+              style={{ 
+                borderStyle: "outset", 
+                borderWidth: "1px", 
+                borderColor: "#D9D9D9 #434343 #434343 #D9D9D9" 
+              }}
               onClick={(e) => {
                 e.stopPropagation()
                 onMinimize()
               }}
             >
-              <div className="w-full h-full flex items-center justify-center">
-                <div className="w-2 h-0.5 bg-black"></div>
-              </div>
+              <div className="w-2 h-0.5 bg-black"></div>
             </button>
 
             {/* Botón maximizar */}
             <button
-              className="w-4 h-4 bg-green-400 border border-green-600 hover:bg-green-300 transition-colors"
-              style={{ borderStyle: "outset" }}
+              className="w-5 h-5 bg-gray-300 border border-gray-500 hover:bg-gray-400 transition-colors flex items-center justify-center"
+              style={{ 
+                borderStyle: "outset", 
+                borderWidth: "1px", 
+                borderColor: "#D9D9D9 #434343 #434343 #D9D9D9" 
+              }}
               onClick={(e) => {
                 e.stopPropagation()
                 onMaximize()
               }}
             >
               <div className="w-full h-full flex items-center justify-center">
-                <div className="w-2 h-2 border border-black"></div>
+                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="0" y="0" width="8" height="8" stroke="black" strokeWidth="1" fill="none" />
+                </svg>
               </div>
             </button>
 
             {/* Botón cerrar */}
             <button
-              className="w-4 h-4 bg-red-400 border border-red-600 hover:bg-red-300 transition-colors"
-              style={{ borderStyle: "outset" }}
+              className="w-5 h-5 bg-gray-300 border border-gray-500 hover:bg-gray-400 transition-colors flex items-center justify-center"
+              style={{ 
+                borderStyle: "outset", 
+                borderWidth: "1px", 
+                borderColor: "#D9D9D9 #434343 #434343 #D9D9D9" 
+              }}
               onClick={(e) => {
                 e.stopPropagation()
                 onClose()
               }}
             >
               <div className="w-full h-full flex items-center justify-center">
-                <div className="text-black text-xs font-bold">×</div>
+                <span className="text-black text-xs font-bold">×</span>
               </div>
             </button>
           </div>

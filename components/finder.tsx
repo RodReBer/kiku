@@ -22,7 +22,7 @@ interface FinderProps {
 export default function Finder({ onFileClick, onFolderClick, initialCategory = "all" }: FinderProps) {
   const { projects, loading } = useData()
   const [searchTerm, setSearchTerm] = useState("")
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+  const [viewMode, setViewMode] = useState<"grid" | "list">("list")
   const [selectedCategory, setSelectedCategory] = useState<"all" | "design" | "photography" | "general">(initialCategory)
 
   // Convertir proyectos a FileItems (solo los activos)
