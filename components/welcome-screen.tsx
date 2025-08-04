@@ -26,9 +26,9 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
         <Image
           src="/nube-grande.png"
           alt="Entrar al Desktop"
-          width={400}
-          height={400}
-          className="object-contain drop-shadow-2xl group-hover:drop-shadow-3xl transition-all duration-300"
+          width={600}
+          height={600}
+          className="object-contain transition-all duration-300"
           draggable={false}
         />
 

@@ -7,7 +7,7 @@ import MacDesktop from "@/components/mac-desktop"
 import DebugPanel from "@/components/debug-panel"
 
 export default function Home() {
-  const [currentScreen, setCurrentScreen] = useState<"loading" | "welcome" | "desktop">("loading")
+  const [currentScreen, setCurrentScreen] = useState<"welcome" | "welcome" | "desktop">("welcome")
   const [showDebug, setShowDebug] = useState(false)
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function Home() {
 
   return (
     <main className="h-screen w-full overflow-hidden">
-      {currentScreen === "loading" && <LoadingScreen />}
+      {/* {currentScreen === "loading" && <LoadingScreen />} */}
       {currentScreen === "welcome" && <WelcomeScreen onEnterDesktop={handleEnterDesktop} />}
       {currentScreen === "desktop" && <MacDesktop />}
       {showDebug && <DebugPanel />}

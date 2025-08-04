@@ -33,7 +33,7 @@ export default function TopMenuBar({ onOpenDrawingApp }: TopMenuBarProps) {
       style={{ backgroundColor: "#ff4a5c" }}
     >
       {/* Nube pequeña más grande y más abajo - ahora es KIKU Paint */}
-      <div className="absolute left-4 top-1.5">
+      <div className="absolute left-4 mt-9">
         <button
           onClick={onOpenDrawingApp}
           className="hover:scale-110 transition-transform duration-200 focus:outline-none group"
@@ -42,8 +42,8 @@ export default function TopMenuBar({ onOpenDrawingApp }: TopMenuBarProps) {
           <Image
             src="/nube-chica.png"
             alt="KIKU Paint"
-            width={100}
-            height={100}
+            width={120}
+            height={120}
             className="object-contain drop-shadow-md group-hover:drop-shadow-lg"
             draggable={false}
           />
