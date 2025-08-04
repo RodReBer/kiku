@@ -364,7 +364,7 @@ export default function MacDesktop() {
   }
 
   return (
-    <div className="h-screen w-full bg-[#ffff] relative overflow-hidden">
+    <div className="h-screen w-full bg-[#ff0000] relative overflow-hidden">
       <TopMenuBar onOpenDrawingApp={handleDrawingAppOpen} />
 
       <div className="flex-1 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 lg:gap-16 p-4 md:p-8 h-full overflow-y-auto md:overflow-hidden">
