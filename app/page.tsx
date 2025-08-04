@@ -12,9 +12,9 @@ export default function Home() {
 
   useEffect(() => {
     // Simular tiempo de carga
-    const timer = setTimeout(() => {
-      setCurrentScreen("welcome")
-    }, 3000) // 3 segundos de loading
+    // const timer = setTimeout(() => {
+    //   setCurrentScreen("welcome")
+    // }, 3000) // 3 segundos de loading
 
     // Enable debug panel with keyboard shortcut (Ctrl+Shift+D)
     const handleKeyDown = (e: KeyboardEvent) => {
