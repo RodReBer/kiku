@@ -133,12 +133,12 @@ export default function RetroWindow({
           className="window-header h-7 border-b border-gray-500 flex items-center justify-between px-2 cursor-move"
           style={{ 
             borderStyle: "solid",
-            background: "linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)",
+            background: "#C0C0C0",
             borderColor: "#D9D9D9 #434343 #434343 #D9D9D9"
           }}
           onMouseDown={handleMouseDown}
         >
-          <span className="text-white font-bold text-xs truncate flex-1 ml-2">{title}</span>          <div className="flex space-x-1">
+          <span className="text-black font-bold text-xs truncate flex-1 ml-2">{title}</span>          <div className="flex space-x-1">
             {/* Botón minimizar estilo Windows 2000 */}
             <button
               className="w-5 h-5 bg-gray-300 border border-gray-500 hover:bg-gray-400 transition-colors flex items-center justify-center"
