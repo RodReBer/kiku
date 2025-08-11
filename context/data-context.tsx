@@ -19,6 +19,7 @@ export interface Project {
   photos?: Photo[]
   description?: string
   status: "active" | "archived"
+  coverImage?: string
   createdAt?: Date
   updatedAt?: Date
 }
@@ -116,23 +117,21 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const updateProject = async (id: string, updates: Partial<Project>) => {
     try {
-      console.log(`Updating project ${id} with:`, updates);
-      const projectRef = doc(db, "projects", id);
-      
+      console.log(`Updating project ${id} with:`, updates)
+      const projectRef = doc(db, "projects", id)
       const updateData = {
         ...updates,
         updatedAt: new Date(),
-      };
-      
-      await updateDoc(projectRef, updateData);
-      console.log(`Project ${id} updated successfully`);
-      
-      // Return success
-      return true;
+      }
+      await updateDoc(projectRef, updateData)
+      console.log(`Project ${id} updated successfully`)
     } catch (err) {
-      console.error("Error updating project:", err);
-      setError(`Error actualizando proyecto: ${err.message || JSON.stringify(err)}`);
-      return false;
+      console.error("Error updating project:", err)
+      let message = "Error actualizando proyecto"
+      if (err && typeof err === 'object' && 'message' in err) {
+        message = `Error actualizando proyecto: ${(err as any).message}`
+      }
+      setError(message)
     }
   }
 

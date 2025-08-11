@@ -41,6 +41,7 @@ export default function AdminPanel() {
     description: "",
     status: "active",
     photos: [],
+  coverImage: "",
   })
 
   const [newProduct, setNewProduct] = useState<Partial<Product>>({
@@ -85,6 +86,7 @@ export default function AdminPanel() {
         description: "",
         status: "active",
         photos: [],
+  coverImage: "",
       })
       setPhotoUrls("")
       setShowNewProject(false)
@@ -285,6 +287,17 @@ export default function AdminPanel() {
                   </div>
 
                   <div>
+                    <label className="block text-purple-200 text-sm font-medium mb-2">Imagen Principal (cover)</label>
+                    <Input
+                      placeholder="URL de la imagen principal"
+                      value={newProject.coverImage || ""}
+                      onChange={(e) => setNewProject({ ...newProject, coverImage: e.target.value })}
+                      className="bg-white/20 border-white/30 text-white placeholder-purple-300"
+                    />
+                    <p className="text-purple-300 text-xs mt-1">Se mostrará como miniatura en el explorador.</p>
+                  </div>
+
+                  <div>
                     <label className="block text-purple-200 text-sm font-medium mb-2">
                       URLs de Fotos (una por línea)
                     </label>
@@ -322,7 +335,7 @@ export default function AdminPanel() {
             )}
 
             <div className="grid gap-6">
-              {projects.map((project) => (
+              {projects.map((project: Project) => (
                 <Card
                   key={project.id}
                   className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/15 transition-all"
@@ -362,21 +375,20 @@ export default function AdminPanel() {
                           size="sm"
                           variant={project.status === "active" ? "default" : "secondary"}
                           onClick={async () => {
-                            const newStatus = project.status === "active" ? "archived" : "active";
-                            const success = await updateProject(project.id, { status: newStatus });
-                            
-                            if (success) {
+                            const newStatus = project.status === "active" ? "archived" : "active"
+                            try {
+                              await updateProject(project.id, { status: newStatus })
                               toast({
                                 title: "Estado actualizado",
                                 description: `El proyecto "${project.name}" ha sido ${newStatus === "active" ? "activado" : "archivado"}.`,
                                 variant: "default",
-                              });
-                            } else {
+                              })
+                            } catch {
                               toast({
                                 title: "Error al actualizar",
                                 description: "No se pudo cambiar el estado del proyecto. Intente nuevamente.",
                                 variant: "destructive",
-                              });
+                              })
                             }
                           }}
                           className={
@@ -427,6 +439,12 @@ export default function AdminPanel() {
                       />
                     ) : (
                       <div>
+                        {project.coverImage && (
+                          <div className="mb-3">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={project.coverImage} alt={project.name} className="w-full max-w-sm rounded-md border border-white/20 shadow-sm" />
+                          </div>
+                        )}
                         <p className="text-purple-200 mb-2">{project.description}</p>
                         {project.photos && (
                           <div className="flex items-center gap-2">
@@ -555,7 +573,7 @@ export default function AdminPanel() {
             )}
 
             <div className="grid gap-6">
-              {products.map((product) => (
+              {products.map((product: Product) => (
                 <Card
                   key={product.id}
                   className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/15 transition-all"
@@ -726,6 +744,12 @@ function ProjectEditForm({
         placeholder="Descripción"
         className="bg-white/20 border-white/30 text-white placeholder-purple-300"
         rows={3}
+      />
+      <Input
+        value={formData.coverImage || ""}
+        onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
+        placeholder="URL de imagen principal (cover)"
+        className="bg-white/20 border-white/30 text-white placeholder-purple-300"
       />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div className="space-y-2">

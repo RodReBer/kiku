@@ -5,12 +5,14 @@ import { useData } from "@/context/data-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Folder, FileText, ImageIcon, Search, Grid, List } from "lucide-react"
+import Image from "next/image"
 
 interface FileItem {
   id: string
   name: string
   type: "file" | "folder" | "project"
   category: "design" | "photography" | "general"
+  coverImage?: string
 }
 
 interface FinderProps {
@@ -27,13 +29,18 @@ export default function Finder({ onFileClick, onFolderClick, initialCategory = "
 
   // Convertir proyectos a FileItems (solo los activos)
   const fileItems: FileItem[] = projects
-    .filter(project => project.status === "active") // Solo mostrar proyectos activos
-    .map((project) => ({
-      id: project.id,
-      name: project.name,
-      type: project.type === "file" || project.type === "folder" ? project.type : "project",
-      category: project.category || "general",
-    }))
+    .filter(project => project.status === "active")
+    .map((project) => {
+      // Fotografía: mostrarse como carpeta (abre todas sus fotos)
+      const isPhotography = project.category === 'photography'
+      return {
+        id: project.id,
+        name: project.name,
+        type: isPhotography ? 'folder' : (project.type === 'file' || project.type === 'folder' ? project.type : 'project'),
+        category: project.category || 'general',
+        coverImage: project.coverImage || project.photos?.[0]?.url,
+      }
+    })
   
   console.log("Projects from Firebase:", projects);
   console.log("Active projects shown:", fileItems.length);
@@ -45,28 +52,52 @@ export default function Finder({ onFileClick, onFolderClick, initialCategory = "
     return matchesSearch && matchesCategory
   })
 
+  const [expandedImage, setExpandedImage] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+
   const handleItemClick = (item: FileItem) => {
-    if (item.type === "file") {
-      onFileClick(item)
-    } else {
+    setSelectedId(item.id)
+    if (item.category === 'photography') {
+      // Tratar como carpeta: delegar a onFolderClick
       onFolderClick(item)
+      return
     }
+    if (item.category === 'design') {
+      // Abrir imagen individual (si tiene coverImage)
+      const project = projects.find(p => p.id === item.id)
+      const image = project?.coverImage || project?.photos?.[0]?.url
+      if (image) setExpandedImage(image)
+      return
+    }
+    // Otros tipos
+    if (item.type === 'file') onFileClick(item)
+    else onFolderClick(item)
   }
 
   const getItemIcon = (item: FileItem) => {
+    // We'll attempt to find the project to get coverImage
+    const project = projects.find(p => p.id === item.id)
+    if (project?.coverImage) {
+      return (
+        <div className="w-20 h-16 md:w-24 md:h-20 border-2 border-gray-400 flex items-center justify-center overflow-hidden bg-white" style={{ borderStyle: selectedId===item.id? 'inset':'outset', outline: selectedId===item.id? '2px dotted #000':'' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={project.coverImage} alt={project.name} className="object-cover w-full h-full" draggable={false} />
+        </div>
+      )
+    }
     switch (item.type) {
       case "folder":
-        return <Folder className="text-yellow-600" size={24} />
+        return <Folder className="text-yellow-700" size={26} />
       case "file":
-        return <FileText className="text-blue-600" size={24} />
+        return <FileText className="text-blue-700" size={26} />
       case "project":
         return item.category === "photography" ? (
-          <ImageIcon className="text-green-600" size={24} />
+          <ImageIcon className="text-green-700" size={26} />
         ) : (
-          <Folder className="text-purple-600" size={24} />
+          <Folder className="text-purple-700" size={26} />
         )
       default:
-        return <FileText className="text-gray-600" size={24} />
+        return <FileText className="text-gray-700" size={26} />
     }
   }
 
@@ -82,66 +113,50 @@ export default function Finder({ onFileClick, onFolderClick, initialCategory = "
   }
 
   return (
-    <div className="h-full flex flex-col bg-gray-100">
+    <div className="h-full flex flex-col bg-[#d4d0c8] text-black font-sans" style={{ fontFamily: 'Tahoma, Verdana, sans-serif' }}>
       {/* Header */}
-      <div className="bg-white border-b border-gray-300 p-3 md:p-4">
-        <div className="flex flex-col md:flex-row gap-3 md:gap-4 items-start md:items-center justify-between">
-          <div className="flex items-center gap-2 w-full md:w-auto">
-            <Search size={16} className="text-gray-500" />
-            <Input
-              placeholder="Buscar archivos..."
+      <div className="border-b-2 border-gray-400 bg-[#e4e0d8] p-2" style={{ borderBottomStyle: 'outset' }}>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center bg-white border-2 border-gray-400 px-2 py-1" style={{ borderStyle: 'inset' }}>
+            <Search size={14} className="text-gray-600 mr-1" />
+            <input
+              placeholder="Buscar..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 md:w-64 text-sm"
+              className="bg-transparent outline-none text-sm w-40"
             />
           </div>
-
-          <div className="flex items-center gap-2 w-full md:w-auto justify-between md:justify-end">
-            <div className="flex gap-1">
-              <Button
-                size="sm"
-                variant={selectedCategory === "all" ? "default" : "outline"}
-                onClick={() => setSelectedCategory("all")}
-                className="text-xs px-2 py-1"
+          <div className="flex items-center gap-1">
+            {['all','design','photography'].map(cat => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat as any)}
+                className={`text-xs px-3 py-1 border-2 border-gray-400 ${selectedCategory===cat? 'bg-white' : 'bg-[#d4d0c8] hover:bg-[#c9c5bd]'} `}
+                style={{ borderStyle: selectedCategory===cat? 'inset':'outset' }}
               >
-                Todos
-              </Button>
-              <Button
-                size="sm"
-                variant={selectedCategory === "design" ? "default" : "outline"}
-                onClick={() => setSelectedCategory("design")}
-                className="text-xs px-2 py-1"
-              >
-                Diseño
-              </Button>
-              <Button
-                size="sm"
-                variant={selectedCategory === "photography" ? "default" : "outline"}
-                onClick={() => setSelectedCategory("photography")}
-                className="text-xs px-2 py-1"
-              >
-                Fotos
-              </Button>
-            </div>
-
-            <div className="flex gap-1 ml-2">
-              <Button
-                size="sm"
-                variant={viewMode === "grid" ? "default" : "outline"}
-                onClick={() => setViewMode("grid")}
-                className="p-1"
-              >
-                <Grid size={14} />
-              </Button>
-              <Button
-                size="sm"
-                variant={viewMode === "list" ? "default" : "outline"}
-                onClick={() => setViewMode("list")}
-                className="p-1"
-              >
-                <List size={14} />
-              </Button>
-            </div>
+                {cat==='all' && 'Todos'}
+                {cat==='design' && 'Diseño'}
+                {cat==='photography' && 'Fotos'}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-1 ml-auto">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-1 border-2 border-gray-400 ${viewMode==='list'? 'bg-white':'bg-[#d4d0c8] hover:bg-[#c9c5bd]'}`}
+              style={{ borderStyle: viewMode==='list'? 'inset':'outset' }}
+              title="Lista"
+            >
+              <List size={14} />
+            </button>
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-1 border-2 border-gray-400 ${viewMode==='grid'? 'bg-white':'bg-[#d4d0c8] hover:bg-[#c9c5bd]'}`}
+              style={{ borderStyle: viewMode==='grid'? 'inset':'outset' }}
+              title="Iconos"
+            >
+              <Grid size={14} />
+            </button>
           </div>
         </div>
       </div>
@@ -228,7 +243,7 @@ export default function Finder({ onFileClick, onFolderClick, initialCategory = "
         </aside>
 
         {/* Main content */}
-        <div className="flex-1 overflow-auto p-3 md:p-4">
+  <div className="flex-1 overflow-auto p-3 md:p-4 bg-[#e4e0d8]" style={{ boxShadow: 'inset 0 0 0 1px #fff' }}>
           {filteredItems.length === 0 ? (
             <div className="text-center text-gray-500 mt-8">
               <FileText size={48} className="mx-auto mb-4 opacity-50" />
@@ -242,33 +257,37 @@ export default function Finder({ onFileClick, onFolderClick, initialCategory = "
               )}
             </div>
           ) : viewMode === "grid" ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
               {filteredItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex flex-col items-center p-3 md:p-4 bg-white rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-sm cursor-pointer transition-all"
+                  className="flex flex-col items-center p-2 md:p-3 bg-[#d4d0c8] border-2 border-gray-400 cursor-pointer select-none"
+                  style={{ borderStyle: selectedId===item.id? 'inset':'outset', outline: selectedId===item.id? '2px dotted #000':'' }}
+                  onMouseDown={(e) => { if(item.category==='photography') e.stopPropagation(); }}
                   onClick={() => handleItemClick(item)}
                 >
                   <div className="mb-2">{getItemIcon(item)}</div>
-                  <span className="text-xs md:text-sm text-center text-gray-700 font-medium truncate w-full">
+                  <span className="text-[11px] md:text-xs text-center text-gray-800 font-medium truncate w-full" title={item.name}>
                     {item.name}
                   </span>
-                  <span className="text-xs text-gray-500 mt-1 capitalize">{item.category}</span>
+                  <span className="text-[10px] text-gray-600 mt-1 capitalize">{item.category === 'photography' ? '📁 Fotos' : item.category === 'design' ? '🎨 Diseño' : item.category}</span>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="space-y-1">
+    <div className="space-y-1">
               {filteredItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center gap-3 p-2 md:p-3 bg-white rounded border border-gray-200 hover:border-gray-300 hover:shadow-sm cursor-pointer transition-all"
+                  className="flex items-center gap-3 p-2 md:p-2 bg-[#d4d0c8] border-2 border-gray-400 cursor-pointer select-none"
+                  style={{ borderStyle: selectedId===item.id? 'inset':'outset', outline: selectedId===item.id? '2px dotted #000':'' }}
+                  onMouseDown={(e) => { if(item.category==='photography') e.stopPropagation(); }}
                   onClick={() => handleItemClick(item)}
                 >
                   {getItemIcon(item)}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-700 truncate">{item.name}</p>
-                    <p className="text-xs text-gray-500 capitalize">
+        <p className="text-sm font-medium text-gray-800 truncate">{item.name}</p>
+        <p className="text-xs text-gray-600 capitalize">
                       {item.category} • {item.type}
                     </p>
                   </div>
@@ -280,12 +299,27 @@ export default function Finder({ onFileClick, onFolderClick, initialCategory = "
       </div>
 
       {/* Footer */}
-      <div className="bg-white border-t border-gray-300 px-3 md:px-4 py-2">
-        <p className="text-xs text-gray-500">
+  <div className="px-3 md:px-4 py-1 border-t-2 border-gray-400 bg-[#d4d0c8] text-[11px]" style={{ borderTopStyle: 'outset' }}>
+    <p className="text-gray-700">
           {filteredItems.length} elemento{filteredItems.length !== 1 ? "s" : ""}
           {searchTerm && ` encontrado${filteredItems.length !== 1 ? "s" : ""} para "${searchTerm}"`}
         </p>
       </div>
+
+      {expandedImage && (
+        <div className="fixed inset-0 z-[9999] bg-black/70 flex items-center justify-center p-4" onClick={() => setExpandedImage(null)}>
+          <div className="bg-[#d4d0c8] p-2 border-2 border-gray-400 max-w-[90vw] max-h-[90vh]" style={{ borderStyle: 'outset' }} onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-xs font-semibold">Vista ampliada</span>
+              <button onClick={() => setExpandedImage(null)} className="text-xs px-2 py-0.5 border-2 border-gray-400 bg-[#d4d0c8] hover:bg-[#c9c5bd]" style={{ borderStyle: 'outset' }}>Cerrar</button>
+            </div>
+            <div className="overflow-auto" style={{ maxWidth: '80vw', maxHeight: '75vh' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={expandedImage} alt="Diseño" className="object-contain max-w-full max-h-[70vh] mx-auto" />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
