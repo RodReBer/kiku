@@ -22,7 +22,7 @@ interface FinderProps {
 export default function Finder({ onFileClick, onFolderClick, initialCategory = "all" }: FinderProps) {
   const { projects, loading } = useData()
   const [searchTerm, setSearchTerm] = useState("")
-  const [viewMode, setViewMode] = useState<"grid" | "list">("list")
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [selectedCategory, setSelectedCategory] = useState<"all" | "design" | "photography" | "general">(initialCategory)
 
   // Convertir proyectos a FileItems (solo los activos)
@@ -146,55 +146,137 @@ export default function Finder({ onFileClick, onFolderClick, initialCategory = "
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-auto p-3 md:p-4">
-        {filteredItems.length === 0 ? (
-          <div className="text-center text-gray-500 mt-8">
-            <FileText size={48} className="mx-auto mb-4 opacity-50" />
-            <p>No se encontraron archivos</p>
-            {searchTerm && <p className="text-sm mt-2">Intenta con otro término de búsqueda</p>}
-            {!searchTerm && selectedCategory !== "all" && (
-              <p className="text-sm mt-2">No hay proyectos activos en esta categoría</p>
-            )}
-            {!searchTerm && selectedCategory === "all" && fileItems.length === 0 && (
-              <p className="text-sm mt-2">No hay proyectos activos disponibles</p>
-            )}
-          </div>
-        ) : viewMode === "grid" ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
-            {filteredItems.map((item) => (
-              <div
-                key={item.id}
-                className="flex flex-col items-center p-3 md:p-4 bg-white rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-sm cursor-pointer transition-all"
-                onClick={() => handleItemClick(item)}
-              >
-                <div className="mb-2">{getItemIcon(item)}</div>
-                <span className="text-xs md:text-sm text-center text-gray-700 font-medium truncate w-full">
-                  {item.name}
-                </span>
-                <span className="text-xs text-gray-500 mt-1 capitalize">{item.category}</span>
+      {/* Content with Windows 2000-style sidebar */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Sidebar (hidden on small screens to avoid clutter) */}
+        <aside className="hidden md:block w-60 shrink-0 bg-[#d4d0c8] border-r-2 border-gray-400" style={{ borderRightStyle: "outset" }}>
+          <div className="h-full p-2">
+            {/* Inner panel with inset look */}
+            <div className="h-full bg-[#e4e0d8] border-2 border-gray-400" style={{ borderStyle: "inset" }}>
+              <div className="px-3 py-2 bg-gradient-to-b from-[#3a6ea5] to-[#2f5d8c] text-white text-sm font-semibold">
+                Tareas de archivo
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-1">
-            {filteredItems.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center gap-3 p-2 md:p-3 bg-white rounded border border-gray-200 hover:border-gray-300 hover:shadow-sm cursor-pointer transition-all"
-                onClick={() => handleItemClick(item)}
-              >
-                {getItemIcon(item)}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-700 truncate">{item.name}</p>
-                  <p className="text-xs text-gray-500 capitalize">
-                    {item.category} • {item.type}
-                  </p>
+              <div className="p-2 space-y-3 text-sm">
+                <div>
+                  <p className="text-[11px] uppercase tracking-wider text-gray-700 mb-2">Explorar</p>
+                  <nav className="space-y-1">
+                    <button
+                      onClick={() => setSelectedCategory("all")}
+                      className={`w-full flex items-center gap-2 px-2 py-1.5 border-2 ${selectedCategory === "all" ? "bg-white" : "bg-[#dcd8d0] hover:bg-[#d7d3cb]"} border-gray-400 text-left`} 
+                      style={{ borderStyle: selectedCategory === "all" ? "inset" : "outset" }}
+                    >
+                      <Folder size={16} className="text-yellow-700" />
+                      <span>Todos los elementos</span>
+                    </button>
+                    <button
+                      onClick={() => setSelectedCategory("design")}
+                      className={`w-full flex items-center gap-2 px-2 py-1.5 border-2 ${selectedCategory === "design" ? "bg-white" : "bg-[#dcd8d0] hover:bg-[#d7d3cb]"} border-gray-400 text-left`} 
+                      style={{ borderStyle: selectedCategory === "design" ? "inset" : "outset" }}
+                    >
+                      <Folder size={16} className="text-purple-700" />
+                      <span>Diseño</span>
+                    </button>
+                    <button
+                      onClick={() => setSelectedCategory("photography")}
+                      className={`w-full flex items-center gap-2 px-2 py-1.5 border-2 ${selectedCategory === "photography" ? "bg-white" : "bg-[#dcd8d0] hover:bg-[#d7d3cb]"} border-gray-400 text-left`} 
+                      style={{ borderStyle: selectedCategory === "photography" ? "inset" : "outset" }}
+                    >
+                      <ImageIcon size={16} className="text-green-700" />
+                      <span>Fotografía</span>
+                    </button>
+                    <button
+                      onClick={() => setSelectedCategory("general")}
+                      className={`w-full flex items-center gap-2 px-2 py-1.5 border-2 ${selectedCategory === "general" ? "bg-white" : "bg-[#dcd8d0] hover:bg-[#d7d3cb]"} border-gray-400 text-left`} 
+                      style={{ borderStyle: selectedCategory === "general" ? "inset" : "outset" }}
+                    >
+                      <FileText size={16} className="text-blue-700" />
+                      <span>General</span>
+                    </button>
+                  </nav>
+                </div>
+
+                <div>
+                  <p className="text-[11px] uppercase tracking-wider text-gray-700 mb-2">Vista</p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setViewMode("list")}
+                      className={`flex-1 flex items-center justify-center gap-2 px-2 py-1.5 border-2 ${viewMode === "list" ? "bg-white" : "bg-[#dcd8d0] hover:bg-[#d7d3cb]"} border-gray-400`} 
+                      style={{ borderStyle: viewMode === "list" ? "inset" : "outset" }}
+                      title="Lista"
+                    >
+                      <List size={14} />
+                      <span className="text-xs">Lista</span>
+                    </button>
+                    <button
+                      onClick={() => setViewMode("grid")}
+                      className={`flex-1 flex items-center justify-center gap-2 px-2 py-1.5 border-2 ${viewMode === "grid" ? "bg-white" : "bg-[#dcd8d0] hover:bg-[#d7d3cb]"} border-gray-400`} 
+                      style={{ borderStyle: viewMode === "grid" ? "inset" : "outset" }}
+                      title="Iconos"
+                    >
+                      <Grid size={14} />
+                      <span className="text-xs">Iconos</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mt-4 text-[11px] text-gray-600 leading-4 px-1">
+                  Consejo: usa la barra de búsqueda para filtrar rápidamente por nombre.
                 </div>
               </div>
-            ))}
+            </div>
           </div>
-        )}
+        </aside>
+
+        {/* Main content */}
+        <div className="flex-1 overflow-auto p-3 md:p-4">
+          {filteredItems.length === 0 ? (
+            <div className="text-center text-gray-500 mt-8">
+              <FileText size={48} className="mx-auto mb-4 opacity-50" />
+              <p>No se encontraron archivos</p>
+              {searchTerm && <p className="text-sm mt-2">Intenta con otro término de búsqueda</p>}
+              {!searchTerm && selectedCategory !== "all" && (
+                <p className="text-sm mt-2">No hay proyectos activos en esta categoría</p>
+              )}
+              {!searchTerm && selectedCategory === "all" && fileItems.length === 0 && (
+                <p className="text-sm mt-2">No hay proyectos activos disponibles</p>
+              )}
+            </div>
+          ) : viewMode === "grid" ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+              {filteredItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex flex-col items-center p-3 md:p-4 bg-white rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-sm cursor-pointer transition-all"
+                  onClick={() => handleItemClick(item)}
+                >
+                  <div className="mb-2">{getItemIcon(item)}</div>
+                  <span className="text-xs md:text-sm text-center text-gray-700 font-medium truncate w-full">
+                    {item.name}
+                  </span>
+                  <span className="text-xs text-gray-500 mt-1 capitalize">{item.category}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {filteredItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-3 p-2 md:p-3 bg-white rounded border border-gray-200 hover:border-gray-300 hover:shadow-sm cursor-pointer transition-all"
+                  onClick={() => handleItemClick(item)}
+                >
+                  {getItemIcon(item)}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-700 truncate">{item.name}</p>
+                    <p className="text-xs text-gray-500 capitalize">
+                      {item.category} • {item.type}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Footer */}
