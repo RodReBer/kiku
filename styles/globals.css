@@ -72,8 +72,20 @@
   }
   body {
     @apply bg-background text-foreground;
+    cursor: url('/MOUSSE-KIKU.png') 0 0, default;
   }
 }
+
+  /* Forzar el cursor personalizado incluso cuando Tailwind añade clases como cursor-pointer, cursor-move, etc. */
+  @layer utilities {
+    .kiku-cursor, .kiku-cursor * {
+      cursor: url('/MOUSSE-KIKU.png') 4 2, auto !important;
+    }
+    /* Mantener cursores de redimensionado si se desea (comenta si quieres siempre el mismo) */
+    .kiku-cursor .cursor-se-resize, .kiku-cursor .cursor-ew-resize, .kiku-cursor .cursor-ns-resize {
+      cursor: se-resize !important; /* o mantener la imagen si prefieres */
+    }
+  }
 
 /* Pixelated image rendering for retro feel */
 .pixelated {

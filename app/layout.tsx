@@ -5,6 +5,7 @@ import "./globals.css"
 import { DataProvider } from "@/context/data-context"
 import { ensureFirebaseInitialized } from "./firebase-init"
 import { Toaster } from "@/components/ui/toaster"
+import CustomCursor from "@/components/custom-cursor"
 
 // Ensure Firebase is initialized
 ensureFirebaseInitialized();
@@ -24,8 +25,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={inter.className}>
+      <body className={`${inter.className} kiku-cursor`}>
         <DataProvider>
+          <CustomCursor size={36} hotspot="center" />
           {children}
           <Toaster />
         </DataProvider>

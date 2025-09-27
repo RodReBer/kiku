@@ -68,6 +68,15 @@
   }
 }
 
+  /* Forzar el cursor personalizado incluso cuando Tailwind añade clases como cursor-pointer, cursor-move, etc. */
+  @layer utilities {
+  .kiku-cursor, .kiku-cursor * { cursor: inherit; /* será reemplazado runtime por CustomCursor */ }
+    /* Mantener cursores de redimensionado si se desea (comenta si quieres siempre el mismo) */
+    .kiku-cursor .cursor-se-resize, .kiku-cursor .cursor-ew-resize, .kiku-cursor .cursor-ns-resize {
+      cursor: se-resize !important; /* o mantener la imagen si prefieres */
+    }
+  }
+
 /* Estilos retro personalizados */
 .pixelated {
   image-rendering: -moz-crisp-edges;
