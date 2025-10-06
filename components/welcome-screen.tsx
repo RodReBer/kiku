@@ -98,17 +98,11 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
       <div className="md:hidden absolute inset-0 z-10">
         <div className="relative w-full h-full">
           {/* KIKU */}
-          <div className="absolute top-[11%] left-3 flex items-end gap-[10px]">
-            {['/inicio celu/K.svg','/inicio celu/I.svg','/inicio celu/KK.svg','/inicio celu/U.svg'].map((src,i)=>(
-              <img
-                key={src+i}
-                src={src}
-                alt=""
-                className={`h-[28vh] max-h-[250px] w-auto block ${i===1 ? '-ml-[14px]' : ''}`}
-                style={{objectFit:'contain'}}
-                draggable={false}
-              />
-            ))}
+          <div className="absolute top-[11%] left-3 flex items-end gap-[8px]">
+            <img src="/inicio celu/K.svg" alt="K" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
+            <img src="/inicio celu/I.svg" alt="I" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
+            <img src="/inicio celu/KK.svg" alt="K" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
+            <img src="/inicio celu/U.svg" alt="U" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
           </div>
           {/* CLICK (solo decorativo en mobile) */}
           <img
@@ -118,7 +112,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
             draggable={false}
           />
           {/* CREAM + AQUI centrado */}
-          <div className="absolute top-[41%] right-3 flex flex-col items-center gap-0">
+          <div className="absolute top-[40%] right-3 flex flex-col items-center gap-0">
             <div className="flex items-end gap-[10px]">
               {["/inicio celu/C.svg", "/inicio celu/R.svg", "/inicio celu/E.svg", "/inicio celu/A.svg", "/inicio celu/M.svg"].map((src, idx) => (
                 <img key={src+idx} src={src} alt="" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
@@ -129,11 +123,11 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
               alt="Aquí"
               whileTap={{ scale: 0.95 }}
               onClick={onEnterDesktop}
-              className=" h-[11vh] max-h-[95px] w-auto cursor-pointer"
+              className=" -mt-[0.8vh] h-[11vh] max-h-[95px] w-auto cursor-pointer"
             />
           </div>
           {/* Caritas */}
-          <div className="absolute right-8 bottom-[3%] flex gap-4">
+          <div className="absolute right-8 bottom-[5%] flex gap-4">
             {[1,2,3].map(i => (
               <img key={i} src="/inicio/CARITA.svg" alt="Carita" className="h-[8vh] max-h-[70px] w-auto" />
             ))}
