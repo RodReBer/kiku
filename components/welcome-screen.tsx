@@ -98,36 +98,35 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
       {/* Mobile nuevo layout compuesto (bloque estable centrado) */}
       <div className="md:hidden absolute inset-0 z-10 pointer-events-none select-none flex items-center justify-center overflow-hidden">
         {/* Bloque estable */}
-        <div className="relative w-[92vw] max-w-[960px] px-[2.2vw]">
-          <div className="relative flex flex-row items-end gap-[0.9vw] mt-[3vw]">
+        <div className="relative w-[92vw] max-w-[960px] max-h-screen overflow-hidden">
+          <div className="relative flex flex-row items-end gap-[0.8vw] mt-[2vw]">
             {/* CLICK sobre KIKU más abajo y a la derecha */}
             <img
               src="/inicio/CLICK.svg"
               alt="Click"
               draggable={false}
-              className="absolute -top-[2vw] left-[28vw] h-[18vw] w-auto"
+              className="absolute -top-[1.2vw] left-[22vw] h-[12vw] w-auto"
             />
             {/* KIKU con K e I sin separación */}
             <div className="flex flex-row items-end">
-              <img src="/inicio celu/K.svg" alt="" draggable={false} className="h-[29vh] w-auto object-contain block" />
-              <div className="h-[29vh] flex items-end -ml-[1vw]">
-                <img src="/inicio celu/I.svg" alt="" draggable={false} className="h-[28.6vh] w-auto object-contain block" />
-              </div>
-              <img src="/inicio celu/KK.svg" alt="" draggable={false} className="h-[29vh] w-auto object-contain block" />
-              <img src="/inicio celu/U.svg" alt="" draggable={false} className="h-[29vh] w-auto object-contain block" />
+              <img src="/inicio celu/K.svg" alt="" draggable={false} className="h-[24vh] w-auto object-contain block" />
+              <img src="/inicio celu/I.svg" alt="" draggable={false} className="h-[24vh] w-auto -ml-[1vw] object-contain block self-end" />
+              <img src="/inicio celu/KK.svg" alt="" draggable={false} className="h-[24vh] w-auto object-contain block" />
+              <img src="/inicio celu/U.svg" alt="" draggable={false} className="h-[24vh] w-auto object-contain block" />
             </div>
           </div>
           {/* CREAM + AQUI (único bloque) */}
-          <div className="relative w-full flex justify-center mt-[0.8vw] px-[2.2vw]">
-            <div className="relative w-full">
-              <div className="flex flex-row items-end gap-[0.9vw] justify-center">
+          <div className="relative w-full flex justify-end mt-[0.6vw]">
+            {/* CREAM alineado a la derecha; AQUI está centrado respecto al bloque CREAM */}
+            <div className="relative flex flex-col items-center">
+              <div className="flex flex-row items-end gap-[0.8vw]">
                 {["/inicio celu/C.svg", "/inicio celu/R.svg", "/inicio celu/E.svg", "/inicio celu/A.svg", "/inicio celu/M.svg"].map((src, idx) => (
                   <img
                     key={src + idx}
                     src={src}
                     alt=""
                     draggable={false}
-                    className="h-[29vh] w-auto object-contain block"
+                    className="h-[24vh] w-auto object-contain block"
                   />
                 ))}
               </div>
@@ -137,19 +136,19 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
                 draggable={false}
                 onClick={onEnterDesktop}
                 whileTap={{ scale: 0.95 }}
-                className="h-[11vh] w-auto mt-[-2.6vw] mx-auto block cursor-pointer pointer-events-auto"
+                className="h-[10vh] w-auto mt-[-2vw] block cursor-pointer pointer-events-auto"
               />
             </div>
           </div>
           {/* CARITAS abajo a la derecha: tres caritas */}
-          <div className="flex flex-row items-end gap-[1.2vw] w-full justify-end pr-[4.2vw] mt-[0.3vw]">
+          <div className="flex flex-row items-end gap-[1vw] w-full justify-end pr-[4vw] mt-[0.2vw]">
             {[1,2,3].map(i => (
               <img
                 key={i}
                 src="/inicio/CARITA.svg"
                 alt="Caritas"
                 draggable={false}
-                className="h-[3.8vh] w-auto object-contain block"
+                className="h-[3.2vh] w-auto object-contain block"
               />
             ))}
           </div>
