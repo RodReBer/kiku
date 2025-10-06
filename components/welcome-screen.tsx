@@ -147,7 +147,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
   {/* Mobile: layout escalado proporcional fijo (re-ajuste: KIKU arriba izq, CREAM abajo der, CLICK sobre KIKU) */}
       <div className="md:hidden absolute inset-0 z-10 flex items-center justify-center overflow-hidden">
         <div
-          className="relative origin-top-left pointer-events-none select-none"
+          className="relative origin-center pointer-events-none select-none"
           style={{
             width: 430,
             height: 820,
