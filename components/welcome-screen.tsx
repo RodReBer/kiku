@@ -25,6 +25,37 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
       window.removeEventListener('orientationchange', setVh)
     }
   }, [])
+
+  // Escalado controlado del canvas móvil para evitar overflow / scroll y cortar elementos
+  useEffect(() => {
+    const BASE_W = 430
+    const BASE_H = 820
+    const recomputeScale = () => {
+      const vw = window.innerWidth
+      // Usar visualViewport si existe para altura más real (resta barras)
+      const rawVh = window.visualViewport ? window.visualViewport.height : window.innerHeight
+      // Escala mínima entre ancho y alto disponibles
+      let scale = Math.min(vw / BASE_W, rawVh / BASE_H)
+      // Pequeño margen para evitar redondeos que generen 1px de scroll
+      scale = scale * 0.995
+      // Clamp de seguridad
+      if (scale > 1) scale = 1
+      document.documentElement.style.setProperty('--mobile-scale', scale.toString())
+    }
+    recomputeScale()
+    window.addEventListener('resize', recomputeScale)
+    window.addEventListener('orientationchange', recomputeScale)
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', recomputeScale)
+    }
+    return () => {
+      window.removeEventListener('resize', recomputeScale)
+      window.removeEventListener('orientationchange', recomputeScale)
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', recomputeScale)
+      }
+    }
+  }, [])
   return (
     <div
       className="w-full relative overflow-hidden bg-white flex items-center justify-center"
@@ -50,10 +81,10 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
       <div className="flex flex-row items-end gap-7">
         {[
           "/inicio/C.svg",
-          "/inicio/R.svg",
-          "/inicio/E.svg",
-          "/inicio/A.svg",
-          "/inicio/M.svg"
+            "/inicio/R.svg",
+            "/inicio/E.svg",
+            "/inicio/A.svg",
+            "/inicio/M.svg"
         ].map((src, idx) => (
           <img
             key={src + idx}
@@ -120,8 +151,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
           style={{
             width: 430,
             height: 820,
-            transform: 'scale(var(--scale-mobile))',
-            ['--scale-mobile' as any]: 'min(calc(100vw / 430), calc(100vh / 820))'
+            transform: 'scale(var(--mobile-scale,1))'
           }}
         >
           {/* KIKU alineado a la izquierda con padding mínimo */}
@@ -156,7 +186,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
             />
           </div>
           {/* Caritas */}
-          <div className="absolute bottom-[90px] right-[40px] flex flex-row gap-[14px]">
+          <div className="absolute bottom-[60px] right-[40px] flex flex-row gap-[14px]">
             {[1,2,3].map(i => (
               <img key={i} src="/inicio/CARITA.svg" alt="Carita" className="h-[64px] w-auto" draggable={false} />
             ))}
