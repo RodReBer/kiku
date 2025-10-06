@@ -32,15 +32,20 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
     const BASE_H = 820
     const recomputeScale = () => {
       const vw = window.innerWidth
-      // Usar visualViewport si existe para altura más real (resta barras)
       const rawVh = window.visualViewport ? window.visualViewport.height : window.innerHeight
-      // Escala mínima entre ancho y alto disponibles
       let scale = Math.min(vw / BASE_W, rawVh / BASE_H)
-      // Pequeño margen para evitar redondeos que generen 1px de scroll
       scale = scale * 0.995
-      // Clamp de seguridad
       if (scale > 1) scale = 1
+      // Limitar el mínimo a 0.9 para que las letras no se achiquen demasiado
+      if (scale < 0.9) scale = 0.9
       document.documentElement.style.setProperty('--mobile-scale', scale.toString())
+      // Si la escala es menor a 1, reducir top/bottom de los bloques para evitar corte
+      const kikuTop = scale < 1 ? 140 : 150
+      const creamTop = scale < 1 ? 350 : 365
+      const caritasBottom = scale < 1 ? 40 : 60
+      document.documentElement.style.setProperty('--kiku-top', `${kikuTop}px`)
+      document.documentElement.style.setProperty('--cream-top', `${creamTop}px`)
+      document.documentElement.style.setProperty('--caritas-bottom', `${caritasBottom}px`)
     }
     recomputeScale()
     window.addEventListener('resize', recomputeScale)
@@ -155,7 +160,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
           }}
         >
           {/* KIKU alineado a la izquierda con padding mínimo */}
-          <div className="absolute top-[150px] left-[17px] flex flex-row items-end gap-[10px]">
+          <div className="absolute left-[17px] flex flex-row items-end gap-[10px]" style={{ top: 'var(--kiku-top, 150px)' }}>
             <img src="/inicio celu/K.svg" alt="K" className="h-[220px] w-auto" />
             <img src="/inicio celu/I.svg" alt="I" className="h-[220px] w-auto -ml-[17px]" />
             <img src="/inicio celu/KK.svg" alt="K" className="h-[220px] w-auto" />
@@ -169,7 +174,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
             draggable={false}
           />
           {/* CREAM alineado a la derecha con padding mínimo */}
-          <div className="absolute top-[365px] right-[17px] flex flex-col items-end">
+          <div className="absolute right-[17px] flex flex-col items-end" style={{ top: 'var(--cream-top, 365px)' }}>
             <div className="flex flex-row items-end gap-[12px]">
               {["/inicio celu/C.svg", "/inicio celu/R.svg", "/inicio celu/E.svg", "/inicio celu/A.svg", "/inicio celu/M.svg"].map((src, idx) => (
                 <img key={src + idx} src={src} alt="" className="h-[220px] w-auto" draggable={false} />
@@ -186,7 +191,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
             />
           </div>
           {/* Caritas */}
-          <div className="absolute bottom-[60px] right-[40px] flex flex-row gap-[14px]">
+          <div className="absolute right-[40px] flex flex-row gap-[14px]" style={{ bottom: 'var(--caritas-bottom, 60px)' }}>
             {[1,2,3].map(i => (
               <img key={i} src="/inicio/CARITA.svg" alt="Carita" className="h-[64px] w-auto" draggable={false} />
             ))}
