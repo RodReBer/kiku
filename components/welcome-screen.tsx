@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 interface WelcomeScreenProps {
   onEnterDesktop: () => void
@@ -10,8 +10,26 @@ interface WelcomeScreenProps {
 
 export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
   const [clickTurns, setClickTurns] = useState(0)
+
+  // Ajuste de altura real del viewport en mobile para evitar scroll por barras de navegador
+  useEffect(() => {
+    const setVh = () => {
+      const vh = window.innerHeight * 0.01
+      document.documentElement.style.setProperty('--app-vh', `${vh}px`)
+    }
+    setVh()
+    window.addEventListener('resize', setVh)
+    window.addEventListener('orientationchange', setVh)
+    return () => {
+      window.removeEventListener('resize', setVh)
+      window.removeEventListener('orientationchange', setVh)
+    }
+  }, [])
   return (
-    <div className="h-screen w-full relative overflow-hidden bg-white flex items-center justify-center">
+    <div
+      className="w-full relative overflow-hidden bg-white flex items-center justify-center"
+      style={{ height: 'calc(var(--app-vh, 1vh) * 100)' }}
+    >
       {/* Fondo de pantalla: letras SVG componiendo KIKUCREAM (responsive) */}
   <div className="absolute inset-0 z-0 flex items-center justify-between pointer-events-none">
     {/* Desktop/Tablet: una sola fila KIKUCREAM ocupando todo el ancho */}
