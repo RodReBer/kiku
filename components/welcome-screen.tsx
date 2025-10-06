@@ -118,7 +118,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
             draggable={false}
           />
           {/* CREAM + AQUI centrado */}
-          <div className="absolute top-[39%] right-3 flex flex-col items-center gap-0">
+          <div className="absolute top-[44%] right-3 flex flex-col items-center gap-0">
             <div className="flex items-end gap-[10px]">
               {["/inicio celu/C.svg", "/inicio celu/R.svg", "/inicio celu/E.svg", "/inicio celu/A.svg", "/inicio celu/M.svg"].map((src, idx) => (
                 <img key={src+idx} src={src} alt="" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
@@ -129,11 +129,11 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
               alt="Aquí"
               whileTap={{ scale: 0.95 }}
               onClick={onEnterDesktop}
-              className="mt-[1vh] h-[11vh] max-h-[95px] w-auto cursor-pointer"
+              className="mt-[0.25vh] h-[11vh] max-h-[95px] w-auto cursor-pointer"
             />
           </div>
           {/* Caritas */}
-          <div className="absolute right-8 bottom-[10%] flex gap-4">
+          <div className="absolute right-8 bottom-[6%] flex gap-4">
             {[1,2,3].map(i => (
               <img key={i} src="/inicio/CARITA.svg" alt="Carita" className="h-[8vh] max-h-[70px] w-auto" />
             ))}
