@@ -100,31 +100,32 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
           {/* KIKU */}
           <div className="absolute top-[15%] left-3 flex items-end gap-[10px]">
             <img src="/inicio celu/K.svg" alt="K" className="h-[26vh] max-h-[230px] w-auto" />
-            <img src="/inicio celu/I.svg" alt="I" className="h-[26vh] max-h-[230px] w-auto -ml-[14px]" />
+            <img src="/inicio celu/I.svg" alt="I" className="h-[26.2vh] max-h-[230px] w-auto -ml-[14px]" />
             <img src="/inicio celu/KK.svg" alt="K" className="h-[26vh] max-h-[230px] w-auto" />
             <img src="/inicio celu/U.svg" alt="U" className="h-[26vh] max-h-[230px] w-auto" />
           </div>
-          {/* CLICK */}
+          {/* CLICK (solo decorativo en mobile) */}
           <img
             src="/inicio/CLICK.svg"
             alt="Click"
-            className="absolute top-[11%] left-[24%] h-[10vh] max-h-[90px] w-auto pointer-events-none"
+            className="absolute top-[13%] left-[26%] h-[9.5vh] max-h-[90px] w-auto pointer-events-none"
             draggable={false}
           />
-          {/* CREAM */}
-          <div className="absolute top-[40%] right-3 flex items-end gap-[10px]">
-            {["/inicio celu/C.svg", "/inicio celu/R.svg", "/inicio celu/E.svg", "/inicio celu/A.svg", "/inicio celu/M.svg"].map((src, idx) => (
-              <img key={src+idx} src={src} alt="" className="h-[26vh] max-h-[230px] w-auto" />
-            ))}
+          {/* CREAM + AQUI centrado */}
+          <div className="absolute top-[40%] right-3 flex flex-col items-center gap-0">
+            <div className="flex items-end gap-[10px]">
+              {["/inicio celu/C.svg", "/inicio celu/R.svg", "/inicio celu/E.svg", "/inicio celu/A.svg", "/inicio celu/M.svg"].map((src, idx) => (
+                <img key={src+idx} src={src} alt="" className="h-[26vh] max-h-[230px] w-auto" />
+              ))}
+            </div>
+            <motion.img
+              src="/inicio/AQUI.svg"
+              alt="Aquí"
+              whileTap={{ scale: 0.95 }}
+              onClick={onEnterDesktop}
+              className="mt-[3vh] h-[11vh] max-h-[95px] w-auto cursor-pointer"
+            />
           </div>
-          {/* AQUI */}
-          <motion.img
-            src="/inicio/AQUI.svg"
-            alt="Aquí"
-            whileTap={{ scale: 0.95 }}
-            onClick={onEnterDesktop}
-            className="absolute top-[66%] right-[14%] h-[11vh] max-h-[95px] w-auto cursor-pointer"
-          />
           {/* Caritas */}
           <div className="absolute right-8 bottom-[12%] flex gap-4">
             {[1,2,3].map(i => (
