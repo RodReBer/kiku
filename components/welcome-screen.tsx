@@ -95,59 +95,60 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
         </div>
       </div>
 
-      {/* Mobile nuevo layout compuesto */}
-      <div className="md:hidden absolute inset-0 z-10 pointer-events-none select-none">
-        {/* KIKU + CLICK */}
-        <div className="relative w-full">
-          <div className="relative flex flex-row items-end gap-[1.2vw] mt-[24vw] ml-[2vw] mr-[10vw]">
+      {/* Mobile nuevo layout compuesto (bloque estable centrado) */}
+      <div className="md:hidden absolute inset-0 z-10 pointer-events-none select-none flex items-center justify-center overflow-hidden">
+        {/* Bloque estable */}
+        <div className="relative w-[94vw] max-w-[1000px]">
+          <div className="relative flex flex-row items-end gap-[1.2vw] mt-[6vw] mr-[6vw]">
             {/* CLICK sobre KIKU más abajo y a la derecha */}
             <img
               src="/inicio/CLICK.svg"
               alt="Click"
               draggable={false}
-              className="absolute -top-[1vw] left-[26vw] h-[19vw] w-auto"
+              className="absolute -top-[2vw] left-[28vw] h-[18vw] w-auto"
             />
             {/* KIKU con K e I sin separación */}
             <div className="flex flex-row items-end">
-              <img src="/inicio celu/K.svg" alt="" draggable={false} className="h-[30vh] w-auto" />
-              <img src="/inicio celu/I.svg" alt="" draggable={false} className="h-[30vh] w-auto -ml-[1.5vw]" />
+              <img src="/inicio celu/K.svg" alt="" draggable={false} className="h-[30vh] w-auto object-contain block" />
+              <img src="/inicio celu/I.svg" alt="" draggable={false} className="h-[30vh] w-auto -ml-[1.5vw] object-contain block" />
             </div>
             {/* resto de K U con gap mínimo */}
-            <img src="/inicio celu/KK.svg" alt="" draggable={false} className="h-[30vh] w-auto" />
-            <img src="/inicio celu/U.svg" alt="" draggable={false} className="h-[30vh] w-auto" />
+            <img src="/inicio celu/KK.svg" alt="" draggable={false} className="h-[30vh] w-auto object-contain block" />
+            <img src="/inicio celu/U.svg" alt="" draggable={false} className="h-[30vh] w-auto object-contain block" />
           </div>
-          {/* CREAM desplazado hacia la derecha */}
-          <div className="relative flex flex-row items-end gap-[1.2vw] justify-end w-full pr-[2vw]">
-            {["/inicio celu/C.svg", "/inicio celu/R.svg", "/inicio celu/E.svg", "/inicio celu/A.svg", "/inicio celu/M.svg"].map((src, idx) => (
-              <img
-                key={src + idx}
-                src={src}
-                alt=""
+          {/* CREAM + AQUI (único bloque) */}
+          <div className="relative w-full flex justify-end">
+            <div className="relative">
+              <div className="flex flex-row items-end gap-[1.2vw]">
+                {["/inicio celu/C.svg", "/inicio celu/R.svg", "/inicio celu/E.svg", "/inicio celu/A.svg", "/inicio celu/M.svg"].map((src, idx) => (
+                  <img
+                    key={src + idx}
+                    src={src}
+                    alt=""
+                    draggable={false}
+                    className="h-[30vh] w-auto object-contain block"
+                  />
+                ))}
+              </div>
+              <motion.img
+                src="/inicio/AQUI.svg"
+                alt="Aquí"
                 draggable={false}
-                className="h-[30vh] w-auto"
+                onClick={onEnterDesktop}
+                whileTap={{ scale: 0.95 }}
+                className="h-[12vh] w-auto mt-[-4vw] mx-auto block cursor-pointer pointer-events-auto"
               />
-            ))}
-          </div>
-          {/* AQUI superpuesto debajo de CREAM */}
-          <div className="relative w-full">
-            <motion.img
-              src="/inicio/AQUI.svg"
-              alt="Aquí"
-              draggable={false}
-              onClick={onEnterDesktop}
-              whileTap={{ scale: 0.95 }}
-              className="h-[13vh] w-auto mt-[-5vw] mx-auto cursor-pointer pointer-events-auto"
-            />
+            </div>
           </div>
           {/* CARITAS abajo a la derecha: tres caritas */}
-          <div className="flex flex-row items-end gap-[2vw] w-full justify-end pr-[6vw] mt-[5vw]">
+          <div className="flex flex-row items-end gap-[1.6vw] w-full justify-end pr-[6vw] mt-[1vw]">
             {[1,2,3].map(i => (
               <img
                 key={i}
                 src="/inicio/CARITA.svg"
                 alt="Caritas"
                 draggable={false}
-                className="h-[5vh] w-auto"
+                className="h-[4.5vh] w-auto object-contain block"
               />
             ))}
           </div>
