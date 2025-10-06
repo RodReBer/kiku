@@ -100,7 +100,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
           {/* KIKU */}
           <div className="absolute top-[11%] left-3 flex items-end gap-[8px]">
             <img src="/inicio celu/K.svg" alt="K" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
-            <img src="/inicio celu/I.svg" alt="I" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
+            <img src="/inicio celu/I.svg" alt="I" className="h-[28vh] max-h-[250px] w-auto block -ml-[14px]" draggable={false} />
             <img src="/inicio celu/KK.svg" alt="K" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
             <img src="/inicio celu/U.svg" alt="U" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
           </div>
@@ -108,11 +108,11 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
           <img
             src="/inicio/CLICK.svg"
             alt="Click"
-            className="absolute top-[8%] left-[22%] h-[9.5vh] max-h-[90px] w-auto pointer-events-none"
+            className="absolute top-[9%] left-[27%] h-[9.5vh] max-h-[90px] w-auto pointer-events-none"
             draggable={false}
           />
           {/* CREAM + AQUI centrado */}
-          <div className="absolute top-[40%] right-3 flex flex-col items-center gap-0">
+          <div className="absolute top-[43%] right-3 flex flex-col items-center gap-0">
             <div className="flex items-end gap-[10px]">
               {["/inicio celu/C.svg", "/inicio celu/R.svg", "/inicio celu/E.svg", "/inicio celu/A.svg", "/inicio celu/M.svg"].map((src, idx) => (
                 <img key={src+idx} src={src} alt="" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
@@ -123,7 +123,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
               alt="Aquí"
               whileTap={{ scale: 0.95 }}
               onClick={onEnterDesktop}
-              className=" -mt-[0.8vh] h-[11vh] max-h-[95px] w-auto cursor-pointer"
+              className=" -mt-[2vh] h-[11vh] max-h-[95px] w-auto cursor-pointer"
             />
           </div>
           {/* Caritas */}
