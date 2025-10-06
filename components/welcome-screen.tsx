@@ -99,23 +99,23 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
         <div className="relative w-full h-full">
           {/* KIKU */}
           <div className="absolute top-[15%] left-3 flex items-end gap-[10px]">
-            <img src="/inicio celu/K.svg" alt="K" className="h-[26vh] max-h-[230px] w-auto" />
-            <img src="/inicio celu/I.svg" alt="I" className="h-[27vh] max-h-[235px] w-auto -ml-[14px]" />
-            <img src="/inicio celu/KK.svg" alt="K" className="h-[26vh] max-h-[230px] w-auto" />
-            <img src="/inicio celu/U.svg" alt="U" className="h-[26vh] max-h-[230px] w-auto" />
+            <img src="/inicio celu/K.svg" alt="K" className="h-[28vh] max-h-[250px] w-auto" />
+            <img src="/inicio celu/I.svg" alt="I" className="h-[28vh] max-h-[250px] w-auto -ml-[14px]" />
+            <img src="/inicio celu/KK.svg" alt="K" className="h-[28vh] max-h-[250px] w-auto" />
+            <img src="/inicio celu/U.svg" alt="U" className="h-[28vh] max-h-[250px] w-auto" />
           </div>
           {/* CLICK (solo decorativo en mobile) */}
           <img
             src="/inicio/CLICK.svg"
             alt="Click"
-            className="absolute top-[13%] left-[26%] h-[9.5vh] max-h-[90px] w-auto pointer-events-none"
+            className="absolute top-[13%] left-[22%] h-[9.5vh] max-h-[90px] w-auto pointer-events-none"
             draggable={false}
           />
           {/* CREAM + AQUI centrado */}
           <div className="absolute top-[45%] right-3 flex flex-col items-center gap-0">
             <div className="flex items-end gap-[10px]">
               {["/inicio celu/C.svg", "/inicio celu/R.svg", "/inicio celu/E.svg", "/inicio celu/A.svg", "/inicio celu/M.svg"].map((src, idx) => (
-                <img key={src+idx} src={src} alt="" className="h-[26vh] max-h-[230px] w-auto" />
+                <img key={src+idx} src={src} alt="" className="h-[28vh] max-h-[250px] w-auto" />
               ))}
             </div>
             <motion.img
@@ -123,7 +123,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
               alt="Aquí"
               whileTap={{ scale: 0.95 }}
               onClick={onEnterDesktop}
-              className="mt-[3vh] h-[11vh] max-h-[95px] w-auto cursor-pointer"
+              className="mt-[2vh] h-[11vh] max-h-[95px] w-auto cursor-pointer"
             />
           </div>
           {/* Caritas */}
