@@ -100,7 +100,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
           {/* KIKU */}
           <div className="absolute top-[15%] left-3 flex items-end gap-[10px]">
             <img src="/inicio celu/K.svg" alt="K" className="h-[26vh] max-h-[230px] w-auto" />
-            <img src="/inicio celu/I.svg" alt="I" className="h-[26.2vh] max-h-[230px] w-auto -ml-[14px]" />
+            <img src="/inicio celu/I.svg" alt="I" className="h-[27vh] max-h-[235px] w-auto -ml-[14px]" />
             <img src="/inicio celu/KK.svg" alt="K" className="h-[26vh] max-h-[230px] w-auto" />
             <img src="/inicio celu/U.svg" alt="U" className="h-[26vh] max-h-[230px] w-auto" />
           </div>
@@ -112,7 +112,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
             draggable={false}
           />
           {/* CREAM + AQUI centrado */}
-          <div className="absolute top-[40%] right-3 flex flex-col items-center gap-0">
+          <div className="absolute top-[45%] right-3 flex flex-col items-center gap-0">
             <div className="flex items-end gap-[10px]">
               {["/inicio celu/C.svg", "/inicio celu/R.svg", "/inicio celu/E.svg", "/inicio celu/A.svg", "/inicio celu/M.svg"].map((src, idx) => (
                 <img key={src+idx} src={src} alt="" className="h-[26vh] max-h-[230px] w-auto" />
@@ -127,7 +127,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
             />
           </div>
           {/* Caritas */}
-          <div className="absolute right-8 bottom-[12%] flex gap-4">
+          <div className="absolute right-8 bottom-[8%] flex gap-4">
             {[1,2,3].map(i => (
               <img key={i} src="/inicio/CARITA.svg" alt="Carita" className="h-[8vh] max-h-[70px] w-auto" />
             ))}
