@@ -100,7 +100,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
           {/* KIKU */}
           <div className="absolute top-[11%] left-3 flex items-end gap-[8px]">
             <img src="/inicio celu/K.svg" alt="K" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
-            <img src="/inicio celu/I.svg" alt="I" className="h-[28vh] max-h-[250px] w-auto block -ml-[14px]" draggable={false} />
+            <img src="/inicio celu/I.svg" alt="I" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
             <img src="/inicio celu/KK.svg" alt="K" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
             <img src="/inicio celu/U.svg" alt="U" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
           </div>
