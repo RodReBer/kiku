@@ -94,12 +94,12 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
         </div>
       </div>
 
-      {/* Mobile: single SVG background composition + AQUI button */}
+      {/* Mobile: full viewport (no crop) + larger composition */}
       <div className="md:hidden absolute inset-0 z-10">
         <img
           src="/inicio celu/CELULAR INICIO.svg"
           alt="KIKUCREAM mobile composition"
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+          className="absolute inset-0 w-full h-full object-contain pt-[2vh] pointer-events-none select-none"
           draggable={false}
           aria-hidden="true"
         />
@@ -107,8 +107,8 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
           src="/inicio/AQUI.svg"
           alt="Aquí"
           whileTap={{ scale: 0.95 }}
-          onClick={onEnterDesktop}
-          className="absolute left-1/2 -translate-x-1/2 top-[72%] h-[11vh] max-h-[95px] w-auto cursor-pointer"
+            onClick={onEnterDesktop}
+          className="absolute left-1/2 -translate-x-1/2 top-[73%] h-[11vh] max-h-[95px] w-auto cursor-pointer"
         />
       </div>
     </div>
