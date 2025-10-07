@@ -102,7 +102,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
             {['/inicio celu/K.svg','/inicio celu/I.svg','/inicio celu/KK.svg','/inicio celu/U.svg'].map((src,idx)=> {
               const isI = src.includes('/I.svg')
               return (
-                <div key={src+idx} className="h-[28vh] max-h-[250px] flex items-end">
+                <div key={src+idx} className="h-[28vh] max-h-[250px] flex items-end border border-red-400">
                   <img
                     src={src}
                     alt=""
