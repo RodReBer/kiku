@@ -99,10 +99,16 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
         <div className="relative w-full h-full">
           {/* KIKU */}
           <div className="absolute top-[11%] left-3 flex items-end gap-[8px]">
-            <img src="/inicio celu/K.svg" alt="K" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
-            <img src="/inicio celu/I.svg" alt="I" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
-            <img src="/inicio celu/KK.svg" alt="K" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
-            <img src="/inicio celu/U.svg" alt="U" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
+            {['/inicio celu/K.svg','/inicio celu/I.svg','/inicio celu/KK.svg','/inicio celu/U.svg'].map((src,idx)=> (
+              <div key={src+idx} className="h-[28vh] max-h-[250px] flex items-end">
+                <img
+                  src={src}
+                  alt=""
+                  className="h-full w-auto block object-contain"
+                  draggable={false}
+                />
+              </div>
+            ))}
           </div>
           {/* CLICK (solo decorativo en mobile) */}
           <img
@@ -113,9 +119,16 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
           />
           {/* CREAM + AQUI centrado */}
           <div className="absolute top-[43%] right-3 flex flex-col items-center gap-0">
-            <div className="flex items-end gap-[10px]">
-              {["/inicio celu/C.svg", "/inicio celu/R.svg", "/inicio celu/E.svg", "/inicio celu/A.svg", "/inicio celu/M.svg"].map((src, idx) => (
-                <img key={src+idx} src={src} alt="" className="h-[28vh] max-h-[250px] w-auto block" draggable={false} />
+            <div className="flex items-end gap-[8px]">
+              {['/inicio celu/C.svg','/inicio celu/R.svg','/inicio celu/E.svg','/inicio celu/A.svg','/inicio celu/M.svg'].map((src,idx)=>(
+                <div key={src+idx} className="h-[28vh] max-h-[250px] flex items-end">
+                  <img
+                    src={src}
+                    alt=""
+                    className="h-full w-auto block object-contain"
+                    draggable={false}
+                  />
+                </div>
               ))}
             </div>
             <motion.img
