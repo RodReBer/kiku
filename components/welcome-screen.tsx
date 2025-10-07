@@ -99,7 +99,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
         <img
           src="/inicio celu/CELULAR INICIO.svg"
           alt="KIKUCREAM mobile composition"
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+          className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none"
           draggable={false}
           aria-hidden="true"
         />
