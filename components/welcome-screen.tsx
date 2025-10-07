@@ -10,7 +10,7 @@ interface WelcomeScreenProps {
 export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
   const [clickTurns, setClickTurns] = useState(0)
   return (
-    <div className="w-full h-[100dvh] relative overflow-hidden bg-white flex items-center justify-center">
+    <div className="fixed inset-0 w-full h-dvh overflow-hidden overscroll-none bg-white flex items-center justify-center select-none">
       {/* Fondo de pantalla: letras SVG componiendo KIKUCREAM (responsive) */}
   <div className="absolute inset-0 z-0 flex items-center justify-between pointer-events-none">
     {/* Desktop/Tablet: una sola fila KIKUCREAM ocupando todo el ancho */}
@@ -99,16 +99,19 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
         <div className="relative w-full h-full">
           {/* KIKU */}
           <div className="absolute top-[11%] left-3 flex items-end gap-[8px]">
-            {['/inicio celu/K.svg','/inicio celu/I.svg','/inicio celu/KK.svg','/inicio celu/U.svg'].map((src,idx)=> (
-              <div key={src+idx} className="h-[28vh] max-h-[250px] border border-red-500">
-                <img
-                  src={src}
-                  alt=""
-                  className="h-full w-auto "
-                  draggable={false}
-                />
-              </div>
-            ))}
+            {['/inicio celu/K.svg','/inicio celu/I.svg','/inicio celu/KK.svg','/inicio celu/U.svg'].map((src,idx)=> {
+              const isI = src.includes('/I.svg')
+              return (
+                <div key={src+idx} className="h-[28vh] max-h-[250px] flex items-end">
+                  <img
+                    src={src}
+                    alt=""
+                    className={"h-full w-auto block object-contain " + (isI ? "scale-[1.035] translate-y-[0.3vh]" : "")}
+                    draggable={false}
+                  />
+                </div>
+              )
+            })}
           </div>
           {/* CLICK (solo decorativo en mobile) */}
           <img
