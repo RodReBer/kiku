@@ -106,7 +106,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
                   <img
                     src={src}
                     alt=""
-                    className={"h-full w-auto block object-contain " + (isI ? "scale-[1.035] " : "")}
+                    className={"h-full w-auto block object-contain " + (isI ? "scale-[1.04] " : "")}
                     draggable={false}
                   />
                 </div>
