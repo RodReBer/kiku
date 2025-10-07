@@ -104,8 +104,8 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
                   <img src="/inicio celu/K.svg" alt="" draggable={false} className="h-full w-auto block object-contain" />
                 </div>
                 {/* I (pegada a la K) */}
-                <div className="h-[28vh] max-h-[250px] flex items-end -ml-[4px]">
-                  <img src="/inicio celu/I.svg" alt="" draggable={false} className="h-full w-auto block object-contain scale-[1.035] translate-y-[0.3vh]" />
+                <div className="h-[28vh] max-h-[250px] flex items-end -ml-[9px]">
+                  <img src="/inicio celu/I.svg" alt="" draggable={false} className="h-full w-auto block object-contain" />
                 </div>
                 {/* K (segunda) con separación hacia la I */}
                 <div className="h-[28vh] max-h-[250px] flex items-end ml-[8px]">
