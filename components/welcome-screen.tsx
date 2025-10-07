@@ -98,21 +98,24 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
       <div className="md:hidden absolute inset-0 z-10">
         <div className="relative w-full h-full">
           {/* KIKU */}
-          <div className="absolute top-[11%] left-3 flex items-end gap-[8px]">
-            {['/inicio celu/K.svg','/inicio celu/I.svg','/inicio celu/KK.svg','/inicio celu/U.svg'].map((src,idx)=> {
-              const isI = src.includes('/I.svg')
-              return (
-                <div key={src+idx} className="h-[28vh] max-h-[250px] flex items-end border border-red-400">
-                  <img
-                    src={src}
-                    alt=""
-                    className={"h-full w-auto block object-contain " + (isI ? "scale-[1.03] translate-y-[-0.20vh]" : "")}
-                    draggable={false}
-                  />
+              <div className="absolute top-[11%] left-3 flex items-end gap-0">
+                {/* K */}
+                <div className="h-[28vh] max-h-[250px] flex items-end">
+                  <img src="/inicio celu/K.svg" alt="" draggable={false} className="h-full w-auto block object-contain" />
                 </div>
-              )
-            })}
-          </div>
+                {/* I (pegada a la K) */}
+                <div className="h-[28vh] max-h-[250px] flex items-end -ml-[4px]">
+                  <img src="/inicio celu/I.svg" alt="" draggable={false} className="h-full w-auto block object-contain scale-[1.035] translate-y-[0.3vh]" />
+                </div>
+                {/* K (segunda) con separación hacia la I */}
+                <div className="h-[28vh] max-h-[250px] flex items-end ml-[8px]">
+                  <img src="/inicio celu/KK.svg" alt="" draggable={false} className="h-full w-auto block object-contain" />
+                </div>
+                {/* U */}
+                <div className="h-[28vh] max-h-[250px] flex items-end ml-[8px]">
+                  <img src="/inicio celu/U.svg" alt="" draggable={false} className="h-full w-auto block object-contain" />
+                </div>
+              </div>
           {/* CLICK (solo decorativo en mobile) */}
           <img
             src="/inicio/CLICK.svg"
