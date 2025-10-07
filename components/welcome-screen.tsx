@@ -94,64 +94,22 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
         </div>
       </div>
 
-  {/* Mobile: layout simple sin JS dinámico */}
+      {/* Mobile: single SVG background composition + AQUI button */}
       <div className="md:hidden absolute inset-0 z-10">
-        <div className="relative w-full h-full">
-          {/* KIKU */}
-              <div className="absolute top-[11%] left-3 flex items-end gap-0">
-                {/* K */}
-                <div className="h-[28vh] max-h-[250px] flex items-end">
-                  <img src="/inicio celu/K.svg" alt="" draggable={false} className="h-full w-auto block object-contain" />
-                </div>
-                {/* I (pegada a la K) */}
-                <div className="h-[28vh] max-h-[250px] flex items-end -ml-[9px]">
-                  <img src="/inicio celu/I.svg" alt="" draggable={false} className="h-full w-auto block object-contain" />
-                </div>
-                {/* K (segunda) con separación hacia la I */}
-                <div className="h-[28vh] max-h-[250px] flex items-end ml-[8px]">
-                  <img src="/inicio celu/KK.svg" alt="" draggable={false} className="h-full w-auto block object-contain" />
-                </div>
-                {/* U */}
-                <div className="h-[28vh] max-h-[250px] flex items-end ml-[8px]">
-                  <img src="/inicio celu/U.svg" alt="" draggable={false} className="h-full w-auto block object-contain" />
-                </div>
-              </div>
-          {/* CLICK (solo decorativo en mobile) */}
-          <img
-            src="/inicio/CLICK.svg"
-            alt="Click"
-            className="absolute top-[9%] left-[27%] h-[9.5vh] max-h-[90px] w-auto pointer-events-none"
-            draggable={false}
-          />
-          {/* CREAM + AQUI centrado */}
-          <div className="absolute top-[43%] right-3 flex flex-col items-center gap-0">
-            <div className="flex items-end gap-[8px]">
-              {['/inicio celu/C.svg','/inicio celu/R.svg','/inicio celu/E.svg','/inicio celu/A.svg','/inicio celu/M.svg'].map((src,idx)=>(
-                <div key={src+idx} className="h-[28vh] max-h-[250px] flex items-end">
-                  <img
-                    src={src}
-                    alt=""
-                    className="h-full w-auto block object-contain"
-                    draggable={false}
-                  />
-                </div>
-              ))}
-            </div>
-            <motion.img
-              src="/inicio/AQUI.svg"
-              alt="Aquí"
-              whileTap={{ scale: 0.95 }}
-              onClick={onEnterDesktop}
-              className=" -mt-[2vh] h-[11vh] max-h-[95px] w-auto cursor-pointer"
-            />
-          </div>
-          {/* Caritas */}
-          <div className="absolute right-8 bottom-[5%] flex gap-4">
-            {[1,2,3].map(i => (
-              <img key={i} src="/inicio/CARITA.svg" alt="Carita" className="h-[8vh] max-h-[70px] w-auto" />
-            ))}
-          </div>
-        </div>
+        <img
+          src="/inicio celu/CELULAR INICIO.svg"
+          alt="KIKUCREAM mobile composition"
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+          draggable={false}
+          aria-hidden="true"
+        />
+        <motion.img
+          src="/inicio/AQUI.svg"
+          alt="Aquí"
+          whileTap={{ scale: 0.95 }}
+          onClick={onEnterDesktop}
+          className="absolute left-1/2 -translate-x-1/2 top-[72%] h-[11vh] max-h-[95px] w-auto cursor-pointer"
+        />
       </div>
     </div>
   )
