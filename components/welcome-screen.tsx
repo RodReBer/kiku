@@ -104,7 +104,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
                 <img
                   src={src}
                   alt=""
-                  className="h-full w-auto block object-contain border border-blue-500"
+                  className="h-full w-auto block object-cover"
                   draggable={false}
                 />
               </div>
