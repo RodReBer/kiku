@@ -100,7 +100,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
           {/* KIKU */}
           <div className="absolute top-[11%] left-3 flex items-end gap-[8px]">
             {['/inicio celu/K.svg','/inicio celu/I.svg','/inicio celu/KK.svg','/inicio celu/U.svg'].map((src,idx)=> (
-              <div key={src+idx} className="h-[28vh] max-h-[250px] flex items-end">
+              <div key={src+idx} className="h-[28vh] max-h-[250px] flex items-end border border-red-500">
                 <img
                   src={src}
                   alt=""
