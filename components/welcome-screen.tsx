@@ -94,22 +94,29 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
         </div>
       </div>
 
-      {/* Mobile: full viewport (no crop) + larger composition */}
-      <div className="md:hidden absolute inset-0 z-10">
-        <img
-          src="/inicio celu/CELULAR INICIO.svg"
-          alt="KIKUCREAM mobile composition"
-          className="absolute inset-0 w-full h-full object-contain pt-[2vh] pointer-events-none select-none"
-          draggable={false}
-          aria-hidden="true"
-        />
-        <motion.img
-          src="/inicio/AQUI.svg"
-          alt="Aquí"
-          whileTap={{ scale: 0.95 }}
+      {/* Mobile: full viewport composition with slight responsive scale to reduce side whitespace */}
+      <div className="md:hidden absolute inset-0 z-10 overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <img
+            src="/inicio celu/CELULAR INICIO.svg"
+            alt="KIKUCREAM mobile composition"
+            className="mobile-composition block w-full h-full object-contain pt-[1.2vh] pointer-events-none select-none max-[380px]:scale-[1.05] max-[350px]:scale-[1.08] max-[330px]:scale-[1.11] origin-center"
+            draggable={false}
+            aria-hidden="true"
+          />
+        </div>
+        {/* AQUI button wrapper centers translation separate from rotation to avoid jump */}
+        <div className="absolute left-1/2 top-[70%] -translate-x-1/2">
+          <motion.img
+            src="/inicio/AQUI.svg"
+            alt="Aquí"
+            whileTap={{ rotate: 360 }}
+            transition={{ duration: 0.55, ease: "easeInOut" }}
             onClick={onEnterDesktop}
-          className="absolute left-1/2 -translate-x-1/2 top-[73%] h-[11vh] max-h-[95px] w-auto cursor-pointer"
-        />
+            style={{ transformOrigin: '50% 50%' }}
+            className="h-[11vh] max-h-[95px] w-auto cursor-pointer"
+          />
+        </div>
       </div>
     </div>
   )
