@@ -106,7 +106,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
           />
         </div>
         {/* AQUI button wrapper centers translation separate from rotation to avoid jump */}
-  <div className="absolute left-1/2 top-[74%] -translate-x-1/2 ">
+  <div className="absolute left-1/2 top-[76%] -translate-x-1/2 ">
           <motion.img
             src="/inicio/AQUI.svg"
             alt="Aquí"
@@ -114,7 +114,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
             transition={{ duration: 0.55, ease: "easeInOut" }}
             onClick={onEnterDesktop}
             style={{ transformOrigin: '50% 50%' }}
-            className="w-[62vw] max-w-[320px] h-auto transform max-[380px]:w-[74vw] max-[360px]:w-[80vw] cursor-pointer"
+            className="w-[74vw] max-w-[400px] h-auto transform max-[420px]:w-[78vw] max-[380px]:w-[84vw] max-[340px]:w-[88vw] cursor-pointer"
           />
         </div>
       </div>
