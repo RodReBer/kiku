@@ -108,8 +108,8 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
             aria-hidden="true"
           />
         </div>
-        {/* AQUI button wrapper centers translation separate from rotation to avoid jump */}
-  <div className="absolute left-1/2 top-[70%] -translate-x-1/2 ">
+    {/* AQUI button wrapper centers translation separate from rotation to avoid jump */}
+  <div className="absolute left-1/2 top-[70%] max-[420px]:top-[72%] max-[380px]:top-[74%] max-[340px]:top-[76%] -translate-x-1/2 ">
           <motion.img
             src="/inicio/AQUI.svg"
             alt="Aquí"
