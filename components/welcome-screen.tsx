@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { motion, useAnimationControls } from "framer-motion"
 import { useState } from "react"
 
 interface WelcomeScreenProps {
@@ -9,6 +9,9 @@ interface WelcomeScreenProps {
 
 export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
   const [clickTurns, setClickTurns] = useState(0)
+  // Mobile-only: control AQUI spin before redirect
+  const mobileAquiControls = useAnimationControls()
+  const [isSpinningMobile, setIsSpinningMobile] = useState(false)
   return (
     <div className="fixed inset-0 w-full h-dvh overflow-hidden overscroll-none bg-white flex items-center justify-center select-none">
       {/* Fondo de pantalla: letras SVG componiendo KIKUCREAM (responsive) */}
@@ -110,10 +113,20 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
           <motion.img
             src="/inicio/AQUI.svg"
             alt="Aquí"
-            whileTap={{ rotate: 360 }}
-            transition={{ duration: 0.55, ease: "easeInOut" }}
-            onClick={onEnterDesktop}
+            animate={mobileAquiControls}
+            onClick={async () => {
+              if (isSpinningMobile) return
+              setIsSpinningMobile(true)
+              try {
+                await mobileAquiControls.start({ rotate: 360, transition: { duration: 0.6, ease: "easeInOut" } })
+              } finally {
+                mobileAquiControls.set({ rotate: 0 })
+                setIsSpinningMobile(false)
+                onEnterDesktop()
+              }
+            }}
             style={{ transformOrigin: '50% 50%' }}
+            aria-busy={isSpinningMobile}
             className="w-[74vw] max-w-[400px] h-auto transform max-[420px]:w-[78vw] max-[380px]:w-[84vw] max-[340px]:w-[88vw] cursor-pointer"
           />
         </div>
