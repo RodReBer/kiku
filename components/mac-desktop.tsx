@@ -365,10 +365,60 @@ export default function MacDesktop() {
   }
 
   return (
-    <div className="h-screen w-full bg-[#ff0000] relative overflow-hidden">
-      <TopMenuBar onOpenDrawingApp={handleDrawingAppOpen} />
+    <div className="h-screen w-full bg-[#2169fd] relative overflow-hidden border-[7px] border-black box-border">
+      {/* kiku.svg y nubes.svg superpuestos */}
+      <div className="absolute inset-0 w-full h-full flex items-center justify-center">
+        <Image
+          src="/escritorio-inicio/kiku.svg"
+          alt="Fondo kiku"
+          width={1920}
+          height={1080}
+          className="absolute w-[130%] h-auto max-h-[130%] object-contain"
+          priority
+        />
+        <Image
+          src="/escritorio-inicio/nubes.svg"
+          alt="Fondo nubes"
+          width={1920}
+          height={1080}
+          className="absolute w-[106%] h-auto max-h-[106%] object-contain"
+          priority
+        />
+      </div>
+      
+      {/* Logo KIKU en la esquina superior izquierda */}
+      <div className="absolute top-4 left-4 md:top-6 md:left-6 z-20">
+        <Image
+          src="/escritorio-inicio/kikulogo (INICIO ICONO).svg"
+          alt="Logo KIKU"
+          width={60}
+          height={60}
+          className="object-contain w-[50px] h-[50px] md:w-[60px] md:h-[60px] lg:w-[80px] lg:h-[80px] cursor-pointer hover:scale-110 transition-transform"
+          draggable={false}
+        />
+      </div>
 
-      <div className="flex-1 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 lg:gap-16 p-4 md:p-8 h-full overflow-y-auto md:overflow-hidden">
+      {/* Contacto en la esquina superior derecha */}
+      <div className="absolute top-4 right-4 md:top-6 md:right-6 z-20 flex flex-col items-end gap-2">
+        <Image
+          src="/escritorio-inicio/contacto.svg"
+          alt="Contacto"
+          width={60}
+          height={60}
+          className="object-contain w-[50px] h-[50px] md:w-[60px] md:h-[60px] lg:w-[80px] lg:h-[80px] cursor-pointer hover:scale-110 transition-transform"
+          draggable={false}
+        />
+        <Image
+          src="/escritorio-inicio/QUE ES KIKU CREAM ICONO.svg"
+          alt="Qué es Kiku Cream"
+          width={60}
+          height={60}
+          className="object-contain w-[50px] h-[50px] md:w-[60px] md:h-[60px] lg:w-[80px] lg:h-[80px] cursor-pointer hover:scale-110 transition-transform"
+          draggable={false}
+        />
+      </div>
+
+      <div className="flex-1 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 lg:gap-16 p-4 md:p-8 h-full overflow-y-auto md:overflow-hidden relative z-10">
         <motion.div
           className="relative cursor-pointer group flex-shrink-0"
           drag
@@ -399,24 +449,13 @@ export default function MacDesktop() {
           }}
         >
           <Image
-            src="/folders/carpeta-diseno.png"
+            src="/escritorio-inicio/NUBE 1 COMPU.svg"
             alt="Carpeta Diseños"
             width={280}
             height={280}
-            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[200px] h-[200px] md:w-[280px] md:h-[280px] lg:w-[320px] lg:h-[320px]"
+            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[15vw] h-auto min-w-[150px] max-w-[320px]"
             draggable={false}
           />
-
-          <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6">
-            <Image
-              src="/logo-kiku.png"
-              alt="Logo KIKU"
-              width={80}
-              height={80}
-              className="object-contain drop-shadow-lg w-[60px] h-[60px] md:w-[80px] md:h-[80px] lg:w-[120px] lg:h-[120px]"
-              draggable={false}
-            />
-          </div>
         </motion.div>
 
         <motion.div
@@ -449,11 +488,11 @@ export default function MacDesktop() {
           }}
         >
           <Image
-            src="/folders/carpeta-foto.png"
+            src="/escritorio-inicio/NUBE 2 COMPU.svg"
             alt="Carpeta Fotografía"
             width={280}
             height={280}
-            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[200px] h-[200px] md:w-[280px] md:h-[280px] lg:w-[320px] lg:h-[320px]"
+            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[15vw] h-auto min-w-[150px] max-w-[320px]"
             draggable={false}
           />
         </motion.div>
@@ -488,11 +527,11 @@ export default function MacDesktop() {
           }}
         >
           <Image
-            src="/folders/carpeta-contacto.png"
+            src="/escritorio-inicio/NUBE 3 COMPU.svg"
             alt="Carpeta Contacto"
             width={280}
             height={280}
-            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[200px] h-[200px] md:w-[280px] md:h-[280px] lg:w-[320px] lg:h-[320px]"
+            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[15vw] h-auto min-w-[150px] max-w-[320px]"
             draggable={false}
           />
         </motion.div>
