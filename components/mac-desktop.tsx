@@ -35,6 +35,12 @@ export default function MacDesktop() {
   const [windows, setWindows] = useState<WindowState[]>([])
   const [nextZIndex, setNextZIndex] = useState(100)
 
+  // Función para resetear el escritorio (cerrar todas las ventanas)
+  const resetDesktop = () => {
+    setWindows([])
+    setNextZIndex(100)
+  }
+
   // Función para obtener dimensiones de imagen - COMPLETAMENTE CORREGIDA
   const getImageDimensions = (src: string): Promise<{ width: number; height: number }> => {
     return new Promise((resolve) => {
@@ -387,19 +393,20 @@ export default function MacDesktop() {
       </div>
       
       {/* Logo KIKU en la esquina superior izquierda */}
-      <div className="absolute top-4 left-4 md:top-6 md:left-6 z-20">
+      <div className="absolute top-4 left-4 md:top-6 md:left-6 z-[1000]">
         <Image
-          src="/escritorio-inicio/kikulogo (INICIO ICONO).svg"
+          src="/escritorio-inicio/kikulogo.svg"
           alt="Logo KIKU"
           width={60}
           height={60}
           className="object-contain w-[50px] h-[50px] md:w-[60px] md:h-[60px] lg:w-[80px] lg:h-[80px] cursor-pointer hover:scale-110 transition-transform"
           draggable={false}
+          onClick={resetDesktop}
         />
       </div>
 
       {/* Contacto en la esquina superior derecha */}
-      <div className="absolute top-4 right-4 md:top-6 md:right-6 z-20 flex flex-col items-end gap-2">
+      <div className="absolute right-2 z-20 flex flex-col items-end">
         <Image
           src="/escritorio-inicio/contacto.svg"
           alt="Contacto"
@@ -409,11 +416,11 @@ export default function MacDesktop() {
           draggable={false}
         />
         <Image
-          src="/escritorio-inicio/QUE ES KIKU CREAM ICONO.svg"
+          src="/escritorio-inicio/signos.svg"
           alt="Qué es Kiku Cream"
           width={60}
           height={60}
-          className="object-contain w-[50px] h-[50px] md:w-[60px] md:h-[60px] lg:w-[80px] lg:h-[80px] cursor-pointer hover:scale-110 transition-transform"
+          className="object-contain w-[50px] h-[50px] md:w-[60px] md:h-[60px] lg:w-[80px] lg:h-[80px] cursor-pointer hover:scale-110 transition-transform -mt-2 md:-mt-4"
           draggable={false}
         />
       </div>
