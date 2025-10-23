@@ -434,7 +434,26 @@ export default function MacDesktop() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onMouseDown={(e) => {
-            // ...existing code...
+            // Guardamos la posición inicial del clic
+            const startPos = { x: e.clientX, y: e.clientY };
+            
+            const handleMouseUp = (e: MouseEvent) => {
+              // Calculamos la distancia arrastrada
+              const distanceMoved = Math.sqrt(
+                Math.pow(e.clientX - startPos.x, 2) + 
+                Math.pow(e.clientY - startPos.y, 2)
+              );
+              
+              // Solo activamos el clic si la distancia es pequeña (menos de 5 píxeles)
+              if (distanceMoved < 5) {
+                handleDesignFolderClick();
+              }
+              
+              // Limpiamos el evento
+              window.removeEventListener('mouseup', handleMouseUp);
+            };
+            
+            window.addEventListener('mouseup', handleMouseUp);
           }}
         >
           <Image
@@ -455,7 +474,26 @@ export default function MacDesktop() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onMouseDown={(e) => {
-              // ...existing code...
+              // Guardamos la posición inicial del clic
+              const startPos = { x: e.clientX, y: e.clientY };
+              
+              const handleMouseUp = (e: MouseEvent) => {
+                // Calculamos la distancia arrastrada
+                const distanceMoved = Math.sqrt(
+                  Math.pow(e.clientX - startPos.x, 2) + 
+                  Math.pow(e.clientY - startPos.y, 2)
+                );
+                
+                // Solo activamos el clic si la distancia es pequeña (menos de 5 píxeles)
+                if (distanceMoved < 5) {
+                  handlePhotoFolderClick();
+                }
+                
+                // Limpiamos el evento
+                window.removeEventListener('mouseup', handleMouseUp);
+              };
+              
+              window.addEventListener('mouseup', handleMouseUp);
             }}
           >
             <Image
@@ -477,7 +515,26 @@ export default function MacDesktop() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onMouseDown={(e) => {
-            // ...existing code...
+            // Guardamos la posición inicial del clic
+            const startPos = { x: e.clientX, y: e.clientY };
+            
+            const handleMouseUp = (e: MouseEvent) => {
+              // Calculamos la distancia arrastrada
+              const distanceMoved = Math.sqrt(
+                Math.pow(e.clientX - startPos.x, 2) + 
+                Math.pow(e.clientY - startPos.y, 2)
+              );
+              
+              // Solo activamos el clic si la distancia es pequeña (menos de 5 píxeles)
+              if (distanceMoved < 5) {
+                handleContactFolderClick();
+              }
+              
+              // Limpiamos el evento
+              window.removeEventListener('mouseup', handleMouseUp);
+            };
+            
+            window.addEventListener('mouseup', handleMouseUp);
           }}
         >
           <Image
