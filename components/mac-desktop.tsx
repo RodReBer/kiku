@@ -385,15 +385,15 @@ export default function MacDesktop() {
         <Image
           src="/escritorio-inicio/nubes.svg"
           alt="Fondo nubes"
-          width={1920}
-          height={1080}
-          className="absolute w-[106%] h-auto max-h-[106%] object-contain"
+          width={400}
+          height={400}
+          className="absolute w-auto h-auto object-contain max-w-full max-h-full"
           priority
         />
       </div>
       
       {/* Logo KIKU en la esquina superior izquierda */}
-      <div className="absolute top-4 left-4 md:top-6 md:left-6 z-[1000]">
+      <div className="absolute top-3 left-1 z-[1000]">
         <Image
           src="/escritorio-inicio/kikulogo.svg"
           alt="Logo KIKU"
@@ -412,7 +412,7 @@ export default function MacDesktop() {
           alt="Contacto"
           width={60}
           height={60}
-          className="object-contain w-[50px] h-[50px] md:w-[60px] md:h-[60px] lg:w-[80px] lg:h-[80px] cursor-pointer hover:scale-110 transition-transform"
+          className="object-contain w-[40px] h-[40px] md:w-[50px] md:h-[50px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform"
           draggable={false}
         />
         <Image
@@ -420,125 +420,72 @@ export default function MacDesktop() {
           alt="Qué es Kiku Cream"
           width={60}
           height={60}
-          className="object-contain w-[50px] h-[50px] md:w-[60px] md:h-[60px] lg:w-[80px] lg:h-[80px] cursor-pointer hover:scale-110 transition-transform -mt-2 md:-mt-4"
+          className="object-contain w-[40px] h-[40px] md:w-[50px] md:h-[50px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform -mt-2 md:-mt-4"
           draggable={false}
         />
       </div>
 
       <div className="flex-1 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 lg:gap-16 p-4 md:p-8 h-full overflow-y-auto md:overflow-hidden relative z-10">
         <motion.div
-          className="relative cursor-pointer group flex-shrink-0"
+          className="absolute cursor-pointer group"
+          style={{ bottom: '11%', left: '14%' }}
           drag
           dragMomentum={false}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onMouseDown={(e) => {
-            // Guardamos la posición inicial del clic
-            const startPos = { x: e.clientX, y: e.clientY };
-            
-            const handleMouseUp = (e: MouseEvent) => {
-              // Calculamos la distancia arrastrada
-              const distanceMoved = Math.sqrt(
-                Math.pow(e.clientX - startPos.x, 2) + 
-                Math.pow(e.clientY - startPos.y, 2)
-              );
-              
-              // Solo activamos el clic si la distancia es pequeña (menos de 5 píxeles)
-              if (distanceMoved < 5) {
-                handleDesignFolderClick();
-              }
-              
-              // Limpiamos el evento
-              window.removeEventListener('mouseup', handleMouseUp);
-            };
-            
-            window.addEventListener('mouseup', handleMouseUp);
+            // ...existing code...
           }}
         >
           <Image
             src="/escritorio-inicio/NUBE 1 COMPU.svg"
             alt="Carpeta Diseños"
-            width={280}
-            height={280}
-            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[15vw] h-auto min-w-[150px] max-w-[320px]"
+            width={310}
+            height={310}
+            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300"
             draggable={false}
           />
         </motion.div>
 
+        <div className="absolute" style={{ top: '1%', left: '42%', transform: 'translateX(-50%)' }}>
+          <motion.div
+            className="cursor-pointer group"
+            drag
+            dragMomentum={false}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onMouseDown={(e) => {
+              // ...existing code...
+            }}
+          >
+            <Image
+              src="/escritorio-inicio/NUBE 2 COMPU.svg"
+              alt="Carpeta Fotografía"
+              width={400}
+              height={400}
+              className="object-contain group-hover:drop-shadow-3xl transition-all duration-300"
+              draggable={false}
+            />
+          </motion.div>
+        </div>
+
         <motion.div
-          className="cursor-pointer group flex-shrink-0"
+          className="absolute cursor-pointer group"
+          style={{ top: '20%', right: '14%' }}
           drag
           dragMomentum={false}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onMouseDown={(e) => {
-            // Guardamos la posición inicial del clic
-            const startPos = { x: e.clientX, y: e.clientY };
-            
-            const handleMouseUp = (e: MouseEvent) => {
-              // Calculamos la distancia arrastrada
-              const distanceMoved = Math.sqrt(
-                Math.pow(e.clientX - startPos.x, 2) + 
-                Math.pow(e.clientY - startPos.y, 2)
-              );
-              
-              // Solo activamos el clic si la distancia es pequeña (menos de 5 píxeles)
-              if (distanceMoved < 5) {
-                handlePhotoFolderClick();
-              }
-              
-              // Limpiamos el evento
-              window.removeEventListener('mouseup', handleMouseUp);
-            };
-            
-            window.addEventListener('mouseup', handleMouseUp);
-          }}
-        >
-          <Image
-            src="/escritorio-inicio/NUBE 2 COMPU.svg"
-            alt="Carpeta Fotografía"
-            width={280}
-            height={280}
-            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[15vw] h-auto min-w-[150px] max-w-[320px]"
-            draggable={false}
-          />
-        </motion.div>
-
-        <motion.div
-          className="cursor-pointer group flex-shrink-0"
-          drag
-          dragMomentum={false}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onMouseDown={(e) => {
-            // Guardamos la posición inicial del clic
-            const startPos = { x: e.clientX, y: e.clientY };
-            
-            const handleMouseUp = (e: MouseEvent) => {
-              // Calculamos la distancia arrastrada
-              const distanceMoved = Math.sqrt(
-                Math.pow(e.clientX - startPos.x, 2) + 
-                Math.pow(e.clientY - startPos.y, 2)
-              );
-              
-              // Solo activamos el clic si la distancia es pequeña (menos de 5 píxeles)
-              if (distanceMoved < 5) {
-                handleContactFolderClick();
-              }
-              
-              // Limpiamos el evento
-              window.removeEventListener('mouseup', handleMouseUp);
-            };
-            
-            window.addEventListener('mouseup', handleMouseUp);
+            // ...existing code...
           }}
         >
           <Image
             src="/escritorio-inicio/NUBE 3 COMPU.svg"
             alt="Carpeta Contacto"
-            width={280}
-            height={280}
-            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[15vw] h-auto min-w-[150px] max-w-[320px]"
+            width={350}
+            height={350}
+            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300"
             draggable={false}
           />
         </motion.div>
