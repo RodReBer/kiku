@@ -10,6 +10,8 @@ import Finder from "./finder"
 import TopMenuBar from "./top-menu-bar"
 import DraggableDesktopIcon from "./draggable-desktop-icon"
 import DrawingApp from "./drawing-app"
+
+import "../styles/nube-pos.css"
 import { useData } from "@/context/data-context"
 
 interface FileItem {
@@ -387,7 +389,7 @@ export default function MacDesktop() {
           alt="Fondo nubes"
           width={400}
           height={400}
-          className="absolute w-auto h-auto object-contain max-w-full max-h-full"
+          className="absolute w-[140%] h-auto object-contain max-w-full max-h-[108%]"
           priority
         />
       </div>
@@ -427,8 +429,7 @@ export default function MacDesktop() {
 
       <div className="flex-1 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 lg:gap-16 p-4 md:p-8 h-full overflow-y-auto md:overflow-hidden relative z-10">
         <motion.div
-          className="absolute cursor-pointer group"
-          style={{ bottom: '11%', left: '14%' }}
+          className="absolute cursor-pointer group nube-pos-1"
           drag
           dragMomentum={false}
           whileHover={{ scale: 1.05 }}
@@ -461,12 +462,12 @@ export default function MacDesktop() {
             alt="Carpeta Diseños"
             width={310}
             height={310}
-            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300"
+            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[180px]  md:w-[220px]  lg:w-[280px]  xl:w-[310px] "
             draggable={false}
           />
         </motion.div>
 
-        <div className="absolute" style={{ top: '1%', left: '42%', transform: 'translateX(-50%)' }}>
+        <div className="absolute nube-pos-2">
           <motion.div
             className="cursor-pointer group"
             drag
@@ -499,17 +500,16 @@ export default function MacDesktop() {
             <Image
               src="/escritorio-inicio/NUBE 2 COMPU.svg"
               alt="Carpeta Fotografía"
-              width={400}
-              height={400}
-              className="object-contain group-hover:drop-shadow-3xl transition-all duration-300"
+              width={460}
+              height={460}
+              className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[240px]  md:w-[300px]  lg:w-[380px]  xl:w-[460px]"
               draggable={false}
             />
           </motion.div>
         </div>
 
         <motion.div
-          className="absolute cursor-pointer group"
-          style={{ top: '20%', right: '14%' }}
+          className="absolute cursor-pointer group nube-pos-3"
           drag
           dragMomentum={false}
           whileHover={{ scale: 1.05 }}
@@ -540,9 +540,9 @@ export default function MacDesktop() {
           <Image
             src="/escritorio-inicio/NUBE 3 COMPU.svg"
             alt="Carpeta Contacto"
-            width={350}
-            height={350}
-            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300"
+            width={450}
+            height={450}
+            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[230px]  md:w-[290px]  lg:w-[370px]  xl:w-[450px] "
             draggable={false}
           />
         </motion.div>
