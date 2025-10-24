@@ -16,7 +16,13 @@
     left: 14%;
   }
 }
-@media (min-width: 1280px) {
+@media (min-width: 1500px) {
+  .nube-pos-1 {
+    bottom: 11%;
+    left: 13%;
+  }
+}
+@media (min-width: 1800px) {
   .nube-pos-1 {
     bottom: 14%;
     left: 18%;
@@ -68,7 +74,14 @@
     right: 14%;
   }
 }
-@media (min-width: 1500px) {
+
+@media (min-width: 1524px) {
+  .nube-pos-3 {
+    top: 18%;
+    right: 9%;
+  }
+}
+@media (min-width: 1800px) {
   .nube-pos-3 {
     top: 20%;
     right: 11%;
