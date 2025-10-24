@@ -374,7 +374,7 @@ export default function MacDesktop() {
   }
 
   return (
-    <div className="h-screen w-full bg-white p-[10px] box-border">
+    <div className="h-screen w-full bg-white p-[5px] box-border">
       <div className="h-full w-full bg-[#2169fd] relative overflow-hidden border-[7px] border-black box-border">
         {/* kiku.svg y nubes.svg superpuestos */}
         <div className="absolute inset-0 w-full h-full flex items-center justify-center">
