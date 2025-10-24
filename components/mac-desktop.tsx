@@ -389,7 +389,7 @@ export default function MacDesktop() {
           alt="Fondo nubes"
           width={400}
           height={400}
-          className="absolute w-[140%] h-auto object-contain max-w-full max-h-[108%]"
+          className="absolute w-[140%] h-auto object-contain max-w-full max-h-[105%]"
           priority
         />
       </div>
