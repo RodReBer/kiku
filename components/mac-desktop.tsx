@@ -36,6 +36,7 @@ export default function MacDesktop() {
   const { projects } = useData()
   const [windows, setWindows] = useState<WindowState[]>([])
   const [nextZIndex, setNextZIndex] = useState(100)
+  const [isDragging, setIsDragging] = useState(false)
 
   // Función para resetear el escritorio (cerrar todas las ventanas)
   const resetDesktop = () => {
@@ -373,9 +374,10 @@ export default function MacDesktop() {
   }
 
   return (
-    <div className="h-screen w-full bg-[#2169fd] relative overflow-hidden border-[7px] border-black box-border">
-      {/* kiku.svg y nubes.svg superpuestos */}
-      <div className="absolute inset-0 w-full h-full flex items-center justify-center">
+    <div className="h-screen w-full bg-white p-[10px] box-border">
+      <div className="h-full w-full bg-[#2169fd] relative overflow-hidden border-[7px] border-black box-border">
+        {/* kiku.svg y nubes.svg superpuestos */}
+        <div className="absolute inset-0 w-full h-full flex items-center justify-center">
         <Image
           src="/escritorio-inicio/kiku.svg"
           alt="Fondo kiku"
@@ -431,70 +433,73 @@ export default function MacDesktop() {
         <motion.div
           className="absolute cursor-pointer group nube-pos-1"
           drag
+          dragElastic={0.1}
           dragMomentum={false}
+          dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+          onDragStart={() => setIsDragging(true)}
+          onDragEnd={() => setTimeout(() => setIsDragging(false), 50)}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onMouseDown={(e) => {
-            // Guardamos la posición inicial del clic
-            const startPos = { x: e.clientX, y: e.clientY };
-            
-            const handleMouseUp = (e: MouseEvent) => {
-              // Calculamos la distancia arrastrada
-              const distanceMoved = Math.sqrt(
-                Math.pow(e.clientX - startPos.x, 2) + 
-                Math.pow(e.clientY - startPos.y, 2)
-              );
-              
-              // Solo activamos el clic si la distancia es pequeña (menos de 5 píxeles)
-              if (distanceMoved < 5) {
-                handleDesignFolderClick();
-              }
-              
-              // Limpiamos el evento
-              window.removeEventListener('mouseup', handleMouseUp);
-            };
-            
-            window.addEventListener('mouseup', handleMouseUp);
+          style={{
+            // Animación de flotación sin interferir con el drag
+            originX: 0.5,
+            originY: 0.5,
+          }}
+          onClick={(e) => {
+            if (!isDragging) {
+              handleDesignFolderClick();
+            }
           }}
         >
-          <Image
-            src="/escritorio-inicio/NUBE 1 COMPU.svg"
-            alt="Carpeta Diseños"
-            width={310}
-            height={310}
-            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[180px]  md:w-[220px]  lg:w-[280px]  xl:w-[380px] "
-            draggable={false}
-          />
+          <motion.div
+            initial={{ y: 0, rotate: 0 }}
+            animate={!isDragging ? {
+              y: [0, -8, -12, -8, 0],
+              rotate: [0, 2, 0, -2, 0],
+            } : {}}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          >
+            <Image
+              src="/escritorio-inicio/NUBE 1 COMPU.svg"
+              alt="Carpeta Diseños"
+              width={310}
+              height={310}
+              className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[180px]  md:w-[220px]  lg:w-[280px]  xl:w-[380px] "
+              draggable={false}
+            />
+          </motion.div>
         </motion.div>
 
-        <div className="absolute nube-pos-2">
+        <motion.div
+          className="absolute cursor-pointer group nube-pos-2"
+          drag
+          dragElastic={0.1}
+          dragMomentum={false}
+          dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+          onDragStart={() => setIsDragging(true)}
+          onDragEnd={() => setTimeout(() => setIsDragging(false), 50)}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            if (!isDragging) {
+              handlePhotoFolderClick();
+            }
+          }}
+        >
           <motion.div
-            className="cursor-pointer group"
-            drag
-            dragMomentum={false}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onMouseDown={(e) => {
-              // Guardamos la posición inicial del clic
-              const startPos = { x: e.clientX, y: e.clientY };
-              
-              const handleMouseUp = (e: MouseEvent) => {
-                // Calculamos la distancia arrastrada
-                const distanceMoved = Math.sqrt(
-                  Math.pow(e.clientX - startPos.x, 2) + 
-                  Math.pow(e.clientY - startPos.y, 2)
-                );
-                
-                // Solo activamos el clic si la distancia es pequeña (menos de 5 píxeles)
-                if (distanceMoved < 5) {
-                  handlePhotoFolderClick();
-                }
-                
-                // Limpiamos el evento
-                window.removeEventListener('mouseup', handleMouseUp);
-              };
-              
-              window.addEventListener('mouseup', handleMouseUp);
+            initial={{ y: 0, rotate: 0 }}
+            animate={!isDragging ? {
+              y: [0, -10, -15, -10, 0],
+              rotate: [0, -2, 0, 2, 0],
+            } : {}}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: "easeInOut",
             }}
           >
             <Image
@@ -506,45 +511,49 @@ export default function MacDesktop() {
               draggable={false}
             />
           </motion.div>
-        </div>
+        </motion.div>
 
         <motion.div
           className="absolute cursor-pointer group nube-pos-3"
           drag
+          dragElastic={0.1}
           dragMomentum={false}
+          dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+          onDragStart={() => setIsDragging(true)}
+          onDragEnd={() => setTimeout(() => setIsDragging(false), 50)}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onMouseDown={(e) => {
-            // Guardamos la posición inicial del clic
-            const startPos = { x: e.clientX, y: e.clientY };
-            
-            const handleMouseUp = (e: MouseEvent) => {
-              // Calculamos la distancia arrastrada
-              const distanceMoved = Math.sqrt(
-                Math.pow(e.clientX - startPos.x, 2) + 
-                Math.pow(e.clientY - startPos.y, 2)
-              );
-              
-              // Solo activamos el clic si la distancia es pequeña (menos de 5 píxeles)
-              if (distanceMoved < 5) {
-                handleContactFolderClick();
-              }
-              
-              // Limpiamos el evento
-              window.removeEventListener('mouseup', handleMouseUp);
-            };
-            
-            window.addEventListener('mouseup', handleMouseUp);
+          style={{
+            originX: 0.5,
+            originY: 0.5,
+          }}
+          onClick={() => {
+            if (!isDragging) {
+              handleContactFolderClick();
+            }
           }}
         >
-          <Image
-            src="/escritorio-inicio/NUBE 3 COMPU.svg"
-            alt="Carpeta Contacto"
-            width={450}
-            height={450}
-            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[230px]  md:w-[290px]  lg:w-[370px]  xl:w-[450px] "
-            draggable={false}
-          />
+          <motion.div
+            initial={{ y: 0, rotate: 0 }}
+            animate={!isDragging ? {
+              y: [0, -10, -14, -8, 0],
+              rotate: [0, -2, 0, 2, 0],
+            } : {}}
+            transition={{
+              duration: 4.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          >
+            <Image
+              src="/escritorio-inicio/NUBE 3 COMPU.svg"
+              alt="Carpeta Contacto"
+              width={450}
+              height={450}
+              className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[230px]  md:w-[290px]  lg:w-[370px]  xl:w-[450px] "
+              draggable={false}
+            />
+          </motion.div>
         </motion.div>
       </div>
 
@@ -570,6 +579,7 @@ export default function MacDesktop() {
           </RetroWindow>
         ))}
       </AnimatePresence>
+      </div>
     </div>
   )
 }
