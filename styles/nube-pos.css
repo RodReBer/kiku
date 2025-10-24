@@ -1,19 +1,67 @@
+/* Animaciones para las nubes */
+@keyframes floatBounce1 {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-8px) rotate(-2deg);
+  }
+}
+
+@keyframes floatBounce2 {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(-50%) translateY(-10px) rotate(-2deg);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-15px) rotate(0deg);
+  }
+  75% {
+    transform: translateX(-50%) translateY(-10px) rotate(2deg);
+  }
+}
+
+@keyframes floatBounce3 {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  30% {
+    transform: translateY(-10px) rotate(-2deg);
+  }
+  60% {
+    transform: translateY(-14px) rotate(0deg);
+  }
+  80% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+}
 
 /* Nube 1 - Diseños */
 .nube-pos-1 {
   bottom: 8%;
   left: 10%;
+  animation: floatBounce1 4s ease-in-out infinite;
 }
 @media (min-width: 768px) {
   .nube-pos-1 {
     bottom: 10%;
     left: 12%;
+    animation: floatBounce1 4s ease-in-out infinite;
   }
 }
 @media (min-width: 1024px) {
   .nube-pos-1 {
     bottom: 11%;
     left: 14%;
+    animation: floatBounce1 4s ease-in-out infinite;
   }
 }
 @media (min-width: 1500px) {
@@ -22,10 +70,11 @@
     left: 13%;
   }
 }
-@media (min-width: 1800px) {
+@media (min-width: 1280px) {
   .nube-pos-1 {
-    bottom: 12%;
-    left: 15%;
+    bottom: 14%;
+    left: 18%;
+    animation: floatBounce1 4s ease-in-out infinite;
   }
 }
 
@@ -34,12 +83,14 @@
   top: 2%;
   left: 50%;
   transform: translateX(-50%);
+  animation: floatBounce2 5s ease-in-out infinite;
 }
 @media (min-width: 768px) {
   .nube-pos-2 {
     top: 1.5%;
     left: 45%;
     transform: translateX(-50%);
+    animation: floatBounce2 5s ease-in-out infinite;
   }
 }
 @media (min-width: 1024px) {
@@ -47,13 +98,15 @@
     top: 1%;
     left: 42%;
     transform: translateX(-50%);
+    animation: floatBounce2 5s ease-in-out infinite;
   }
 }
 @media (min-width: 1280px) {
   .nube-pos-2 {
-    top: 0%;
+    top: 2%;
     left: 40%;
     transform: translateX(-50%);
+    animation: floatBounce2 5s ease-in-out infinite;
   }
 }
 
@@ -61,17 +114,20 @@
 .nube-pos-3 {
   top: 18%;
   right: 10%;
+  animation: floatBounce3 4.5s ease-in-out infinite;
 }
 @media (min-width: 768px) {
   .nube-pos-3 {
     top: 19%;
     right: 12%;
+    animation: floatBounce3 4.5s ease-in-out infinite;
   }
 }
 @media (min-width: 1024px) {
   .nube-pos-3 {
     top: 20%;
     right: 14%;
+    animation: floatBounce3 4.5s ease-in-out infinite;
   }
 }
 
@@ -81,9 +137,10 @@
     right: 9%;
   }
 }
-@media (min-width: 1800px) {
+@media (min-width: 1280px) {
   .nube-pos-3 {
     top: 20%;
     right: 11%;
+    animation: floatBounce3 4.5s ease-in-out infinite;
   }
 }
