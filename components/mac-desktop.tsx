@@ -462,7 +462,7 @@ export default function MacDesktop() {
             alt="Carpeta Diseños"
             width={310}
             height={310}
-            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[180px]  md:w-[220px]  lg:w-[280px]  xl:w-[310px] "
+            className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[180px]  md:w-[220px]  lg:w-[280px]  xl:w-[380px] "
             draggable={false}
           />
         </motion.div>
