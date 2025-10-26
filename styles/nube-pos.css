@@ -114,7 +114,21 @@
   }
 }
 
-@media (min-width: 1500px) {
+@media (min-width: 1400px) {
+  .nube-pos-1 {
+    bottom: 14%;
+    left: 14%;
+    pointer-events: none;
+  }
+
+  .nube-pos-1>* {
+    animation: floatBounce1 4s ease-in-out infinite;
+    will-change: transform;
+    pointer-events: auto;
+  }
+}
+
+@media (min-width: 1600px) {
   .nube-pos-1 {
     bottom: 13.5%;
     left: 13%;
