@@ -1,44 +1,59 @@
 /* Animaciones para las nubes */
 @keyframes floatBounce1 {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg) translateZ(0);
   }
+
   25% {
     transform: translateY(-8px) rotate(2deg) translateZ(0);
   }
+
   50% {
     transform: translateY(-12px) rotate(0deg) translateZ(0);
   }
+
   75% {
     transform: translateY(-8px) rotate(-2deg) translateZ(0);
   }
 }
 
 @keyframes floatBounce2 {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg) translateZ(0);
   }
+
   25% {
     transform: translateY(-10px) rotate(-2deg) translateZ(0);
   }
+
   50% {
     transform: translateY(-15px) rotate(0deg) translateZ(0);
   }
+
   75% {
     transform: translateY(-10px) rotate(2deg) translateZ(0);
   }
 }
 
 @keyframes floatBounce3 {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg) translateZ(0);
   }
+
   30% {
     transform: translateY(-10px) rotate(-2deg) translateZ(0);
   }
+
   60% {
     transform: translateY(-14px) rotate(0deg) translateZ(0);
   }
+
   80% {
     transform: translateY(-8px) rotate(2deg) translateZ(0);
   }
@@ -50,51 +65,59 @@
   left: 10%;
   pointer-events: none;
 }
-.nube-pos-1 > * {
+
+.nube-pos-1>* {
   animation: floatBounce1 4s ease-in-out infinite;
   will-change: transform;
   pointer-events: auto;
 }
+
 @media (min-width: 768px) {
   .nube-pos-1 {
     bottom: 10%;
     left: 12%;
     pointer-events: none;
   }
-  .nube-pos-1 > * {
+
+  .nube-pos-1>* {
     animation: floatBounce1 4s ease-in-out infinite;
     will-change: transform;
     pointer-events: auto;
   }
 }
+
 @media (min-width: 1024px) {
   .nube-pos-1 {
     bottom: 11%;
     left: 14%;
     pointer-events: none;
   }
-  .nube-pos-1 > * {
+
+  .nube-pos-1>* {
     animation: floatBounce1 4s ease-in-out infinite;
     will-change: transform;
     pointer-events: auto;
   }
 }
-@media (min-width: 1500px) {
-  .nube-pos-1 {
-    bottom: 11%;
-    left: 13%;
-  }
-}
+
 @media (min-width: 1280px) {
   .nube-pos-1 {
     bottom: 14%;
     left: 18%;
     pointer-events: none;
   }
-  .nube-pos-1 > * {
+
+  .nube-pos-1>* {
     animation: floatBounce1 4s ease-in-out infinite;
     will-change: transform;
     pointer-events: auto;
+  }
+}
+
+@media (min-width: 1500px) {
+  .nube-pos-1 {
+    bottom: 11%;
+    left: 13%;
   }
 }
 
@@ -102,48 +125,53 @@
 .nube-pos-2 {
   top: 2%;
   left: 50%;
-  transform: translateX(-50%);
+  right: auto;
   pointer-events: none;
 }
-.nube-pos-2 > * {
+
+.nube-pos-2>* {
   animation: floatBounce2 5s ease-in-out infinite;
   will-change: transform;
   pointer-events: auto;
 }
+
 @media (min-width: 768px) {
   .nube-pos-2 {
     top: 1.5%;
     left: 42%;
-    transform: translateX(-50%);
+    right: auto;
     pointer-events: none;
   }
-  .nube-pos-2 > * {
+
+  .nube-pos-2>* {
     animation: floatBounce2 5s ease-in-out infinite;
     will-change: transform;
     pointer-events: auto;
   }
 }
+
 @media (min-width: 1024px) {
   .nube-pos-2 {
     top: 1%;
     left: 38%;
-    transform: translateX(-50%);
     pointer-events: none;
   }
-  .nube-pos-2 > * {
+
+  .nube-pos-2>* {
     animation: floatBounce2 5s ease-in-out infinite;
     will-change: transform;
     pointer-events: auto;
   }
 }
+
 @media (min-width: 1280px) {
   .nube-pos-2 {
     top: 2%;
-    left: 35%;
-    transform: translateX(-50%);
+    left: 26%;
     pointer-events: none;
   }
-  .nube-pos-2 > * {
+
+  .nube-pos-2>* {
     animation: floatBounce2 5s ease-in-out infinite;
     will-change: transform;
     pointer-events: auto;
@@ -156,30 +184,35 @@
   right: 10%;
   pointer-events: none;
 }
-.nube-pos-3 > * {
+
+.nube-pos-3>* {
   animation: floatBounce3 4.5s ease-in-out infinite;
   will-change: transform;
   pointer-events: auto;
 }
+
 @media (min-width: 768px) {
   .nube-pos-3 {
     top: 19%;
     right: 12%;
     pointer-events: none;
   }
-  .nube-pos-3 > * {
+
+  .nube-pos-3>* {
     animation: floatBounce3 4.5s ease-in-out infinite;
     will-change: transform;
     pointer-events: auto;
   }
 }
+
 @media (min-width: 1024px) {
   .nube-pos-3 {
     top: 20%;
     right: 14%;
     pointer-events: none;
   }
-  .nube-pos-3 > * {
+
+  .nube-pos-3>* {
     animation: floatBounce3 4.5s ease-in-out infinite;
     will-change: transform;
     pointer-events: auto;
@@ -192,13 +225,15 @@
     right: 9%;
   }
 }
+
 @media (min-width: 1280px) {
   .nube-pos-3 {
     top: 20%;
     right: 13%;
     pointer-events: none;
   }
-  .nube-pos-3 > * {
+
+  .nube-pos-3>* {
     animation: floatBounce3 4.5s ease-in-out infinite;
     will-change: transform;
     pointer-events: auto;
