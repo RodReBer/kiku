@@ -89,7 +89,7 @@
 @media (min-width: 1024px) {
   .nube-pos-1 {
     bottom: 11%;
-    left: 10%;
+    left: 8%;
     pointer-events: none;
   }
 
@@ -103,7 +103,7 @@
 @media (min-width: 1280px) {
   .nube-pos-1 {
     bottom: 14%;
-    left: 10%;
+    left: 8%;
     pointer-events: none;
   }
 
