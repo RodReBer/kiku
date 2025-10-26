@@ -120,6 +120,7 @@
     left: 13%;
   }
 }
+
 @media (min-width: 1800px) {
   .nube-pos-1 {
     bottom: 13.5%;
@@ -225,13 +226,6 @@
   }
 }
 
-@media (min-width: 1524px) {
-  .nube-pos-3 {
-    top: 18%;
-    right: 9%;
-  }
-}
-
 @media (min-width: 1280px) {
   .nube-pos-3 {
     top: 20%;
@@ -243,5 +237,19 @@
     animation: floatBounce3 4.5s ease-in-out infinite;
     will-change: transform;
     pointer-events: auto;
+  }
+}
+
+@media (min-width: 1524px) {
+  .nube-pos-3 {
+    top: 20%;
+    right: 11%;
+  }
+}
+
+@media (min-width: 1800px) {
+  .nube-pos-3 {
+    top: 18%;
+    right: 9%;
   }
 }
