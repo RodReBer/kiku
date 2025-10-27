@@ -61,8 +61,10 @@
 
 /* Nube 1 - Diseños */
 .nube-pos-1 {
-  bottom: 8%;
-  left: 10%;
+  /* Mobile: arriba, centrada más cerca del kiku vertical izquierdo */
+  top: 8%;
+  left: 50%;
+  transform: translateX(-50%);
   pointer-events: none;
 }
 
@@ -74,8 +76,11 @@
 
 @media (min-width: 768px) {
   .nube-pos-1 {
+    /* Desktop: abajo izquierda */
+    top: auto;
     bottom: 10%;
     left: 9%;
+    transform: none;
     pointer-events: none;
   }
 
@@ -157,9 +162,11 @@
 
 /* Nube 2 - Fotografía */
 .nube-pos-2 {
-  top: 2%;
+  /* Mobile: centro vertical */
+  top: 35%;
   left: 50%;
   right: auto;
+  transform: translateX(-50%);
   pointer-events: none;
 }
 
@@ -171,9 +178,11 @@
 
 @media (min-width: 768px) {
   .nube-pos-2 {
+    /* Desktop: arriba centro */
     top: 1.5%;
     left: 42%;
     right: auto;
+    transform: none;
     pointer-events: none;
   }
 
@@ -214,8 +223,12 @@
 
 /* Nube 3 - Contacto */
 .nube-pos-3 {
-  top: 18%;
-  right: 10%;
+  /* Mobile: abajo centrada */
+  top: auto;
+  bottom: 15%;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
   pointer-events: none;
 }
 
@@ -227,8 +240,12 @@
 
 @media (min-width: 768px) {
   .nube-pos-3 {
+    /* Desktop: arriba derecha */
     top: 19%;
+    bottom: auto;
     right: 12%;
+    left: auto;
+    transform: none;
     pointer-events: none;
   }
 

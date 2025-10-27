@@ -376,209 +376,298 @@ export default function MacDesktop() {
   return (
     <div className="h-screen w-full bg-white p-[5px] box-border">
       <div className="h-full w-full bg-[#2169fd] relative overflow-hidden border-[7px] border-black box-border">
-        {/* kiku.svg y nubes.svg superpuestos */}
-        <div className="absolute inset-0 w-full h-full flex items-center justify-center">
-        <Image
-          src="/escritorio-inicio/kiku.svg"
-          alt="Fondo kiku"
-          width={1920}
-          height={1080}
-          className="absolute w-[130%] h-auto max-h-[130%] object-contain"
-          priority
-        />
-        <Image
-          src="/escritorio-inicio/nubes.svg"
-          alt="Fondo nubes"
-          width={400}
-          height={400}
-          className="absolute w-[140%] h-auto object-contain max-w-full max-h-[105%]"
-          priority
-        />
-      </div>
-      
-      {/* Logo KIKU en la esquina superior izquierda */}
-      <div className="absolute top-3 left-1 z-[1000]">
-        <Image
-          src="/escritorio-inicio/kikulogo.svg"
-          alt="Logo KIKU"
-          width={60}
-          height={60}
-          className="object-contain w-[50px] h-[50px] md:w-[60px] md:h-[60px] lg:w-[80px] lg:h-[80px] cursor-pointer hover:scale-110 transition-transform"
-          draggable={false}
-          onClick={resetDesktop}
-        />
-      </div>
+        {/* Desktop: kiku.svg y nubes.svg superpuestos */}
+        <div className="hidden md:block absolute inset-0 w-full h-full">
+          <div className="absolute inset-0 w-full h-full flex items-center justify-center">
+            <Image
+              src="/escritorio-inicio/kiku.svg"
+              alt="Fondo kiku"
+              width={1920}
+              height={1080}
+              className="absolute z-0 inset-0 h-full w-auto max-w-none object-contain"
+              priority
+            />
+            <Image
+              src="/escritorio-inicio/nubes.svg"
+              alt="Fondo nubes"
+              width={400}
+              height={400}
+              className="absolute z-10 inset-0 h-full w-auto object-contain max-w-none pointer-events-none"
+              priority
+            />
+          </div>
+        </div>
 
-      {/* Contacto en la esquina superior derecha */}
-      <div className="absolute right-2 z-20 flex flex-col items-end">
-        <Image
-          src="/escritorio-inicio/contacto.svg"
-          alt="Contacto"
-          width={60}
-          height={60}
-          className="object-contain w-[40px] h-[40px] md:w-[50px] md:h-[50px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform"
-          draggable={false}
-        />
-        <Image
-          src="/escritorio-inicio/signos.svg"
-          alt="Qué es Kiku Cream"
-          width={60}
-          height={60}
-          className="object-contain w-[40px] h-[40px] md:w-[50px] md:h-[50px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform -mt-2 md:-mt-4"
-          draggable={false}
-        />
-      </div>
+        {/* Mobile: kiku.svg vertical a la izquierda y nubes.svg de fondo, nubes por delante */}
+        <div className="md:hidden absolute inset-0 w-full h-full">
+          {/* KIKU y nubes móviles: kiku al fondo, nubes encima */}
+          <div className="absolute inset-0 flex items-center left-0 top-0 z-0 justify-start">
+            <Image
+              src="/escritorio-celu/kiku.svg"
+              alt="Fondo kiku móvil"
+              width={600}
+              height={2000}
+              className="h-full w-auto max-w-none object-contain"
+              priority
+            />
+          </div>
+          <div className="absolute inset-0 w-full h-full z-10 pointer-events-none flex items-center justify-center">
+            <Image
+              src="/escritorio-celu/nubes.svg"
+              alt="Fondo nubes móvil"
+              width={400}
+              height={400}
+              className="h-full w-auto max-w-none object-contain"
+              priority
+            />
+          </div>
+        </div>
 
-      <div className="flex-1 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 lg:gap-16 p-4 md:p-8 h-full overflow-y-auto md:overflow-hidden relative z-10">
-        <motion.div
-          className="absolute cursor-pointer group nube-pos-1"
-          drag
-          dragElastic={0.1}
-          dragMomentum={false}
-          dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
-          onDragStart={() => setIsDragging(true)}
-          onDragEnd={() => setTimeout(() => setIsDragging(false), 50)}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          style={{
-            // Animación de flotación sin interferir con el drag
-            originX: 0.5,
-            originY: 0.5,
-          }}
-          onClick={(e) => {
-            if (!isDragging) {
-              handleDesignFolderClick();
-            }
-          }}
-        >
+        {/* Logo KIKU - Desktop: arriba izquierda, Mobile: arriba derecha */}
+        <div className="absolute top-3 left-1 md:left-1 md:top-3 md:block hidden z-[1000]">
+          <Image
+            src="/escritorio-inicio/kikulogo.svg"
+            alt="Logo KIKU"
+            width={60}
+            height={60}
+            className="object-contain w-[50px] h-[50px] md:w-[60px] md:h-[60px] lg:w-[80px] lg:h-[80px] cursor-pointer hover:scale-110 transition-transform"
+            draggable={false}
+            onClick={resetDesktop}
+          />
+        </div>
+        <div className="absolute top-2 right-1.5 md:hidden z-[1000]">
+          <Image
+            src="/escritorio-celu/kikulogo.svg"
+            alt="Logo KIKU"
+            width={60}
+            height={60}
+            className="object-contain w-[50px] h-[50px] cursor-pointer hover:scale-110 transition-transform"
+            draggable={false}
+            onClick={resetDesktop}
+          />
+        </div>
+
+        {/* Contacto y Signos - Desktop: arriba derecha, Mobile: abajo derecha */}
+  <div className="hidden md:flex absolute right-2 bottom-6 z-20 flex-col items-end">
+          <Image
+            src="/escritorio-inicio/signos.svg"
+            alt="Qué es Kiku Cream"
+            width={60}
+            height={60}
+            className="object-contain w-[48px] h-[48px] md:w-[56px] md:h-[56px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform"
+            draggable={false}
+          />
+          <Image
+            src="/escritorio-inicio/contacto.svg"
+            alt="Contacto"
+            width={60}
+            height={60}
+            className="object-contain w-[48px] h-[48px] md:w-[56px] md:h-[56px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform -mt-0.5 md:-mt-1"
+            draggable={false}
+          />
+        </div>
+  <div className="md:hidden absolute bottom-1 right-1 z-20 flex flex-col items-end ">
+          <Image
+            src="/escritorio-celu/signos.svg"
+            alt="Qué es Kiku Cream"
+            width={60}
+            height={60}
+            className="object-contain w-[44px] h-[44px] cursor-pointer hover:scale-110 transition-transform"
+            draggable={false}
+          />
+          <Image
+            src="/escritorio-celu/contacto.svg"
+            alt="Contacto"
+            width={60}
+            height={60}
+            className="object-contain w-[44px] h-[44px] cursor-pointer hover:scale-110 transition-transform -mt-3"
+            draggable={false}
+          />
+        </div>
+
+        {/* Nubes interactivas (desktop y mobile) */}
+    <div className="flex-1 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 lg:gap-16 p-4 md:p-8 h-full overflow-y-auto md:overflow-hidden relative z-30">
+          {/* ...existing code for interactive nubes (motion.divs)... */}
           <motion.div
-            initial={{ y: 0, rotate: 0 }}
-            animate={!isDragging ? {
-              y: [0, -8, -12, -8, 0],
-              rotate: [0, 2, 0, -2, 0],
-            } : {}}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: "easeInOut",
+            className="absolute cursor-pointer group nube-pos-1"
+            drag
+            dragElastic={0.1}
+            dragMomentum={false}
+            dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+            onDragStart={() => setIsDragging(true)}
+            onDragEnd={() => setTimeout(() => setIsDragging(false), 50)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            style={{
+              // Animación de flotación sin interferir con el drag
+              originX: 0.5,
+              originY: 0.5,
+            }}
+            onClick={(e) => {
+              if (!isDragging) {
+                handleDesignFolderClick();
+              }
             }}
           >
-            <Image
-              src="/escritorio-inicio/NUBE 1 COMPU.svg"
-              alt="Carpeta Diseños"
-              width={310}
-              height={310}
-              className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[180px]  md:w-[220px]  lg:w-[280px]  xl:w-[380px] "
-              draggable={false}
-            />
+            <motion.div
+              initial={{ y: 0, rotate: 0 }}
+              animate={!isDragging ? {
+                y: [0, -8, -12, -8, 0],
+                rotate: [0, 2, 0, -2, 0],
+              } : {}}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            >
+              {/* Desktop image */}
+              <Image
+                src="/escritorio-inicio/NUBE 1 COMPU.svg"
+                alt="Carpeta Diseños"
+                width={310}
+                height={310}
+                className="hidden md:block object-contain group-hover:drop-shadow-3xl transition-all duration-300 md:w-[220px] lg:w-[280px] xl:w-[380px]"
+                draggable={false}
+              />
+              {/* Mobile image */}
+              <Image
+                src="/escritorio-celu/NUBE 1 CELU.svg"
+                alt="Carpeta Diseños"
+                width={180}
+                height={180}
+                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[140px]"
+                draggable={false}
+              />
+            </motion.div>
           </motion.div>
-        </motion.div>
 
-        <motion.div
-          className="absolute cursor-pointer group nube-pos-2"
-          drag
-          dragElastic={0.1}
-          dragMomentum={false}
-          dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
-          onDragStart={() => setIsDragging(true)}
-          onDragEnd={() => setTimeout(() => setIsDragging(false), 50)}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => {
-            if (!isDragging) {
-              handlePhotoFolderClick();
-            }
-          }}
-        >
           <motion.div
-            initial={{ y: 0, rotate: 0 }}
-            animate={!isDragging ? {
-              y: [0, -10, -15, -10, 0],
-              rotate: [0, -2, 0, 2, 0],
-            } : {}}
-            transition={{
-              duration: 5,
-              repeat: Infinity,
-              ease: "easeInOut",
+            className="absolute cursor-pointer group nube-pos-2"
+            drag
+            dragElastic={0.1}
+            dragMomentum={false}
+            dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+            onDragStart={() => setIsDragging(true)}
+            onDragEnd={() => setTimeout(() => setIsDragging(false), 50)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              if (!isDragging) {
+                handlePhotoFolderClick();
+              }
             }}
           >
-            <Image
-              src="/escritorio-inicio/NUBE 2 COMPU.svg"
-              alt="Carpeta Fotografía"
-              width={460}
-              height={460}
-              className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[240px]  md:w-[300px]  lg:w-[380px]  xl:w-[460px]"
-              draggable={false}
-            />
+            <motion.div
+              initial={{ y: 0, rotate: 0 }}
+              animate={!isDragging ? {
+                y: [0, -10, -15, -10, 0],
+                rotate: [0, -2, 0, 2, 0],
+              } : {}}
+              transition={{
+                duration: 5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            >
+              {/* Desktop image */}
+              <Image
+                src="/escritorio-inicio/NUBE 2 COMPU.svg"
+                alt="Carpeta Fotografía"
+                width={460}
+                height={460}
+                className="hidden md:block object-contain group-hover:drop-shadow-3xl transition-all duration-300 md:w-[300px] lg:w-[380px] xl:w-[460px]"
+                draggable={false}
+              />
+              {/* Mobile image */}
+              <Image
+                src="/escritorio-celu/NUBE 2 CELU.svg"
+                alt="Carpeta Fotografía"
+                width={200}
+                height={200}
+                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[160px]"
+                draggable={false}
+              />
+            </motion.div>
           </motion.div>
-        </motion.div>
 
-        <motion.div
-          className="absolute cursor-pointer group nube-pos-3"
-          drag
-          dragElastic={0.1}
-          dragMomentum={false}
-          dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
-          onDragStart={() => setIsDragging(true)}
-          onDragEnd={() => setTimeout(() => setIsDragging(false), 50)}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          style={{
-            originX: 0.5,
-            originY: 0.5,
-          }}
-          onClick={() => {
-            if (!isDragging) {
-              handleContactFolderClick();
-            }
-          }}
-        >
           <motion.div
-            initial={{ y: 0, rotate: 0 }}
-            animate={!isDragging ? {
-              y: [0, -10, -14, -8, 0],
-              rotate: [0, -2, 0, 2, 0],
-            } : {}}
-            transition={{
-              duration: 4.5,
-              repeat: Infinity,
-              ease: "easeInOut",
+            className="absolute cursor-pointer group nube-pos-3"
+            drag
+            dragElastic={0.1}
+            dragMomentum={false}
+            dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+            onDragStart={() => setIsDragging(true)}
+            onDragEnd={() => setTimeout(() => setIsDragging(false), 50)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            style={{
+              originX: 0.5,
+              originY: 0.5,
+            }}
+            onClick={() => {
+              if (!isDragging) {
+                handleContactFolderClick();
+              }
             }}
           >
-            <Image
-              src="/escritorio-inicio/NUBE 3 COMPU.svg"
-              alt="Carpeta Contacto"
-              width={450}
-              height={450}
-              className="object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[230px]  md:w-[290px]  lg:w-[370px]  xl:w-[450px] "
-              draggable={false}
-            />
+            <motion.div
+              initial={{ y: 0, rotate: 0 }}
+              animate={!isDragging ? {
+                y: [0, -10, -14, -8, 0],
+                rotate: [0, -2, 0, 2, 0],
+              } : {}}
+              transition={{
+                duration: 4.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            >
+              {/* Desktop image */}
+              <Image
+                src="/escritorio-inicio/NUBE 3 COMPU.svg"
+                alt="Carpeta Contacto"
+                width={450}
+                height={450}
+                className="hidden md:block object-contain group-hover:drop-shadow-3xl transition-all duration-300 md:w-[290px] lg:w-[370px] xl:w-[450px]"
+                draggable={false}
+              />
+              {/* Mobile image */}
+              <Image
+                src="/escritorio-celu/NUBE 3 CELU.svg"
+                alt="Carpeta Contacto"
+                width={180}
+                height={180}
+                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[140px]"
+                draggable={false}
+              />
+            </motion.div>
           </motion.div>
-        </motion.div>
-      </div>
+        </div>
 
-      <AnimatePresence>
-        {windows.map((window) => (
-          <RetroWindow
-            key={window.id}
-            id={window.id}
-            title={window.title}
-            isMinimized={window.isMinimized}
-            isMaximized={window.isMaximized}
-            position={window.position}
-            size={window.size}
-            zIndex={window.zIndex}
-            onClose={() => closeWindow(window.id)}
-            onMinimize={() => updateWindow(window.id, { isMinimized: !window.isMinimized })}
-            onMaximize={() => updateWindow(window.id, { isMaximized: !window.isMaximized })}
-            onMove={(newPosition) => updateWindow(window.id, { position: newPosition })}
-            onResize={(newSize) => updateWindow(window.id, { size: newSize })}
-            onFocus={() => bringToFront(window.id)}
-          >
-            {window.content}
-          </RetroWindow>
-        ))}
-      </AnimatePresence>
+        {/* Ventanas flotantes (RetroWindow) */}
+        <AnimatePresence>
+          {windows.map((window) => (
+            <RetroWindow
+              key={window.id}
+              id={window.id}
+              title={window.title}
+              isMinimized={window.isMinimized}
+              isMaximized={window.isMaximized}
+              position={window.position}
+              size={window.size}
+              zIndex={window.zIndex}
+              onClose={() => closeWindow(window.id)}
+              onMinimize={() => updateWindow(window.id, { isMinimized: !window.isMinimized })}
+              onMaximize={() => updateWindow(window.id, { isMaximized: !window.isMaximized })}
+              onMove={(newPosition) => updateWindow(window.id, { position: newPosition })}
+              onResize={(newSize) => updateWindow(window.id, { size: newSize })}
+              onFocus={() => bringToFront(window.id)}
+            >
+              {window.content}
+            </RetroWindow>
+          ))}
+        </AnimatePresence>
       </div>
     </div>
   )
