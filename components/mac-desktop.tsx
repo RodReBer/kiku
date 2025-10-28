@@ -152,7 +152,7 @@ export default function MacDesktop() {
 
         // Obtener dimensiones de forma segura
         const dimensions = await getImageDimensions(imagePath)
-        
+
         // Aseguramos que el tamaño de la ventana se adapte exactamente a la imagen
         // para evitar bandas negras
         const windowDimensions = {
@@ -199,12 +199,12 @@ export default function MacDesktop() {
   const openVirusEffect = (images: string[], projectName: string, delayBetween = 150) => {
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768
     const actualDelay = isMobile ? delayBetween * 2 : delayBetween
-    
+
     // Validar que todas las URLs sean cadenas de texto válidas
     const validImages = images.filter(url => typeof url === 'string' && url.trim() !== '');
-    
+
     console.log(`Abriendo cascada de ${validImages.length} imágenes para el proyecto "${projectName}"`);
-    
+
     if (validImages.length === 0) {
       // Mostrar mensaje si no hay imágenes válidas
       const content = (
@@ -238,7 +238,7 @@ export default function MacDesktop() {
       // Extraer las URLs de las fotos del proyecto en Firebase
       const photoUrls = project.photos.map(p => p.url)
       console.log("URLs de fotos:", photoUrls)
-      
+
       // Abrir efecto cascada con las URLs
       openVirusEffect(
         photoUrls,
@@ -247,7 +247,7 @@ export default function MacDesktop() {
       )
     } else {
       console.log("Proyecto sin fotos o no encontrado:", folder.name)
-      
+
       // Mostrar una alerta si no hay fotos
       const windowId = `error-${Date.now()}`
       const content = (
@@ -274,7 +274,7 @@ export default function MacDesktop() {
       const [initialCategory] = useState<"design" | "photography" | "general" | "all">("design");
       return <Finder onFileClick={handleFileClick} onFolderClick={handleFolderClick} initialCategory={initialCategory} />;
     };
-    
+
     openCenteredWindow("Explorador KIKU - Diseños", <FinderWithDesignCategory />, {
       width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 900,
       height: isMobile ? Math.min(500, window.innerHeight * 0.8) : 700,
@@ -288,7 +288,7 @@ export default function MacDesktop() {
       const [initialCategory] = useState<"design" | "photography" | "general" | "all">("photography");
       return <Finder onFileClick={handleFileClick} onFolderClick={handleFolderClick} initialCategory={initialCategory} />;
     };
-    
+
     openCenteredWindow("Explorador KIKU - Fotografía", <FinderWithPhotoCategory />, {
       width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 900,
       height: isMobile ? Math.min(500, window.innerHeight * 0.8) : 700,
@@ -374,7 +374,7 @@ export default function MacDesktop() {
   }
 
   return (
-    <div className="h-screen w-full bg-white p-[5px] box-border">
+    <div className="h-screen w-full bg-white p-[3px] box-border overflow-hidden">
       <div className="h-full w-full bg-[#2169fd] relative overflow-hidden border-[7px] border-black box-border">
         {/* Desktop: kiku.svg y nubes.svg superpuestos */}
         <div className="hidden md:block absolute inset-0 w-full h-full">
@@ -399,7 +399,7 @@ export default function MacDesktop() {
         </div>
 
         {/* Mobile: kiku.svg vertical a la izquierda y nubes.svg de fondo, nubes por delante */}
-        <div className="md:hidden absolute inset-0 w-full h-full">
+        <div className="md:hidden absolute inset-0 w-full h-full overflow-hidden">
           {/* KIKU ocupa todo el alto en móvil */}
           <div className="absolute inset-0 flex items-center left-0 top-0 z-10 justify-start">
             <Image
@@ -425,7 +425,7 @@ export default function MacDesktop() {
             onClick={resetDesktop}
           />
         </div>
-        <div className="absolute top-3 right-3 md:hidden z-[1000]">
+        <div className="absolute top-2 right-1 md:hidden z-[1000]">
           <Image
             src="/escritorio-celu/kikulogo.svg"
             alt="Logo KIKU"
@@ -456,13 +456,13 @@ export default function MacDesktop() {
             draggable={false}
           />
         </div>
-        <div className="md:hidden absolute bottom-3 right-3 z-30 flex flex-col items-end gap-2">
+        <div className="md:hidden absolute bottom-1 right-1 z-30 flex flex-col items-end gap-0">
           <Image
             src="/escritorio-celu/nubes.svg"
             alt="Fondo nubes móvil"
             width={400}
             height={400}
-            className="w-[95px] h-[95px] object-contain max-w-full max-h-full -mr-1"
+            className="w-[110px] h-[110px] object-contain -mr-1"
             priority
           />
           <Image
@@ -478,13 +478,13 @@ export default function MacDesktop() {
             alt="Qué es Kiku Cream"
             width={60}
             height={60}
-            className="object-contain w-[40px] h-[40px] cursor-pointer hover:scale-110 transition-transform"
+            className="object-contain w-[40px] h-[40px] cursor-pointer hover:scale-110 transition-transform -mt-2"
             draggable={false}
           />
         </div>
 
         {/* Nubes interactivas (desktop y mobile) */}
-    <div className="flex-1 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 lg:gap-16 p-4 md:p-8 h-full md:overflow-hidden relative z-30 overflow-x-hidden overflow-y-hidden">
+        <div className="flex-1 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 lg:gap-16 p-0 md:p-8 h-full overflow-hidden relative z-30">
           {/* ...existing code for interactive nubes (motion.divs)... */}
           <motion.div
             className="absolute cursor-pointer group nube-pos-1"
