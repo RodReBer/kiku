@@ -462,7 +462,7 @@ export default function MacDesktop() {
             alt="Fondo nubes móvil"
             width={400}
             height={400}
-            className="w-[65%] h-auto object-contain max-w-full max-h-full"
+            className="w-[30%] h-auto object-contain max-w-full max-h-full"
             priority
           />
           <Image
