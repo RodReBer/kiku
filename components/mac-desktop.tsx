@@ -484,7 +484,7 @@ export default function MacDesktop() {
         </div>
 
         {/* Nubes interactivas (desktop y mobile) */}
-    <div className="flex-1 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 lg:gap-16 p-4 md:p-8 h-full overflow-y-auto md:overflow-hidden relative z-30 overflow-x-hidden overflow-y-hidden">
+    <div className="flex-1 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 lg:gap-16 p-4 md:p-8 h-full md:overflow-hidden relative z-30 overflow-x-hidden overflow-y-hidden">
           {/* ...existing code for interactive nubes (motion.divs)... */}
           <motion.div
             className="absolute cursor-pointer group nube-pos-1"
