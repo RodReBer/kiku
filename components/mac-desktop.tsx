@@ -470,7 +470,7 @@ export default function MacDesktop() {
             alt="Contacto"
             width={60}
             height={60}
-            className="object-contain w-[40px] h-[40px] cursor-pointer hover:scale-110 transition-transform"
+            className="object-contain w-[50x] h-[50x] cursor-pointer hover:scale-110 transition-transform"
             draggable={false}
           />
           <Image
@@ -478,7 +478,7 @@ export default function MacDesktop() {
             alt="Qué es Kiku Cream"
             width={60}
             height={60}
-            className="object-contain w-[40px] h-[40px] cursor-pointer hover:scale-110 transition-transform -mt-2"
+            className="object-contain w-[50x] h-[50x] cursor-pointer hover:scale-110 transition-transform -mt-2"
             draggable={false}
           />
         </div>
