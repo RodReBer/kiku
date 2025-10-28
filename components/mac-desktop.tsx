@@ -384,7 +384,7 @@ export default function MacDesktop() {
               alt="Fondo kiku"
               width={1920}
               height={1080}
-              className="absolute z-0 inset-0 h-full w-auto max-w-none object-contain"
+              className="absolute z-10 w-[130%] h-auto max-h-[130%] object-contain"
               priority
             />
             <Image
@@ -392,7 +392,7 @@ export default function MacDesktop() {
               alt="Fondo nubes"
               width={400}
               height={400}
-              className="absolute z-10 inset-0 h-full w-auto object-contain max-w-none pointer-events-none"
+              className="absolute z-0 w-[130%] h-auto object-contain max-w-full max-h-[105%] pointer-events-none"
               priority
             />
           </div>
@@ -400,24 +400,14 @@ export default function MacDesktop() {
 
         {/* Mobile: kiku.svg vertical a la izquierda y nubes.svg de fondo, nubes por delante */}
         <div className="md:hidden absolute inset-0 w-full h-full">
-          {/* KIKU y nubes móviles: kiku al fondo, nubes encima */}
-          <div className="absolute inset-0 flex items-center left-0 top-0 z-0 justify-start">
+          {/* KIKU ocupa todo el alto en móvil */}
+          <div className="absolute inset-0 flex items-center left-0 top-0 z-10 justify-start">
             <Image
               src="/escritorio-celu/kiku.svg"
               alt="Fondo kiku móvil"
               width={600}
               height={2000}
-              className="h-full w-auto max-w-none object-contain"
-              priority
-            />
-          </div>
-          <div className="absolute inset-0 w-full h-full z-10 pointer-events-none flex items-center justify-center">
-            <Image
-              src="/escritorio-celu/nubes.svg"
-              alt="Fondo nubes móvil"
-              width={400}
-              height={400}
-              className="h-full w-auto max-w-none object-contain"
+              className="h-full max-h-full w-auto object-contain"
               priority
             />
           </div>
@@ -435,52 +425,60 @@ export default function MacDesktop() {
             onClick={resetDesktop}
           />
         </div>
-        <div className="absolute top-2 right-1.5 md:hidden z-[1000]">
+        <div className="absolute top-3 right-3 md:hidden z-[1000]">
           <Image
             src="/escritorio-celu/kikulogo.svg"
             alt="Logo KIKU"
             width={60}
             height={60}
-            className="object-contain w-[50px] h-[50px] cursor-pointer hover:scale-110 transition-transform"
+            className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform"
             draggable={false}
             onClick={resetDesktop}
           />
         </div>
 
         {/* Contacto y Signos - Desktop: arriba derecha, Mobile: abajo derecha */}
-  <div className="hidden md:flex absolute right-2 bottom-6 z-20 flex-col items-end">
-          <Image
-            src="/escritorio-inicio/signos.svg"
-            alt="Qué es Kiku Cream"
-            width={60}
-            height={60}
-            className="object-contain w-[48px] h-[48px] md:w-[56px] md:h-[56px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform"
-            draggable={false}
-          />
+        <div className="hidden md:flex absolute right-2 z-20 flex-col items-end">
           <Image
             src="/escritorio-inicio/contacto.svg"
             alt="Contacto"
             width={60}
             height={60}
-            className="object-contain w-[48px] h-[48px] md:w-[56px] md:h-[56px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform -mt-0.5 md:-mt-1"
+            className="object-contain w-[40px] h-[40px] md:w-[50px] md:h-[50px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform"
             draggable={false}
           />
-        </div>
-  <div className="md:hidden absolute bottom-1 right-1 z-20 flex flex-col items-end ">
           <Image
-            src="/escritorio-celu/signos.svg"
+            src="/escritorio-inicio/signos.svg"
             alt="Qué es Kiku Cream"
             width={60}
             height={60}
-            className="object-contain w-[44px] h-[44px] cursor-pointer hover:scale-110 transition-transform"
+            className="object-contain w-[40px] h-[40px] md:w-[50px] md:h-[50px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform -mt-2 md:-mt-4"
             draggable={false}
+          />
+        </div>
+        <div className="md:hidden absolute bottom-3 right-3 z-30 flex flex-col items-end gap-2">
+          <Image
+            src="/escritorio-celu/nubes.svg"
+            alt="Fondo nubes móvil"
+            width={400}
+            height={400}
+            className="w-[65%] h-auto object-contain max-w-full max-h-full"
+            priority
           />
           <Image
             src="/escritorio-celu/contacto.svg"
             alt="Contacto"
             width={60}
             height={60}
-            className="object-contain w-[44px] h-[44px] cursor-pointer hover:scale-110 transition-transform -mt-3"
+            className="object-contain w-[40px] h-[40px] cursor-pointer hover:scale-110 transition-transform"
+            draggable={false}
+          />
+          <Image
+            src="/escritorio-celu/signos.svg"
+            alt="Qué es Kiku Cream"
+            width={60}
+            height={60}
+            className="object-contain w-[40px] h-[40px] cursor-pointer hover:scale-110 transition-transform"
             draggable={false}
           />
         </div>
