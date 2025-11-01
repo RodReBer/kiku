@@ -472,7 +472,7 @@ export default function MacDesktop() {
             alt="Fondo nubes móvil"
             width={400}
             height={400}
-            className="w-[110px] h-[110px] object-contain -mr-1"
+            className="w-[130px] h-[130px] object-contain -mr-1"
             priority
           />
           <Image
@@ -480,7 +480,7 @@ export default function MacDesktop() {
             alt="Contacto"
             width={60}
             height={60}
-            className="object-contain w-[50x] h-[50x] cursor-pointer hover:scale-110 transition-transform"
+            className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform"
             draggable={false}
           />
           <Image
@@ -488,7 +488,7 @@ export default function MacDesktop() {
             alt="Qué es Kiku Cream"
             width={60}
             height={60}
-            className="object-contain w-[50x] h-[50x] cursor-pointer hover:scale-110 transition-transform "
+            className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform -mt-2"
             draggable={false}
           />
         </div>
@@ -544,7 +544,7 @@ export default function MacDesktop() {
                 alt="Carpeta Diseños"
                 width={180}
                 height={180}
-                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[140px]"
+                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[160px]"
                 draggable={false}
               />
             </motion.div>
@@ -591,8 +591,8 @@ export default function MacDesktop() {
               <Image
                 src="/escritorio-celu/NUBE 2 CELU.svg"
                 alt="Carpeta Fotografía"
-                width={200}
-                height={200}
+                width={180}
+                height={180}
                 className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[160px]"
                 draggable={false}
               />
@@ -646,7 +646,7 @@ export default function MacDesktop() {
                 alt="Carpeta Contacto"
                 width={180}
                 height={180}
-                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[140px]"
+                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[500px]"
                 draggable={false}
               />
             </motion.div>
