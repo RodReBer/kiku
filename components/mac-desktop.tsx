@@ -425,13 +425,13 @@ export default function MacDesktop() {
               priority
             />
           </div>
-          <div className="absolute inset-0 flex items-center right-0 top-0 z-10 justify-end">
+          <div className="absolute inset-0 flex items-center right-0 top-0 z-10 justify-end mobile-nubes-container">
             <Image
               src="/escritorio-celu/kikunubes.svg"
               alt="Fondo kikunubes móvil"
               width={600}
               height={2000}
-              className="h-full max-h-full w-auto object-contain"
+              className="h-full max-h-full w-auto object-contain mobile-kikunubes"
               priority
             />
           </div>
@@ -481,13 +481,13 @@ export default function MacDesktop() {
             draggable={false}
           />
         </div>
-        <div className="md:hidden absolute bottom-1 right-1 z-10 flex flex-col items-end gap-0 pointer-events-none">
+        <div className="md:hidden absolute bottom-1 right-1 z-10 flex flex-col items-end gap-0 pointer-events-none ">
           <Image
             src="/escritorio-celu/nubes.svg"
             alt="Fondo nubes móvil"
             width={400}
             height={400}
-            className="w-[130px] h-[130px] object-contain -mr-1 pointer-events-none"
+            className="w-[175px] h-[175px] object-contain pointer-events-none mobile-nubes-bg"
             priority
           />
           <Image
@@ -504,7 +504,7 @@ export default function MacDesktop() {
             alt="Qué es Kiku Cream"
             width={60}
             height={60}
-            className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform -mt-2 pointer-events-auto"
+            className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform -mt-3 pointer-events-auto"
             draggable={false}
           />
         </div>

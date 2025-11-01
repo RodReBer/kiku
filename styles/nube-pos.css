@@ -1,3 +1,52 @@
+/* ============================================
+   BACKGROUND KIKUNUBES MÓVIL
+   ============================================ */
+
+/* iPhone SE, iPhone 5 (320px - 374px) - Mover a la izquierda */
+@media (max-width: 374px) {
+  .mobile-kikunubes-container {
+    padding-right: 0;
+    margin-right: -20px; /* Mueve 20px a la izquierda */
+  }
+}
+
+/* iPhone 12 mini, 13 mini (375px - 389px) - Ajuste menor */
+@media (min-width: 375px) and (max-width: 389px) {
+  .mobile-kikunubes-container {
+    margin-right: -12px; /* Mueve 12px a la izquierda */
+  }
+}
+
+/* ============================================
+   BACKGROUND NUBES.SVG MÓVIL (icono inferior)
+   ============================================ */
+
+/* Ajuste para pantallas pequeñas - el nubes.svg pequeño de abajo */
+.mobile-nubes-container {
+  right: 0.25rem; /* default (right-1) */
+}
+
+.mobile-nubes-bg {
+  margin-right: -0.8rem; /* default (-mr-1) */
+}
+
+/* iPhone SE, iPhone 5 (320px - 374px) */
+@media (max-width: 374px) {
+  .mobile-nubes-container {
+    right: -2rem;
+  }
+  .mobile-nubes-bg {
+    margin-right: 15px;
+  }
+}
+
+/* iPhone 12 mini, 13 mini (375px - 389px) */
+@media (min-width: 375px) and (max-width: 389px) {
+  .mobile-nubes-container {
+    right: 3.5rem;
+  }
+}
+
 /* Animaciones para las nubes */
 @keyframes floatBounce1 {
 
@@ -344,7 +393,7 @@
 /* MOBILE GRANDE - Tablets pequeños (480px - 767px) */
 @media (min-width: 480px) and (max-width: 767px) {
   .nube-pos-3 {
-    bottom: 25%;
+    bottom: 2%;
     left: calc(50% - 130px);
   }
   .nube-3-mobile-size {
