@@ -411,6 +411,16 @@ export default function MacDesktop() {
               priority
             />
           </div>
+          <div className="absolute inset-0 flex items-center right-0 top-0 z-10 justify-end">
+            <Image
+              src="/escritorio-celu/kikunubes.svg"
+              alt="Fondo kikunubes móvil"
+              width={600}
+              height={2000}
+              className="h-full max-h-full w-auto object-contain"
+              priority
+            />
+          </div>
         </div>
 
         {/* Logo KIKU - Desktop: arriba izquierda, Mobile: arriba derecha */}
@@ -478,7 +488,7 @@ export default function MacDesktop() {
             alt="Qué es Kiku Cream"
             width={60}
             height={60}
-            className="object-contain w-[50x] h-[50x] cursor-pointer hover:scale-110 transition-transform -mt-2"
+            className="object-contain w-[50x] h-[50x] cursor-pointer hover:scale-110 transition-transform "
             draggable={false}
           />
         </div>
