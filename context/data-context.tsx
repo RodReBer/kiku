@@ -14,8 +14,8 @@ export interface Photo {
 export interface Project {
   id: string
   name: string
-  type: "photography" | "design" | "illustration" | "file" | "folder"
-  category: "design" | "photography" | "general"
+  type: "photography" | "design" | "illustration" | "video" | "file" | "folder"
+  category: "design" | "photography" | "video" | "general"
   photos?: Photo[]
   description?: string
   status: "active" | "archived"

@@ -231,6 +231,7 @@ export default function AdminPanel() {
                         <SelectContent className="bg-purple-900 border-purple-700">
                           <SelectItem value="photography">📸 Fotografía</SelectItem>
                           <SelectItem value="design">🎨 Diseño</SelectItem>
+                          <SelectItem value="video">🎬 Video</SelectItem>
                           <SelectItem value="illustration">✏️ Ilustración</SelectItem>
                           <SelectItem value="file">📄 Archivo</SelectItem>
                           <SelectItem value="folder">📁 Carpeta</SelectItem>
@@ -254,6 +255,7 @@ export default function AdminPanel() {
                         <SelectContent className="bg-purple-900 border-purple-700">
                           <SelectItem value="design">🎨 Diseño</SelectItem>
                           <SelectItem value="photography">📸 Fotografía</SelectItem>
+                          <SelectItem value="video">🎬 Video</SelectItem>
                           <SelectItem value="general">📋 General</SelectItem>
                         </SelectContent>
                       </Select>
@@ -764,6 +766,7 @@ function ProjectEditForm({
             <SelectContent>
               <SelectItem value="photography">Fotografía</SelectItem>
               <SelectItem value="design">Diseño</SelectItem>
+              <SelectItem value="video">Video</SelectItem>
               <SelectItem value="illustration">Ilustración</SelectItem>
               <SelectItem value="file">Archivo</SelectItem>
               <SelectItem value="folder">Carpeta</SelectItem>

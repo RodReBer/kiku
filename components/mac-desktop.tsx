@@ -18,7 +18,7 @@ interface FileItem {
   id: string
   name: string
   type: "file" | "folder" | "project"
-  category: "design" | "photography" | "general"
+  category: "design" | "photography" | "video" | "general"
 }
 
 interface WindowState {
@@ -285,11 +285,25 @@ export default function MacDesktop() {
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768
     // Configuramos el finder para mostrar específicamente la categoría de fotografía
     const FinderWithPhotoCategory = () => {
-      const [initialCategory] = useState<"design" | "photography" | "general" | "all">("photography");
+      const [initialCategory] = useState<"design" | "photography" | "video" | "general" | "all">("photography");
       return <Finder onFileClick={handleFileClick} onFolderClick={handleFolderClick} initialCategory={initialCategory} />;
     };
 
     openCenteredWindow("Explorador KIKU - Fotografía", <FinderWithPhotoCategory />, {
+      width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 900,
+      height: isMobile ? Math.min(500, window.innerHeight * 0.8) : 700,
+    })
+  }
+
+  const handleVideoFolderClick = () => {
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768
+    // Configuramos el finder para mostrar específicamente la categoría de video
+    const FinderWithVideoCategory = () => {
+      const [initialCategory] = useState<"design" | "photography" | "video" | "general" | "all">("video");
+      return <Finder onFileClick={handleFileClick} onFolderClick={handleFolderClick} initialCategory={initialCategory} />;
+    };
+
+    openCenteredWindow("Explorador KIKU - Videos", <FinderWithVideoCategory />, {
       width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 900,
       height: isMobile ? Math.min(500, window.innerHeight * 0.8) : 700,
     })
@@ -456,6 +470,7 @@ export default function MacDesktop() {
             height={60}
             className="object-contain w-[40px] h-[40px] md:w-[50px] md:h-[50px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform"
             draggable={false}
+            onClick={handleContactFolderClick}
           />
           <Image
             src="/escritorio-inicio/signos.svg"
@@ -466,13 +481,13 @@ export default function MacDesktop() {
             draggable={false}
           />
         </div>
-        <div className="md:hidden absolute bottom-1 right-1 z-30 flex flex-col items-end gap-0">
+        <div className="md:hidden absolute bottom-1 right-1 z-10 flex flex-col items-end gap-0 pointer-events-none">
           <Image
             src="/escritorio-celu/nubes.svg"
             alt="Fondo nubes móvil"
             width={400}
             height={400}
-            className="w-[130px] h-[130px] object-contain -mr-1"
+            className="w-[130px] h-[130px] object-contain -mr-1 pointer-events-none"
             priority
           />
           <Image
@@ -480,15 +495,16 @@ export default function MacDesktop() {
             alt="Contacto"
             width={60}
             height={60}
-            className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform"
+            className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform pointer-events-auto"
             draggable={false}
+            onClick={handleContactFolderClick}
           />
           <Image
             src="/escritorio-celu/signos.svg"
             alt="Qué es Kiku Cream"
             width={60}
             height={60}
-            className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform -mt-2"
+            className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform -mt-2 pointer-events-auto"
             draggable={false}
           />
         </div>
@@ -544,7 +560,7 @@ export default function MacDesktop() {
                 alt="Carpeta Diseños"
                 width={180}
                 height={180}
-                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[160px]"
+                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 nube-1-mobile-size"
                 draggable={false}
               />
             </motion.div>
@@ -593,7 +609,7 @@ export default function MacDesktop() {
                 alt="Carpeta Fotografía"
                 width={180}
                 height={180}
-                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[160px]"
+                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 nube-2-mobile-size"
                 draggable={false}
               />
             </motion.div>
@@ -615,7 +631,7 @@ export default function MacDesktop() {
             }}
             onClick={() => {
               if (!isDragging) {
-                handleContactFolderClick();
+                handleVideoFolderClick();
               }
             }}
           >
@@ -643,10 +659,10 @@ export default function MacDesktop() {
               {/* Mobile image */}
               <Image
                 src="/escritorio-celu/NUBE 3 CELU.svg"
-                alt="Carpeta Contacto"
-                width={180}
-                height={180}
-                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 w-[500px]"
+                alt="Carpeta Video"
+                width={250}
+                height={250}
+                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 nube-3-mobile-size"
                 draggable={false}
               />
             </motion.div>
