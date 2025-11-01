@@ -35,13 +35,13 @@ interface WindowState {
 export default function MacDesktop() {
   const { projects } = useData()
   const [windows, setWindows] = useState<WindowState[]>([])
-  const [nextZIndex, setNextZIndex] = useState(100)
+  const [nextZIndex, setNextZIndex] = useState(3000) // Base alto para ventanas (por encima de UI)
   const [isDragging, setIsDragging] = useState(false)
 
   // Función para resetear el escritorio (cerrar todas las ventanas)
   const resetDesktop = () => {
     setWindows([])
-    setNextZIndex(100)
+    setNextZIndex(3000)
   }
 
   // Función para obtener dimensiones de imagen - COMPLETAMENTE CORREGIDA
@@ -201,7 +201,7 @@ export default function MacDesktop() {
           </div>
         )
 
-        // Crear ventana con posición aleatoria y z-index alto
+        // Crear ventana con posición aleatoria y z-index dinámico
         const photoWindow: WindowState = {
           id: windowId,
           title,
@@ -210,10 +210,11 @@ export default function MacDesktop() {
           isMaximized: false,
           position: { x: randomX, y: randomY },
           size: windowDimensions,
-          zIndex: 2000 + index, // z-index muy alto para que estén por encima de todo
+          zIndex: nextZIndex + index, // z-index dinámico que se incrementa
         }
 
         setWindows((prev) => [...prev, photoWindow])
+        setNextZIndex((prev) => prev + 1)
       } catch (error) {
         console.error("Error creating photo window:", error)
         // Crear ventana con dimensiones por defecto si hay error
@@ -498,7 +499,7 @@ export default function MacDesktop() {
         </div>
 
         {/* Contacto y Signos - Desktop: arriba derecha, Mobile: abajo derecha */}
-        <div className="hidden md:flex absolute top-2 right-2 z-[100] flex-col items-end gap-2 pointer-events-auto">
+        <div className="hidden md:flex absolute top-2 right-2 z-[200] flex-col items-end gap-2 pointer-events-auto">
           <Image
             src="/escritorio-inicio/contacto.svg"
             alt="Contacto"
@@ -523,13 +524,14 @@ export default function MacDesktop() {
             }}
           />
         </div>
-        <div className="md:hidden absolute bottom-1 right-1 z-10 flex flex-col items-end gap-0 pointer-events-none ">
+        {/* Container móvil con nubes.svg y botones - nubes SVG arriba en el DOM */}
+        <div className="md:hidden absolute bottom-1 right-1 flex flex-col items-end gap-0 pointer-events-none">
           <Image
             src="/escritorio-celu/nubes.svg"
             alt="Fondo nubes móvil"
             width={400}
             height={400}
-            className="w-[175px] h-[175px] object-contain pointer-events-none mobile-nubes-bg"
+            className="w-[175px] h-[175px] object-contain pointer-events-none mobile-nubes-bg z-[100]"
             priority
           />
           <Image
@@ -537,7 +539,7 @@ export default function MacDesktop() {
             alt="Contacto"
             width={60}
             height={60}
-            className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform pointer-events-auto"
+            className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform pointer-events-auto z-[200]"
             draggable={false}
             onClick={(e) => {
               e.stopPropagation();
@@ -549,7 +551,7 @@ export default function MacDesktop() {
             alt="Qué es Kiku Cream"
             width={60}
             height={60}
-            className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform -mt-3 pointer-events-auto"
+            className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform -mt-3 pointer-events-auto z-[200]"
             draggable={false}
             onClick={(e) => {
               e.stopPropagation();
@@ -558,7 +560,7 @@ export default function MacDesktop() {
         </div>
 
         {/* Nubes interactivas (desktop y mobile) */}
-        <div className="flex-1 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 lg:gap-16 p-0 md:p-8 h-full overflow-hidden relative z-30">
+        <div className="flex-1 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 lg:gap-16 p-0 md:p-8 h-full overflow-hidden relative z-[150]">
           {/* ...existing code for interactive nubes (motion.divs)... */}
           <motion.div
             className="absolute cursor-pointer group nube-pos-1"
@@ -664,7 +666,7 @@ export default function MacDesktop() {
           </motion.div>
 
           <motion.div
-            className="absolute cursor-pointer group nube-pos-3"
+            className="absolute cursor-pointer group nube-pos-3 z-[200]"
             drag
             dragElastic={0.1}
             dragMomentum={false}
