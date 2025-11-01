@@ -498,26 +498,32 @@ export default function MacDesktop() {
         </div>
 
         {/* Contacto y Signos - Desktop: arriba derecha, Mobile: abajo derecha */}
-        <div className="hidden md:flex absolute right-2 z-20 flex-col items-end">
+        <div className="hidden md:flex absolute top-2 right-2 z-[100] flex-col items-end gap-2 pointer-events-auto">
           <Image
             src="/escritorio-inicio/contacto.svg"
             alt="Contacto"
             width={60}
             height={60}
-            className="object-contain w-[40px] h-[40px] md:w-[50px] md:h-[50px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform"
+            className="object-contain w-[40px] h-[40px] md:w-[50px] md:h-[50px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform pointer-events-auto"
             draggable={false}
-            onClick={handleContactFolderClick}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleContactFolderClick();
+            }}
           />
           <Image
             src="/escritorio-inicio/signos.svg"
             alt="Qué es Kiku Cream"
             width={60}
             height={60}
-            className="object-contain w-[40px] h-[40px] md:w-[50px] md:h-[50px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform -mt-2 md:-mt-4"
+            className="object-contain w-[40px] h-[40px] md:w-[50px] md:h-[50px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform pointer-events-auto"
             draggable={false}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
           />
         </div>
-        <div className="md:hidden absolute bottom-1 right-1 z-10 flex flex-col items-end gap-0 pointer-events-none ">
+        <div className="md:hidden absolute bottom-1 right-1 z-[100] flex flex-col items-end gap-0 pointer-events-none ">
           <Image
             src="/escritorio-celu/nubes.svg"
             alt="Fondo nubes móvil"
@@ -533,7 +539,10 @@ export default function MacDesktop() {
             height={60}
             className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform pointer-events-auto"
             draggable={false}
-            onClick={handleContactFolderClick}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleContactFolderClick();
+            }}
           />
           <Image
             src="/escritorio-celu/signos.svg"
@@ -542,6 +551,9 @@ export default function MacDesktop() {
             height={60}
             className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform -mt-3 pointer-events-auto"
             draggable={false}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
           />
         </div>
 
