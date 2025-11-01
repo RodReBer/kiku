@@ -138,7 +138,7 @@ export default function Finder({ onFileClick, onFolderClick, initialCategory = "
                 {cat==='all' && 'Todos'}
                 {cat==='design' && 'Diseño'}
                 {cat==='photography' && 'Fotos'}
-                {cat==='video' && 'Videos'}
+                {cat==='video' && 'Y más'}
               </button>
             ))}
           </div>
@@ -272,7 +272,7 @@ export default function Finder({ onFileClick, onFolderClick, initialCategory = "
                   <span className="text-[11px] md:text-xs text-center text-gray-800 font-medium truncate w-full" title={item.name}>
                     {item.name}
                   </span>
-                  <span className="text-[10px] text-gray-600 mt-1 capitalize">{item.category === 'photography' ? '📁 Fotos' : item.category === 'design' ? '🎨 Diseño' : item.category === 'video' ? '🎬 Video' : item.category}</span>
+                  <span className="text-[10px] text-gray-600 mt-1 capitalize">{item.category === 'photography' ? '📁 Fotos' : item.category === 'design' ? '🎨 Diseño' : item.category === 'video' ? '✨ Y más' : item.category}</span>
                 </div>
               ))}
             </div>

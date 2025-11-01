@@ -9,9 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Trash2, Edit, Plus, Save, X, RefreshCw, ImageIcon, Folder, Check, Archive } from "lucide-react"
+import { Trash2, Edit, Plus, Save, X, RefreshCw, ImageIcon, Folder, Check, Archive, Upload } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import type { Project, Product, Photo } from "@/context/data-context"
+import { uploadImage, uploadMultipleImages, generateProjectPath } from "@/lib/storage-utils"
 
 export default function AdminPanel() {
   const { toast } = useToast()
@@ -55,30 +56,93 @@ export default function AdminPanel() {
   })
 
   const [photoUrls, setPhotoUrls] = useState("")
+  const [uploadingFiles, setUploadingFiles] = useState(false)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [coverImageFile, setCoverImageFile] = useState<File | null>(null)
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (files) {
+      setSelectedFiles(Array.from(files))
+    }
+  }
+
+  const handleCoverImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      setCoverImageFile(file)
+    }
+  }
 
   const handleAddProject = async () => {
     if (!newProject.name || !newProject.type || !newProject.category) {
-      alert("Por favor completa todos los campos requeridos")
+      toast({
+        title: "Error",
+        description: "Por favor completa todos los campos requeridos",
+        variant: "destructive",
+      })
       return
     }
 
-    // Procesar URLs de fotos
-    const photos: Photo[] = photoUrls
-      .split("\n")
-      .filter((url) => url.trim())
-      .map((url, index) => ({
+    setUploadingFiles(true)
+    try {
+      let coverImageUrl = newProject.coverImage || ""
+      let uploadedPhotoUrls: string[] = []
+
+      // Subir cover image si se seleccionó un archivo
+      if (coverImageFile) {
+        const basePath = generateProjectPath(
+          newProject.category as "design" | "photography" | "video" | "general",
+          newProject.name
+        )
+        coverImageUrl = await uploadImage(coverImageFile, `${basePath}/cover-${coverImageFile.name}`)
+        toast({
+          title: "✓ Cover image subida",
+          description: "Imagen de portada subida correctamente",
+        })
+      }
+
+      // Subir archivos seleccionados si los hay
+      if (selectedFiles.length > 0) {
+        const basePath = generateProjectPath(
+          newProject.category as "design" | "photography" | "video" | "general",
+          newProject.name
+        )
+        uploadedPhotoUrls = await uploadMultipleImages(selectedFiles, basePath)
+        toast({
+          title: `✓ ${uploadedPhotoUrls.length} archivos subidos`,
+          description: "Todos los archivos se subieron correctamente",
+        })
+      }
+
+      // Procesar URLs manuales si se ingresaron (del textarea photoUrls state)
+      const manualUrlsFromTextarea = photoUrls
+        .split("\n")
+        .filter((url: string) => url.trim())
+        .map((url: string) => url.trim())
+
+      // Combinar URLs subidas y manuales
+      const allUrls = [...uploadedPhotoUrls, ...manualUrlsFromTextarea]
+
+      const photos: Photo[] = allUrls.map((url, index) => ({
         id: `photo-${Date.now()}-${index}`,
-        url: url.trim(),
+        url: url,
         title: `Foto ${index + 1}`,
         description: "",
       }))
 
-    try {
       await addProject({
         ...(newProject as Omit<Project, "id">),
+        coverImage: coverImageUrl,
         photos,
       })
 
+      toast({
+        title: "✓ Proyecto creado",
+        description: `${newProject.name} se agregó correctamente`,
+      })
+
+      // Reset form
       setNewProject({
         name: "",
         type: "photography",
@@ -86,12 +150,21 @@ export default function AdminPanel() {
         description: "",
         status: "active",
         photos: [],
-  coverImage: "",
+        coverImage: "",
       })
       setPhotoUrls("")
+      setSelectedFiles([])
+      setCoverImageFile(null)
       setShowNewProject(false)
     } catch (err) {
       console.error("Error adding project:", err)
+      toast({
+        title: "Error",
+        description: "Error al crear el proyecto. Intenta de nuevo.",
+        variant: "destructive",
+      })
+    } finally {
+      setUploadingFiles(false)
     }
   }
 
@@ -294,39 +367,97 @@ export default function AdminPanel() {
                       placeholder="URL de la imagen principal"
                       value={newProject.coverImage || ""}
                       onChange={(e) => setNewProject({ ...newProject, coverImage: e.target.value })}
-                      className="bg-white/20 border-white/30 text-white placeholder-purple-300"
+                      className="bg-white/20 border-white/30 text-white placeholder-purple-300 mb-2"
                     />
+                    <div className="flex items-center gap-2">
+                      <label className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded cursor-pointer transition-colors">
+                        <Upload size={16} />
+                        <span className="text-sm">O subir archivo</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleCoverImageSelect}
+                          className="hidden"
+                        />
+                      </label>
+                      {coverImageFile && (
+                        <span className="text-sm text-purple-200">✓ {coverImageFile.name}</span>
+                      )}
+                    </div>
                     <p className="text-purple-300 text-xs mt-1">Se mostrará como miniatura en el explorador.</p>
                   </div>
 
                   <div>
                     <label className="block text-purple-200 text-sm font-medium mb-2">
-                      URLs de Fotos (una por línea)
+                      Subir Archivos (Fotos/Videos)
+                    </label>
+                    <label className="flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded cursor-pointer transition-colors mb-2">
+                      <Upload size={18} />
+                      <span>Seleccionar archivos desde tu computadora</span>
+                      <input
+                        type="file"
+                        accept="image/*,video/*"
+                        multiple
+                        onChange={handleFileSelect}
+                        className="hidden"
+                      />
+                    </label>
+                    {selectedFiles.length > 0 && (
+                      <div className="bg-white/10 rounded p-2 mb-2">
+                        <p className="text-purple-200 text-sm font-medium mb-1">
+                          {selectedFiles.length} archivo(s) seleccionado(s):
+                        </p>
+                        <ul className="text-xs text-purple-300 space-y-1">
+                          {selectedFiles.map((file, idx) => (
+                            <li key={idx}>✓ {file.name}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    <p className="text-purple-300 text-xs">
+                      🔥 Los archivos se subirán automáticamente a Firebase Storage
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-purple-200 text-sm font-medium mb-2">
+                      URLs de Fotos (opcional - una por línea)
                     </label>
                     <Textarea
                       placeholder="https://ejemplo.com/foto1.jpg&#10;https://ejemplo.com/foto2.jpg&#10;https://ejemplo.com/foto3.jpg"
                       value={photoUrls}
                       onChange={(e) => setPhotoUrls(e.target.value)}
                       className="bg-white/20 border-white/30 text-white placeholder-purple-300"
-                      rows={6}
+                      rows={4}
                     />
                     <p className="text-purple-300 text-xs mt-1">
-                      💡 Pega aquí los links de tus fotos de Firebase Storage o cualquier URL pública
+                      💡 Solo si quieres agregar URLs adicionales manualmente
                     </p>
                   </div>
 
                   <div className="flex gap-3 pt-4">
                     <Button
                       onClick={handleAddProject}
-                      className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+                      disabled={uploadingFiles}
+                      className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50"
                     >
-                      <Save size={16} className="mr-2" />
-                      Crear Proyecto
+                      {uploadingFiles ? (
+                        <>
+                          <RefreshCw size={16} className="mr-2 animate-spin" />
+                          Subiendo archivos...
+                        </>
+                      ) : (
+                        <>
+                          <Save size={16} className="mr-2" />
+                          Crear Proyecto
+                        </>
+                      )}
                     </Button>
                     <Button
                       variant="outline"
                       onClick={() => setShowNewProject(false)}
-                      className="bg-white/20 border-white/30 text-white hover:bg-white/30"
+                      disabled={uploadingFiles}
+                      className="bg-white/20 border-white/30 text-white hover:bg-white/30 disabled:opacity-50"
                     >
                       <X size={16} className="mr-2" />
                       Cancelar
