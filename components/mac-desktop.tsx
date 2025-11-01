@@ -525,7 +525,7 @@ export default function MacDesktop() {
           />
         </div>
         {/* Container móvil con nubes.svg y botones - nubes SVG arriba en el DOM */}
-        <div className="md:hidden absolute bottom-1 right-1 flex flex-col items-end gap-0 pointer-events-none">
+        <div className="md:hidden absolute -bottom-1 right-1 flex flex-col items-end gap-0 pointer-events-none">
           <Image
             src="/escritorio-celu/nubes.svg"
             alt="Fondo nubes móvil"
@@ -551,7 +551,7 @@ export default function MacDesktop() {
             alt="Qué es Kiku Cream"
             width={60}
             height={60}
-            className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform -mt-3 pointer-events-auto z-[200]"
+            className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform -mt-4 pointer-events-auto z-[200]"
             draggable={false}
             onClick={(e) => {
               e.stopPropagation();
@@ -710,7 +710,7 @@ export default function MacDesktop() {
               <Image
                 src="/escritorio-celu/NUBE 3 CELU.svg"
                 alt="Carpeta Video"
-                width={250}
+                width={240}
                 height={0}
                 className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 nube-3-mobile-size h-auto"
                 draggable={false}

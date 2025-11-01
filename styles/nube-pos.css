@@ -135,7 +135,7 @@
 @media (min-width: 375px) and (max-width: 389px) {
   .nube-pos-1 {
     top: 15%;
-    left: calc(55% - 60px);
+    left: calc(55% - 45px);
   }
   .nube-1-mobile-size {
     width: 170px;
@@ -335,7 +335,7 @@
 
 /* Control de tamaño de imagen mobile - Solo ancho, altura automática */
 .nube-3-mobile-size {
-  width: 250px;
+  width: 240px;
   height: auto;
 }
 
@@ -357,11 +357,11 @@
 /* iPhone 12 mini, 13 mini (375px - 389px) */
 @media (min-width: 375px) and (max-width: 389px) {
   .nube-pos-3 {
-    bottom: 2%;
-    left: calc(50% - 125px);
+    bottom: 3%;
+    left: calc(50% - 110px);
   }
   .nube-3-mobile-size {
-    width: 250px;
+    width: 220px;
     height: auto;
   }
 }
@@ -373,7 +373,7 @@
     left: calc(50% - 110px);
   }
   .nube-3-mobile-size {
-    width: 250px;
+    width: 240px;
     height: auto;
   }
 }
@@ -385,7 +385,7 @@
     left: calc(50% - 120px);
   }
   .nube-3-mobile-size {
-    width: 260px;
+    width: 240px;
     height: auto;
   }
 }
