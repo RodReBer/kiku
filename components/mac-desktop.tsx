@@ -145,20 +145,44 @@ export default function MacDesktop() {
     createWindow(windowId, title, content, true, size)
   }
 
-  const createPhotoWindow = (imagePath: string, title: string, delay = 0) => {
+  const createPhotoWindow = (imagePath: string, title: string, delay = 0, index = 0) => {
     setTimeout(async () => {
       try {
         const windowId = `photo-${Date.now()}-${Math.random()}`
+        const isMobile = typeof window !== "undefined" && window.innerWidth < 768
 
         // Obtener dimensiones de forma segura
         const dimensions = await getImageDimensions(imagePath)
 
-        // Aseguramos que el tamaño de la ventana se adapte exactamente a la imagen
-        // para evitar bandas negras
-        const windowDimensions = {
-          width: dimensions.width + 4, // Añadimos un pequeño padding
-          height: dimensions.height + 4, // para la ventana
-        };
+        // Dimensiones responsivas para las ventanas de fotos
+        let windowDimensions
+        if (isMobile) {
+          // En móvil: ventanas más pequeñas para que quepan varias
+          const maxWidth = Math.min(280, window.innerWidth * 0.7)
+          const maxHeight = Math.min(350, window.innerHeight * 0.5)
+          const scale = Math.min(maxWidth / dimensions.width, maxHeight / dimensions.height, 1)
+          windowDimensions = {
+            width: Math.round(dimensions.width * scale),
+            height: Math.round(dimensions.height * scale),
+          }
+        } else {
+          // En desktop: ventanas más grandes
+          const maxWidth = Math.min(500, window.innerWidth * 0.4)
+          const maxHeight = Math.min(600, window.innerHeight * 0.6)
+          const scale = Math.min(maxWidth / dimensions.width, maxHeight / dimensions.height, 1)
+          windowDimensions = {
+            width: Math.round(dimensions.width * scale),
+            height: Math.round(dimensions.height * scale),
+          }
+        }
+
+        // Posición aleatoria desperdigada por toda la pantalla
+        const viewportWidth = window.innerWidth
+        const viewportHeight = window.innerHeight
+        
+        // Generar posición aleatoria pero asegurando que la ventana esté visible
+        const randomX = Math.random() * (viewportWidth - windowDimensions.width - 50)
+        const randomY = Math.random() * (viewportHeight - windowDimensions.height - 100)
 
         const content = (
           <div className="w-full h-full flex items-center justify-center bg-black p-0">
@@ -177,7 +201,19 @@ export default function MacDesktop() {
           </div>
         )
 
-        createWindow(windowId, title, content, false, windowDimensions)
+        // Crear ventana con posición aleatoria y z-index alto
+        const photoWindow: WindowState = {
+          id: windowId,
+          title,
+          content,
+          isMinimized: false,
+          isMaximized: false,
+          position: { x: randomX, y: randomY },
+          size: windowDimensions,
+          zIndex: 2000 + index, // z-index muy alto para que estén por encima de todo
+        }
+
+        setWindows((prev) => [...prev, photoWindow])
       } catch (error) {
         console.error("Error creating photo window:", error)
         // Crear ventana con dimensiones por defecto si hay error
@@ -224,8 +260,8 @@ export default function MacDesktop() {
     validImages.forEach((imagePath, index) => {
       // Extraer un nombre para la imagen desde la URL
       const fileName = imagePath.split("/").pop()?.split(".")[0] || `Imagen ${index + 1}`
-      // Crear ventana para cada foto con el delay correspondiente
-      createPhotoWindow(imagePath, `${projectName} - ${fileName}`, index * actualDelay)
+      // Crear ventana para cada foto con el delay correspondiente y el índice para z-index
+      createPhotoWindow(imagePath, `${projectName} - ${fileName}`, index * actualDelay, index)
     })
   }
 
