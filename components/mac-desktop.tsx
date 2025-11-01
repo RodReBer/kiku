@@ -523,7 +523,7 @@ export default function MacDesktop() {
             }}
           />
         </div>
-        <div className="md:hidden absolute bottom-1 right-1 z-[100] flex flex-col items-end gap-0 pointer-events-none ">
+        <div className="md:hidden absolute bottom-1 right-1 z-10 flex flex-col items-end gap-0 pointer-events-none ">
           <Image
             src="/escritorio-celu/nubes.svg"
             alt="Fondo nubes móvil"
@@ -607,8 +607,8 @@ export default function MacDesktop() {
                 src="/escritorio-celu/NUBE 1 CELU.svg"
                 alt="Carpeta Diseños"
                 width={180}
-                height={180}
-                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 nube-1-mobile-size"
+                height={0}
+                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 nube-1-mobile-size h-auto"
                 draggable={false}
               />
             </motion.div>
@@ -656,8 +656,8 @@ export default function MacDesktop() {
                 src="/escritorio-celu/NUBE 2 CELU.svg"
                 alt="Carpeta Fotografía"
                 width={180}
-                height={180}
-                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 nube-2-mobile-size"
+                height={0}
+                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 nube-2-mobile-size h-auto"
                 draggable={false}
               />
             </motion.div>
@@ -709,8 +709,8 @@ export default function MacDesktop() {
                 src="/escritorio-celu/NUBE 3 CELU.svg"
                 alt="Carpeta Video"
                 width={250}
-                height={250}
-                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 nube-3-mobile-size"
+                height={0}
+                className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 nube-3-mobile-size h-auto"
                 draggable={false}
               />
             </motion.div>
