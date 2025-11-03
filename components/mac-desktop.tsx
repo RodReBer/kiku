@@ -499,7 +499,7 @@ export default function MacDesktop() {
         </div>
 
         {/* Contacto y Signos - Desktop: arriba derecha, Mobile: abajo derecha */}
-        <div className="hidden md:flex absolute top-2 right-2 z-[200] flex-col items-end gap-2 pointer-events-auto">
+        <div className="hidden md:flex absolute top-0 right-2 z-[200] flex-col items-end gap-0 pointer-events-auto">
           <Image
             src="/escritorio-inicio/contacto.svg"
             alt="Contacto"
