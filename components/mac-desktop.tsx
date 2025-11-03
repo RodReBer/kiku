@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import RetroWindow from "./retro-window"
@@ -37,6 +37,11 @@ export default function MacDesktop() {
   const [windows, setWindows] = useState<WindowState[]>([])
   const [nextZIndex, setNextZIndex] = useState(3000) // Base alto para ventanas (por encima de UI)
   const [isDragging, setIsDragging] = useState(false)
+
+  // Scroll hacia arriba al montar el componente
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [])
 
   // Función para resetear el escritorio (cerrar todas las ventanas)
   const resetDesktop = () => {
