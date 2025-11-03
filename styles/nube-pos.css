@@ -431,14 +431,14 @@
 
 @media (min-width: 1524px) {
   .nube-pos-3 {
-    top: 22%;
+    top: 24%;
     right: 12%;
   }
 }
 
 @media (min-width: 1800px) {
   .nube-pos-3 {
-    top: 18%;
+    top: 23%;
     right: 15%;
   }
 }

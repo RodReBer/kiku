@@ -510,7 +510,7 @@ export default function MacDesktop() {
             alt="Contacto"
             width={60}
             height={60}
-            className="object-contain w-[40px] h-[40px] md:w-[50px] md:h-[50px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform pointer-events-auto"
+            className="object-contain w-[40px] h-[40px] md:w-[50px] md:h-[50px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform pointer-events-auto -mb-4"
             draggable={false}
             onClick={(e) => {
               e.stopPropagation();
