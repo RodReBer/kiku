@@ -26,7 +26,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
             src={src}
             alt=""
             draggable={false}
-            className="h-[90vh] max-h-screen w-auto"
+            className="h-[100vh] max-h-screen w-auto"
           />
         ))}
       </div>
@@ -56,7 +56,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
       </div>
 
     {/* Desktop: CLICK / AQUI / CARITAS grandes centradas un poco más arriba del medio */}
-  <div className="absolute top-[10%] left-1/2 md:left-[52%] xl:left-[55%] 2xl:left-[57%] -translate-x-1/2 z-[2000] hidden md:flex flex-row items-center justify-center pointer-events-auto">
+  <div className="absolute top-[5%] left-1/2 md:left-[52%] xl:left-[55%] 2xl:left-[57%] -translate-x-1/2 z-[2000] hidden md:flex flex-row items-center justify-center pointer-events-auto">
           <motion.img
           src="/inicio/CLICK.svg"
           alt="Click"
