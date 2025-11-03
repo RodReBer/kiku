@@ -27,7 +27,8 @@
 }
 
 .mobile-nubes-bg {
-  margin-right: -0.8rem; /* default (-mr-1) */
+  margin-right: -1rem; /* default (-mr-1) */
+  margin-bottom: -0.5rem; /* mover hacia abajo */
 }
 
 /* iPhone SE, iPhone 5 (320px - 374px) */
@@ -135,7 +136,7 @@
 @media (min-width: 375px) and (max-width: 389px) {
   .nube-pos-1 {
     top: 15%;
-    left: calc(55% - 45px);
+    left: calc(55% - 30px);
   }
   .nube-1-mobile-size {
     width: 170px;

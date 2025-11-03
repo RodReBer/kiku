@@ -492,7 +492,7 @@ export default function MacDesktop() {
             alt="Logo KIKU"
             width={60}
             height={60}
-            className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform"
+            className="object-contain w-[60px] h-[60px] cursor-pointer hover:scale-110 transition-transform"
             draggable={false}
             onClick={resetDesktop}
           />
@@ -531,7 +531,7 @@ export default function MacDesktop() {
             alt="Fondo nubes móvil"
             width={400}
             height={400}
-            className="w-[175px] h-[175px] object-contain pointer-events-none mobile-nubes-bg z-[100]"
+            className="w-[185px] h-[185px] object-contain pointer-events-none mobile-nubes-bg z-[100]"
             priority
           />
           <Image
