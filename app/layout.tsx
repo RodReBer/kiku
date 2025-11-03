@@ -15,7 +15,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "KIKU Cream - Portfolio Retro",
   description: "Portfolio retro aesthetic de KIKU Cream",
-    generator: 'v0.dev'
+  generator: 'Rodrigo Rey'
 }
 
 export default function RootLayout({

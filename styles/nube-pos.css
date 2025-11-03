@@ -1,3 +1,53 @@
+/* ============================================
+   BACKGROUND KIKUNUBES MÓVIL
+   ============================================ */
+
+/* iPhone SE, iPhone 5 (320px - 374px) - Mover a la izquierda */
+@media (max-width: 374px) {
+  .mobile-kikunubes-container {
+    padding-right: 0;
+    margin-right: -20px; /* Mueve 20px a la izquierda */
+  }
+}
+
+/* iPhone 12 mini, 13 mini (375px - 389px) - Ajuste menor */
+@media (min-width: 375px) and (max-width: 389px) {
+  .mobile-kikunubes-container {
+    margin-right: -12px; /* Mueve 12px a la izquierda */
+  }
+}
+
+/* ============================================
+   BACKGROUND NUBES.SVG MÓVIL (icono inferior)
+   ============================================ */
+
+/* Ajuste para pantallas pequeñas - el nubes.svg pequeño de abajo */
+.mobile-nubes-container {
+  right: 0.25rem; /* default (right-1) */
+}
+
+.mobile-nubes-bg {
+  margin-right: -1rem; /* default (-mr-1) */
+  margin-bottom: -0.5rem; /* mover hacia abajo */
+}
+
+/* iPhone SE, iPhone 5 (320px - 374px) */
+@media (max-width: 374px) {
+  .mobile-nubes-container {
+    right: -2rem;
+  }
+  .mobile-nubes-bg {
+    margin-right: 15px;
+  }
+}
+
+/* iPhone 12 mini, 13 mini (375px - 389px) */
+@media (min-width: 375px) and (max-width: 389px) {
+  .mobile-nubes-container {
+    right: 3.5rem;
+  }
+}
+
 /* Animaciones para las nubes */
 @keyframes floatBounce1 {
 
@@ -59,10 +109,20 @@
   }
 }
 
-/* Nube 1 - Diseños */
+/* ============================================
+   NUBE 1 - DISEÑOS
+   ============================================ */
+
+/* Control de tamaño de imagen mobile - Solo ancho, altura automática */
+.nube-1-mobile-size {
+  width: 160px;
+  height: auto;
+}
+
+/* MOBILE BASE - iPhone SE, iPhone 5 (320px - 374px) */
 .nube-pos-1 {
-  bottom: 8%;
-  left: 10%;
+  top: 8%;
+  left: calc(50% - 80px);
   pointer-events: none;
 }
 
@@ -72,17 +132,62 @@
   pointer-events: auto;
 }
 
+/* iPhone 12 mini, 13 mini (375px - 389px) */
+@media (min-width: 375px) and (max-width: 389px) {
+  .nube-pos-1 {
+    top: 15%;
+    left: calc(55% - 30px);
+  }
+  .nube-1-mobile-size {
+    width: 170px;
+    height: auto;
+  }
+}
+
+/* iPhone 12, 13, 14 standard (390px - 413px) */
+@media (min-width: 390px) and (max-width: 413px) {
+  .nube-pos-1 {
+    top: 16%;
+    left: calc(55% - 40px);
+  }
+  .nube-1-mobile-size {
+    width: 180px;
+    height: auto;
+  }
+}
+
+/* iPhone 14 Plus, 12/13 Pro Max (414px - 479px) */
+@media (min-width: 414px) and (max-width: 479px) {
+  .nube-pos-1 {
+    top: 16%;
+    left: calc(50% - 20px);
+  }
+  .nube-1-mobile-size {
+    width: 190px;
+    height: auto;
+  }
+}
+
+/* MOBILE GRANDE - Tablets pequeños (480px - 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+  .nube-pos-1 {
+    top: 15%;
+    left: calc(50% - 90px);
+  }
+  .nube-1-mobile-size {
+    width: 200px;
+    height: auto;
+  }
+}
+
+/* TABLET Y DESKTOP - A partir de 768px */
 @media (min-width: 768px) {
   .nube-pos-1 {
+    top: auto;
     bottom: 10%;
     left: 9%;
+    transform: none;
     pointer-events: none;
-  }
-
-  .nube-pos-1>* {
-    animation: floatBounce1 4s ease-in-out infinite;
-    will-change: transform;
-    pointer-events: auto;
   }
 }
 
@@ -90,13 +195,6 @@
   .nube-pos-1 {
     bottom: 11%;
     left: 8%;
-    pointer-events: none;
-  }
-
-  .nube-pos-1>* {
-    animation: floatBounce1 4s ease-in-out infinite;
-    will-change: transform;
-    pointer-events: auto;
   }
 }
 
@@ -104,13 +202,6 @@
   .nube-pos-1 {
     bottom: 14%;
     left: 8%;
-    pointer-events: none;
-  }
-
-  .nube-pos-1>* {
-    animation: floatBounce1 4s ease-in-out infinite;
-    will-change: transform;
-    pointer-events: auto;
   }
 }
 
@@ -118,26 +209,13 @@
   .nube-pos-1 {
     bottom: 14%;
     left: 10%;
-    pointer-events: none;
-  }
-
-  .nube-pos-1>* {
-    animation: floatBounce1 4s ease-in-out infinite;
-    will-change: transform;
-    pointer-events: auto;
   }
 }
+
 @media (min-width: 1500px) {
   .nube-pos-1 {
     bottom: 14%;
     left: 13%;
-    pointer-events: none;
-  }
-
-  .nube-pos-1>* {
-    animation: floatBounce1 4s ease-in-out infinite;
-    will-change: transform;
-    pointer-events: auto;
   }
 }
 
@@ -155,10 +233,20 @@
   }
 }
 
-/* Nube 2 - Fotografía */
+/* ============================================
+   NUBE 2 - FOTOGRAFÍA
+   ============================================ */
+
+/* Control de tamaño de imagen mobile - Solo ancho, altura automática */
+.nube-2-mobile-size {
+  width: 160px;
+  height: auto;
+}
+
+/* MOBILE BASE - iPhone SE, iPhone 5 (320px - 374px) */
 .nube-pos-2 {
-  top: 2%;
-  left: 50%;
+  top: 35%;
+  left: calc(50% - 80px);
   right: auto;
   pointer-events: none;
 }
@@ -169,18 +257,62 @@
   pointer-events: auto;
 }
 
+/* iPhone 12 mini, 13 mini (375px - 389px) */
+@media (min-width: 375px) and (max-width: 389px) {
+  .nube-pos-2 {
+    top: 43%;
+    left: calc(53% - 75px);
+  }
+  .nube-2-mobile-size {
+    width: 170px;
+    height: auto;
+  }
+}
+
+/* iPhone 12, 13, 14 standard (390px - 413px) */
+@media (min-width: 390px) and (max-width: 413px) {
+  .nube-pos-2 {
+    top: 43%;
+    left: calc(53% - 50px);
+  }
+  .nube-2-mobile-size {
+    width: 180px;
+    height: auto;
+  }
+}
+
+/* iPhone 14 Plus, 12/13 Pro Max (414px - 479px) */
+@media (min-width: 414px) and (max-width: 479px) {
+  .nube-pos-2 {
+    top: 43%;
+    left: calc(50% - 40px);
+  }
+  .nube-2-mobile-size {
+    width: 190px;
+    height: auto;
+  }
+}
+
+/* MOBILE GRANDE - Tablets pequeños (480px - 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+  .nube-pos-2 {
+    top: 42%;
+    left: calc(50% - 100px);
+  }
+  .nube-2-mobile-size {
+    width: 200px;
+    height: auto;
+  }
+}
+
+/* TABLET Y DESKTOP - A partir de 768px */
 @media (min-width: 768px) {
   .nube-pos-2 {
     top: 1.5%;
     left: 42%;
     right: auto;
+    transform: none;
     pointer-events: none;
-  }
-
-  .nube-pos-2>* {
-    animation: floatBounce2 5s ease-in-out infinite;
-    will-change: transform;
-    pointer-events: auto;
   }
 }
 
@@ -188,13 +320,6 @@
   .nube-pos-2 {
     top: 1%;
     left: 38%;
-    pointer-events: none;
-  }
-
-  .nube-pos-2>* {
-    animation: floatBounce2 5s ease-in-out infinite;
-    will-change: transform;
-    pointer-events: auto;
   }
 }
 
@@ -202,20 +327,25 @@
   .nube-pos-2 {
     top: 2%;
     left: 26%;
-    pointer-events: none;
-  }
-
-  .nube-pos-2>* {
-    animation: floatBounce2 5s ease-in-out infinite;
-    will-change: transform;
-    pointer-events: auto;
   }
 }
 
-/* Nube 3 - Contacto */
+/* ============================================
+   NUBE 3 - VIDEO
+   ============================================ */
+
+/* Control de tamaño de imagen mobile - Solo ancho, altura automática */
+.nube-3-mobile-size {
+  width: 240px;
+  height: auto;
+}
+
+/* MOBILE BASE - iPhone SE, iPhone 5 (320px - 374px) */
 .nube-pos-3 {
-  top: 18%;
-  right: 10%;
+  top: auto;
+  bottom: 15%;
+  left: calc(50% - 90px);
+  right: auto;
   pointer-events: none;
 }
 
@@ -225,17 +355,63 @@
   pointer-events: auto;
 }
 
+/* iPhone 12 mini, 13 mini (375px - 389px) */
+@media (min-width: 375px) and (max-width: 389px) {
+  .nube-pos-3 {
+    bottom: 3%;
+    left: calc(50% - 110px);
+  }
+  .nube-3-mobile-size {
+    width: 220px;
+    height: auto;
+  }
+}
+
+/* iPhone 12, 13, 14 standard (390px - 413px) */
+@media (min-width: 390px) and (max-width: 413px) {
+  .nube-pos-3 {
+    bottom: 2%;
+    left: calc(50% - 110px);
+  }
+  .nube-3-mobile-size {
+    width: 240px;
+    height: auto;
+  }
+}
+
+/* iPhone 14 Plus, 12/13 Pro Max (414px - 479px) */
+@media (min-width: 414px) and (max-width: 479px) {
+  .nube-pos-3 {
+    bottom: 3%;
+    left: calc(50% - 120px);
+  }
+  .nube-3-mobile-size {
+    width: 240px;
+    height: auto;
+  }
+}
+
+/* MOBILE GRANDE - Tablets pequeños (480px - 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+  .nube-pos-3 {
+    bottom: 2%;
+    left: calc(50% - 130px);
+  }
+  .nube-3-mobile-size {
+    width: 260px;
+    height: auto;
+  }
+}
+
+/* TABLET Y DESKTOP - A partir de 768px */
 @media (min-width: 768px) {
   .nube-pos-3 {
     top: 19%;
+    bottom: auto;
     right: 12%;
+    left: auto;
+    transform: none;
     pointer-events: none;
-  }
-
-  .nube-pos-3>* {
-    animation: floatBounce3 4.5s ease-in-out infinite;
-    will-change: transform;
-    pointer-events: auto;
   }
 }
 
@@ -243,13 +419,6 @@
   .nube-pos-3 {
     top: 20%;
     right: 14%;
-    pointer-events: none;
-  }
-
-  .nube-pos-3>* {
-    animation: floatBounce3 4.5s ease-in-out infinite;
-    will-change: transform;
-    pointer-events: auto;
   }
 }
 
@@ -257,20 +426,13 @@
   .nube-pos-3 {
     top: 20%;
     right: 13%;
-    pointer-events: none;
-  }
-
-  .nube-pos-3>* {
-    animation: floatBounce3 4.5s ease-in-out infinite;
-    will-change: transform;
-    pointer-events: auto;
   }
 }
 
 @media (min-width: 1524px) {
   .nube-pos-3 {
-    top: 20%;
-    right: 11%;
+    top: 24%;
+    right: 12%;
   }
 }
 

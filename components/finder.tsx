@@ -11,32 +11,33 @@ interface FileItem {
   id: string
   name: string
   type: "file" | "folder" | "project"
-  category: "design" | "photography" | "general"
+  category: "design" | "photography" | "video" | "general"
   coverImage?: string
 }
 
 interface FinderProps {
   onFileClick: (file: FileItem) => void
   onFolderClick: (folder: FileItem) => void
-  initialCategory?: "all" | "design" | "photography" | "general"
+  initialCategory?: "all" | "design" | "photography" | "video" | "general"
 }
 
 export default function Finder({ onFileClick, onFolderClick, initialCategory = "all" }: FinderProps) {
   const { projects, loading } = useData()
   const [searchTerm, setSearchTerm] = useState("")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-  const [selectedCategory, setSelectedCategory] = useState<"all" | "design" | "photography" | "general">(initialCategory)
+  const [selectedCategory, setSelectedCategory] = useState<"all" | "design" | "photography" | "video" | "general">(initialCategory)
 
   // Convertir proyectos a FileItems (solo los activos)
   const fileItems: FileItem[] = projects
     .filter(project => project.status === "active")
     .map((project) => {
-      // Fotografía: mostrarse como carpeta (abre todas sus fotos)
+      // Fotografía y Video: mostrarse como carpeta (abre todas sus fotos/videos)
       const isPhotography = project.category === 'photography'
+      const isVideo = project.category === 'video'
       return {
         id: project.id,
         name: project.name,
-        type: isPhotography ? 'folder' : (project.type === 'file' || project.type === 'folder' ? project.type : 'project'),
+        type: (isPhotography || isVideo) ? 'folder' : (project.type === 'file' || project.type === 'folder' ? project.type : 'project'),
         category: project.category || 'general',
         coverImage: project.coverImage || project.photos?.[0]?.url,
       }
@@ -57,7 +58,7 @@ export default function Finder({ onFileClick, onFolderClick, initialCategory = "
 
   const handleItemClick = (item: FileItem) => {
     setSelectedId(item.id)
-    if (item.category === 'photography') {
+    if (item.category === 'photography' || item.category === 'video') {
       // Tratar como carpeta: delegar a onFolderClick
       onFolderClick(item)
       return
@@ -127,7 +128,7 @@ export default function Finder({ onFileClick, onFolderClick, initialCategory = "
             />
           </div>
           <div className="flex items-center gap-1">
-            {['all','design','photography'].map(cat => (
+            {['all','design','photography','video'].map(cat => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat as any)}
@@ -137,6 +138,7 @@ export default function Finder({ onFileClick, onFolderClick, initialCategory = "
                 {cat==='all' && 'Todos'}
                 {cat==='design' && 'Diseño'}
                 {cat==='photography' && 'Fotos'}
+                {cat==='video' && 'Y más'}
               </button>
             ))}
           </div>
@@ -270,7 +272,7 @@ export default function Finder({ onFileClick, onFolderClick, initialCategory = "
                   <span className="text-[11px] md:text-xs text-center text-gray-800 font-medium truncate w-full" title={item.name}>
                     {item.name}
                   </span>
-                  <span className="text-[10px] text-gray-600 mt-1 capitalize">{item.category === 'photography' ? '📁 Fotos' : item.category === 'design' ? '🎨 Diseño' : item.category}</span>
+                  <span className="text-[10px] text-gray-600 mt-1 capitalize">{item.category === 'photography' ? '📁 Fotos' : item.category === 'design' ? '🎨 Diseño' : item.category === 'video' ? '✨ Y más' : item.category}</span>
                 </div>
               ))}
             </div>

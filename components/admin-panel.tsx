@@ -9,9 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Trash2, Edit, Plus, Save, X, RefreshCw, ImageIcon, Folder, Check, Archive } from "lucide-react"
+import { Trash2, Edit, Plus, Save, X, RefreshCw, ImageIcon, Folder, Check, Archive, Upload } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import type { Project, Product, Photo } from "@/context/data-context"
+import { uploadImage, uploadMultipleImages, generateProjectPath } from "@/lib/storage-utils"
 
 export default function AdminPanel() {
   const { toast } = useToast()
@@ -36,12 +37,9 @@ export default function AdminPanel() {
 
   const [newProject, setNewProject] = useState<Partial<Project>>({
     name: "",
-    type: "photography",
     category: "photography",
-    description: "",
-    status: "active",
     photos: [],
-  coverImage: "",
+    coverImage: "",
   })
 
   const [newProduct, setNewProduct] = useState<Partial<Product>>({
@@ -55,43 +53,116 @@ export default function AdminPanel() {
   })
 
   const [photoUrls, setPhotoUrls] = useState("")
+  const [uploadingFiles, setUploadingFiles] = useState(false)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [coverImageFile, setCoverImageFile] = useState<File | null>(null)
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (files) {
+      setSelectedFiles(Array.from(files))
+    }
+  }
+
+  const handleCoverImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      setCoverImageFile(file)
+    }
+  }
 
   const handleAddProject = async () => {
-    if (!newProject.name || !newProject.type || !newProject.category) {
-      alert("Por favor completa todos los campos requeridos")
+    if (!newProject.name || !newProject.category) {
+      toast({
+        title: "Error",
+        description: "Por favor completa todos los campos requeridos",
+        variant: "destructive",
+      })
       return
     }
 
-    // Procesar URLs de fotos
-    const photos: Photo[] = photoUrls
-      .split("\n")
-      .filter((url) => url.trim())
-      .map((url, index) => ({
+    setUploadingFiles(true)
+    try {
+      let coverImageUrl = newProject.coverImage || ""
+      let uploadedPhotoUrls: string[] = []
+
+      // Subir cover image si se seleccionó un archivo
+      if (coverImageFile) {
+        const basePath = generateProjectPath(
+          newProject.category as "design" | "photography" | "video" | "general",
+          newProject.name
+        )
+        coverImageUrl = await uploadImage(coverImageFile, `${basePath}/cover-${coverImageFile.name}`)
+        toast({
+          title: "✓ Cover image subida",
+          description: "Imagen de portada subida correctamente",
+        })
+      }
+
+      // Subir archivos seleccionados si los hay
+      if (selectedFiles.length > 0) {
+        const basePath = generateProjectPath(
+          newProject.category as "design" | "photography" | "video" | "general",
+          newProject.name
+        )
+        uploadedPhotoUrls = await uploadMultipleImages(selectedFiles, basePath)
+        toast({
+          title: `✓ ${uploadedPhotoUrls.length} archivos subidos`,
+          description: "Todos los archivos se subieron correctamente",
+        })
+      }
+
+      // Procesar URLs manuales si se ingresaron (del textarea photoUrls state)
+      const manualUrlsFromTextarea = photoUrls
+        .split("\n")
+        .filter((url: string) => url.trim())
+        .map((url: string) => url.trim())
+
+      // Combinar URLs subidas y manuales
+      const allUrls = [...uploadedPhotoUrls, ...manualUrlsFromTextarea]
+
+      const photos: Photo[] = allUrls.map((url, index) => ({
         id: `photo-${Date.now()}-${index}`,
-        url: url.trim(),
+        url: url,
         title: `Foto ${index + 1}`,
         description: "",
       }))
 
-    try {
       await addProject({
-        ...(newProject as Omit<Project, "id">),
+        name: newProject.name!,
+        category: newProject.category!,
+        type: newProject.category === "photography" ? "photography" : newProject.category === "design" ? "design" : "video",
+        status: "active",
+        description: "",
+        coverImage: coverImageUrl,
         photos,
+      } as Omit<Project, "id">)
+
+      toast({
+        title: "✓ Proyecto creado",
+        description: `${newProject.name} se agregó correctamente`,
       })
 
+      // Reset form
       setNewProject({
         name: "",
-        type: "photography",
         category: "photography",
-        description: "",
-        status: "active",
         photos: [],
-  coverImage: "",
+        coverImage: "",
       })
       setPhotoUrls("")
+      setSelectedFiles([])
+      setCoverImageFile(null)
       setShowNewProject(false)
     } catch (err) {
       console.error("Error adding project:", err)
+      toast({
+        title: "Error",
+        description: "Error al crear el proyecto. Intenta de nuevo.",
+        variant: "destructive",
+      })
+    } finally {
+      setUploadingFiles(false)
     }
   }
 
@@ -220,27 +291,6 @@ export default function AdminPanel() {
                       />
                     </div>
                     <div>
-                      <label className="block text-purple-200 text-sm font-medium mb-2">Tipo</label>
-                      <Select
-                        value={newProject.type || ""}
-                        onValueChange={(value) => setNewProject({ ...newProject, type: value as Project["type"] })}
-                      >
-                        <SelectTrigger className="bg-white/20 border-white/30 text-white">
-                          <SelectValue placeholder="Seleccionar tipo" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-purple-900 border-purple-700">
-                          <SelectItem value="photography">📸 Fotografía</SelectItem>
-                          <SelectItem value="design">🎨 Diseño</SelectItem>
-                          <SelectItem value="illustration">✏️ Ilustración</SelectItem>
-                          <SelectItem value="file">📄 Archivo</SelectItem>
-                          <SelectItem value="folder">📁 Carpeta</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
                       <label className="block text-purple-200 text-sm font-medium mb-2">Categoría</label>
                       <Select
                         value={newProject.category || ""}
@@ -252,38 +302,12 @@ export default function AdminPanel() {
                           <SelectValue placeholder="Seleccionar categoría" />
                         </SelectTrigger>
                         <SelectContent className="bg-purple-900 border-purple-700">
-                          <SelectItem value="design">🎨 Diseño</SelectItem>
                           <SelectItem value="photography">📸 Fotografía</SelectItem>
-                          <SelectItem value="general">📋 General</SelectItem>
+                          <SelectItem value="design">� Diseño</SelectItem>
+                          <SelectItem value="video">🎬 Y más</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-                    <div>
-                      <label className="block text-purple-200 text-sm font-medium mb-2">Estado</label>
-                      <Select
-                        value={newProject.status || ""}
-                        onValueChange={(value) => setNewProject({ ...newProject, status: value as Project["status"] })}
-                      >
-                        <SelectTrigger className="bg-white/20 border-white/30 text-white">
-                          <SelectValue placeholder="Seleccionar estado" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-purple-900 border-purple-700">
-                          <SelectItem value="active">✅ Activo</SelectItem>
-                          <SelectItem value="archived">📦 Archivado</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-purple-200 text-sm font-medium mb-2">Descripción</label>
-                    <Textarea
-                      placeholder="Describe tu proyecto..."
-                      value={newProject.description || ""}
-                      onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
-                      className="bg-white/20 border-white/30 text-white placeholder-purple-300"
-                      rows={3}
-                    />
                   </div>
 
                   <div>
@@ -292,39 +316,81 @@ export default function AdminPanel() {
                       placeholder="URL de la imagen principal"
                       value={newProject.coverImage || ""}
                       onChange={(e) => setNewProject({ ...newProject, coverImage: e.target.value })}
-                      className="bg-white/20 border-white/30 text-white placeholder-purple-300"
+                      className="bg-white/20 border-white/30 text-white placeholder-purple-300 mb-2"
                     />
+                    <div className="flex items-center gap-2">
+                      <label className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded cursor-pointer transition-colors">
+                        <Upload size={16} />
+                        <span className="text-sm">O subir archivo</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleCoverImageSelect}
+                          className="hidden"
+                        />
+                      </label>
+                      {coverImageFile && (
+                        <span className="text-sm text-purple-200">✓ {coverImageFile.name}</span>
+                      )}
+                    </div>
                     <p className="text-purple-300 text-xs mt-1">Se mostrará como miniatura en el explorador.</p>
                   </div>
 
                   <div>
                     <label className="block text-purple-200 text-sm font-medium mb-2">
-                      URLs de Fotos (una por línea)
+                      Subir Archivos (Fotos/Videos)
                     </label>
-                    <Textarea
-                      placeholder="https://ejemplo.com/foto1.jpg&#10;https://ejemplo.com/foto2.jpg&#10;https://ejemplo.com/foto3.jpg"
-                      value={photoUrls}
-                      onChange={(e) => setPhotoUrls(e.target.value)}
-                      className="bg-white/20 border-white/30 text-white placeholder-purple-300"
-                      rows={6}
-                    />
-                    <p className="text-purple-300 text-xs mt-1">
-                      💡 Pega aquí los links de tus fotos de Firebase Storage o cualquier URL pública
+                    <label className="flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded cursor-pointer transition-colors mb-2">
+                      <Upload size={18} />
+                      <span>Seleccionar archivos desde tu computadora</span>
+                      <input
+                        type="file"
+                        accept="image/*,video/*"
+                        multiple
+                        onChange={handleFileSelect}
+                        className="hidden"
+                      />
+                    </label>
+                    {selectedFiles.length > 0 && (
+                      <div className="bg-white/10 rounded p-2 mb-2">
+                        <p className="text-purple-200 text-sm font-medium mb-1">
+                          {selectedFiles.length} archivo(s) seleccionado(s):
+                        </p>
+                        <ul className="text-xs text-purple-300 space-y-1">
+                          {selectedFiles.map((file, idx) => (
+                            <li key={idx}>✓ {file.name}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    <p className="text-purple-300 text-xs">
+                      🔥 Los archivos se subirán automáticamente a Firebase Storage
                     </p>
                   </div>
 
                   <div className="flex gap-3 pt-4">
                     <Button
                       onClick={handleAddProject}
-                      className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+                      disabled={uploadingFiles}
+                      className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50"
                     >
-                      <Save size={16} className="mr-2" />
-                      Crear Proyecto
+                      {uploadingFiles ? (
+                        <>
+                          <RefreshCw size={16} className="mr-2 animate-spin" />
+                          Subiendo archivos...
+                        </>
+                      ) : (
+                        <>
+                          <Save size={16} className="mr-2" />
+                          Crear Proyecto
+                        </>
+                      )}
                     </Button>
                     <Button
                       variant="outline"
                       onClick={() => setShowNewProject(false)}
-                      className="bg-white/20 border-white/30 text-white hover:bg-white/30"
+                      disabled={uploadingFiles}
+                      className="bg-white/20 border-white/30 text-white hover:bg-white/30 disabled:opacity-50"
                     >
                       <X size={16} className="mr-2" />
                       Cancelar
@@ -466,206 +532,17 @@ export default function AdminPanel() {
           </TabsContent>
 
           <TabsContent value="products" className="space-y-6 mt-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-semibold text-white">Gestión de Productos</h2>
-              <Button
-                onClick={() => setShowNewProduct(true)}
-                className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
-              >
-                <Plus size={16} className="mr-2" />
-                Nuevo Producto
-              </Button>
-            </div>
-
-            {showNewProduct && (
-              <Card className="bg-white/10 backdrop-blur-md border border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center">
-                    <Plus size={20} className="mr-2" />
-                    Crear Nuevo Producto
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-purple-200 text-sm font-medium mb-2">Nombre del Producto</label>
-                      <Input
-                        placeholder="Ej: Print Fotográfico A4"
-                        value={newProduct.name || ""}
-                        onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-                        className="bg-white/20 border-white/30 text-white placeholder-purple-300"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-purple-200 text-sm font-medium mb-2">Precio ($)</label>
-                      <Input
-                        type="number"
-                        placeholder="15000"
-                        value={newProduct.price || ""}
-                        onChange={(e) => setNewProduct({ ...newProduct, price: Number(e.target.value) })}
-                        className="bg-white/20 border-white/30 text-white placeholder-purple-300"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-purple-200 text-sm font-medium mb-2">URL de Imagen</label>
-                    <Input
-                      placeholder="https://ejemplo.com/producto.jpg"
-                      value={newProduct.image || ""}
-                      onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
-                      className="bg-white/20 border-white/30 text-white placeholder-purple-300"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-purple-200 text-sm font-medium mb-2">Categoría</label>
-                      <Input
-                        placeholder="prints, stickers, digital..."
-                        value={newProduct.category || ""}
-                        onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
-                        className="bg-white/20 border-white/30 text-white placeholder-purple-300"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-purple-200 text-sm font-medium mb-2">Stock</label>
-                      <Input
-                        type="number"
-                        placeholder="10"
-                        value={newProduct.stock || ""}
-                        onChange={(e) => setNewProduct({ ...newProduct, stock: Number(e.target.value) })}
-                        className="bg-white/20 border-white/30 text-white placeholder-purple-300"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-purple-200 text-sm font-medium mb-2">Descripción</label>
-                    <Textarea
-                      placeholder="Describe tu producto..."
-                      value={newProduct.description || ""}
-                      onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-                      className="bg-white/20 border-white/30 text-white placeholder-purple-300"
-                      rows={3}
-                    />
-                  </div>
-
-                  <div className="flex gap-3 pt-4">
-                    <Button
-                      onClick={handleAddProduct}
-                      className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
-                    >
-                      <Save size={16} className="mr-2" />
-                      Crear Producto
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowNewProduct(false)}
-                      className="bg-white/20 border-white/30 text-white hover:bg-white/30"
-                    >
-                      <X size={16} className="mr-2" />
-                      Cancelar
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            <div className="grid gap-6">
-              {products.map((product: Product) => (
-                <Card
-                  key={product.id}
-                  className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/15 transition-all"
-                >
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-white flex items-center">💰 {product.name}</CardTitle>
-                        <p className="text-2xl font-bold text-green-400 mt-1">${product.price.toLocaleString()}</p>
-                        <div className="flex gap-2 mt-2">
-                          <Badge variant="outline" className="border-purple-400 text-purple-200">
-                            {product.category}
-                          </Badge>
-                          <Badge
-                            variant={product.status === "available" ? "default" : "secondary"}
-                            className={
-                              product.status === "available"
-                                ? "bg-green-500/30 text-green-200"
-                                : product.status === "sold_out"
-                                  ? "bg-red-500/30 text-red-200"
-                                  : "bg-yellow-500/30 text-yellow-200"
-                            }
-                          >
-                            {product.status === "available" && "✅ Disponible"}
-                            {product.status === "sold_out" && "❌ Agotado"}
-                            {product.status === "coming_soon" && "⏳ Próximamente"}
-                          </Badge>
-                          {product.stock && (
-                            <Badge variant="secondary" className="bg-blue-500/30 text-blue-200">
-                              Stock: {product.stock}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setEditingProduct(product.id)}
-                          disabled={editingProduct === product.id}
-                          className="bg-white/20 border-white/30 text-white hover:bg-white/30"
-                        >
-                          <Edit size={16} />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDeleteProduct(product.id)}
-                          className="bg-red-500/30 border-red-500/50 text-red-200 hover:bg-red-500/50"
-                        >
-                          <Trash2 size={16} />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    {editingProduct === product.id ? (
-                      <ProductEditForm
-                        product={product}
-                        onSave={async (updates) => {
-                          await updateProduct(product.id, updates)
-                          setEditingProduct(null)
-                        }}
-                        onCancel={() => setEditingProduct(null)}
-                      />
-                    ) : (
-                      <div>
-                        <p className="text-purple-200 mb-2">{product.description}</p>
-                        {product.image && (
-                          <div className="flex items-center gap-2 mb-2">
-                            <ImageIcon size={16} className="text-purple-300" />
-                            <a
-                              href={product.image}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-sm text-blue-300 hover:text-blue-200 underline"
-                            >
-                              Ver imagen
-                            </a>
-                          </div>
-                        )}
-                        {product.createdAt && (
-                          <p className="text-xs text-purple-400 mt-2">
-                            Creado: {product.createdAt.toLocaleDateString()}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <Card className="bg-white/10 backdrop-blur-md border border-white/20">
+              <CardContent className="py-16 text-center">
+                <div className="max-w-md mx-auto space-y-4">
+                  <div className="text-6xl">🛍️</div>
+                  <h3 className="text-3xl font-bold text-white">Próximamente...</h3>
+                  <p className="text-purple-200">
+                    La tienda KIKU está en construcción. Pronto podrás gestionar tus productos desde aquí.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
@@ -764,6 +641,7 @@ function ProjectEditForm({
             <SelectContent>
               <SelectItem value="photography">Fotografía</SelectItem>
               <SelectItem value="design">Diseño</SelectItem>
+              <SelectItem value="video">Video</SelectItem>
               <SelectItem value="illustration">Ilustración</SelectItem>
               <SelectItem value="file">Archivo</SelectItem>
               <SelectItem value="folder">Carpeta</SelectItem>
