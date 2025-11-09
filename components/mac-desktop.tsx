@@ -696,7 +696,7 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
                 transition={{ duration: 0.2 }}
-                className="absolute top-full left-0 mt-3 bg-[#FFE500] rounded-3xl shadow-2xl px-6 py-5 min-w-[280px] border-4 border-black"
+                className="absolute top-full left-0 mt-3 bg-[#ffff00] rounded-3xl shadow-2xl px-6 py-5 min-w-[280px] border-4 border-black"
               >
                 <div className="space-y-1">
                   <button
