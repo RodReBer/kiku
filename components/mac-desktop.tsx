@@ -37,6 +37,7 @@ export default function MacDesktop() {
   const [windows, setWindows] = useState<WindowState[]>([])
   const [nextZIndex, setNextZIndex] = useState(3000) // Base alto para ventanas (por encima de UI)
   const [isDragging, setIsDragging] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   // Scroll hacia arriba al montar el componente
   useEffect(() => {
@@ -354,56 +355,102 @@ export default function MacDesktop() {
   const handleContactFolderClick = () => {
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768
     const contactContent = (
-      <div className="p-4 md:p-8 bg-gray-100 h-full font-mono overflow-y-auto">
-        <div className="max-w-2xl mx-auto">
-          <h2 className="text-lg md:text-2xl font-bold mb-4 md:mb-6 text-center text-black">
-            ═══ INFORMACIÓN DE CONTACTO ═══
-          </h2>
-          <div className="space-y-4 md:space-y-6">
-            <div className="bg-white p-4 md:p-6 border-2 border-gray-400" style={{ borderStyle: "inset" }}>
-              <h3 className="font-bold text-base md:text-lg mb-2 md:mb-3 text-black">📧 EMAIL</h3>
-              <p className="text-black font-mono text-sm md:text-base">cat4rin4a@gmail.com</p>
-              <div className="mt-2 text-xs text-gray-600">
-                ┌─────────────────────────────────┐
-                <br />│ Respuesta en 24-48 horas │<br />
-                └─────────────────────────────────┘
+      <div className="p-4 md:p-6 bg-[#c0c0c0] h-full overflow-y-auto font-sans">
+        <div className="max-w-lg mx-auto">
+          <div className="bg-[#000080] text-white px-2 py-1 mb-4 font-bold text-sm">
+            📧 Contact Form
+          </div>
+          
+          <form className="space-y-4" onSubmit={(e) => {
+            e.preventDefault()
+            const formData = new FormData(e.currentTarget)
+            const from = formData.get('from')
+            const email = formData.get('email')
+            const message = formData.get('message')
+            
+            // Crear mailto link
+            const subject = `Message from ${from}`
+            const body = `From: ${from}\nEmail: ${email}\n\nMessage:\n${message}`
+            window.location.href = `mailto:kiku.creamm@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+          }}>
+            {/* Sending to */}
+            <div className="bg-white border-2 border-[#808080] p-3" style={{ borderStyle: "inset" }}>
+              <label className="block text-xs font-bold mb-1 text-black">Sending to:</label>
+              <div className="bg-[#fff] border border-[#000] px-2 py-1">
+                <span className="text-sm text-black font-mono">kiku.creamm@gmail.com</span>
               </div>
             </div>
 
-            <div className="bg-white p-4 md:p-6 border-2 border-gray-400" style={{ borderStyle: "inset" }}>
-              <h3 className="font-bold text-base md:text-lg mb-2 md:mb-3 text-black">📱 INSTAGRAM</h3>
-              <p className="text-black font-mono text-sm md:text-base">@kiku.cream</p>
-              <div className="mt-2 text-xs text-gray-600">
-                ┌─────────────────────────────────┐
-                <br />│ Portfolio visual y updates │<br />
-                └─────────────────────────────────┘
-              </div>
+            {/* From */}
+            <div className="bg-white border-2 border-[#808080] p-3" style={{ borderStyle: "inset" }}>
+              <label className="block text-xs font-bold mb-1 text-black">From:</label>
+              <input
+                type="text"
+                name="from"
+                required
+                className="w-full border-2 border-[#7f7f7f] px-2 py-1 text-sm text-black bg-white focus:outline-none"
+                style={{ borderStyle: "inset" }}
+                placeholder="Your name"
+              />
             </div>
 
-            <div className="bg-white p-4 md:p-6 border-2 border-gray-400" style={{ borderStyle: "inset" }}>
-              <h3 className="font-bold text-base md:text-lg mb-2 md:mb-3 text-black">🌐 WEB</h3>
-              <p className="text-black font-mono text-sm md:text-base">www.kiku-designs.retro</p>
-              <div className="mt-2 text-xs text-gray-600">
-                ┌─────────────────────────────────┐
-                <br />│ Portfolio completo disponible │<br />
-                └─────────────────────────────────┘
-              </div>
+            {/* Email */}
+            <div className="bg-white border-2 border-[#808080] p-3" style={{ borderStyle: "inset" }}>
+              <label className="block text-xs font-bold mb-1 text-black">Email:</label>
+              <input
+                type="email"
+                name="email"
+                required
+                className="w-full border-2 border-[#7f7f7f] px-2 py-1 text-sm text-black bg-white focus:outline-none"
+                style={{ borderStyle: "inset" }}
+                placeholder="your.email@example.com"
+              />
             </div>
 
-            <div
-              className="bg-yellow-200 p-3 md:p-4 border-2 border-yellow-400 text-center"
-              style={{ borderStyle: "outset" }}
-            >
-              <p className="text-black font-bold text-xs md:text-sm">⚡ DISPONIBLE PARA PROYECTOS CREATIVOS ⚡</p>
-              <p className="text-xs text-gray-700 mt-1">Diseño gráfico • Ilustración • Branding</p>
+            {/* Message */}
+            <div className="bg-white border-2 border-[#808080] p-3" style={{ borderStyle: "inset" }}>
+              <label className="block text-xs font-bold mb-1 text-black">Message:</label>
+              <textarea
+                name="message"
+                required
+                rows={6}
+                className="w-full border-2 border-[#7f7f7f] px-2 py-1 text-sm text-black bg-white focus:outline-none resize-none font-mono"
+                style={{ borderStyle: "inset" }}
+                placeholder="Type your message here..."
+              />
             </div>
+
+            {/* Buttons */}
+            <div className="flex gap-2 justify-end pt-2">
+              <button
+                type="submit"
+                className="px-6 py-2 bg-[#c0c0c0] border-2 text-black text-sm font-bold hover:bg-[#d0d0d0] active:border-[#000] transition-colors"
+                style={{ borderStyle: "outset" }}
+              >
+                Send
+              </button>
+              <button
+                type="button"
+                onClick={() => closeWindow(`contact-${Date.now()}`)}
+                className="px-6 py-2 bg-[#c0c0c0] border-2 text-black text-sm font-bold hover:bg-[#d0d0d0] active:border-[#000] transition-colors"
+                style={{ borderStyle: "outset" }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+
+          <div className="mt-6 bg-[#dfdfdf] border-2 border-[#808080] p-3 text-xs text-black" style={{ borderStyle: "groove" }}>
+            <p className="font-bold mb-1">📱 Also find me on:</p>
+            <p>Instagram: @kiku.cream</p>
+            <p>Response time: 24-48 hours</p>
           </div>
         </div>
       </div>
     )
-    openCenteredWindow("Contacto KIKU", contactContent, {
-      width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 700,
-      height: isMobile ? Math.min(500, window.innerHeight * 0.8) : 600,
+    openCenteredWindow("Contact - KIKU", contactContent, {
+      width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 600,
+      height: isMobile ? Math.min(550, window.innerHeight * 0.85) : 650,
     })
   }
 
@@ -414,6 +461,157 @@ export default function MacDesktop() {
       width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 1000,
       height: isMobile ? Math.min(500, window.innerHeight * 0.8) : 700,
     })
+  }
+
+  const handleAboutClick = () => {
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768
+    
+    const aboutTexts = {
+      es: `Kiku Cream es un estudio creativo multidisciplinario fundado en 2023. Su nombre proviene de la palabra japonesa kiku (菊), que significa crisantemo —una flor asociada con el sol y adoptada como emblema de la familia imperial japonesa. Simboliza poder, luz y fortaleza, pero también evoca la idea de la belleza en transición: aquella que cambia, se transforma, envejece, se quiebra y, a veces, se desvanece. En Kiku Cream no buscamos la belleza clásica; perseguimos una estética transparente, honesta, cruda y emocional.
+
+Kiku encarna la esencia de nuestro enfoque creativo: un lenguaje visual impulsado por la intensidad y la vitalidad, donde la luz y el color no son simples herramientas técnicas, sino verdaderos protagonistas narrativos. Nuestra estética abraza el contraste y una sensibilidad que une la expresión cultural y emocional a través de una mirada contemporánea.
+
+Ofrecemos servicios de dirección creativa y producción integral, así como de diseño gráfico, fotografía, edición y corrección de color. Cada proyecto se aborda con una mentalidad transversal, combinando concepto y forma para crear piezas visuales que comuniquen, desafíen y transformen.
+
+Colaboramos con marcas, proyectos artísticos y plataformas editoriales que buscan una identidad visual sólida, coherente y con propósito. Si tu proyecto requiere una dirección creativa con intención y presencia, estamos listos para construirla juntos.`,
+      en: `Kiku Cream is a multidisciplinary creative studio founded in 2023. Its name comes from the Japanese word kiku (菊), meaning chrysanthemum — a flower associated with the sun and adopted as the emblem of the Japanese imperial family. It symbolizes power, light, and strength, but also evokes the idea of beauty in transition: one that changes, transforms, ages, breaks, and sometimes fades. At Kiku Cream, we don't seek classic beauty; we pursue an aesthetic that is transparent, honest, raw, and emotional.
+
+Kiku embodies the essence of our creative approach: a visual language driven by intensity and vitality, where light and color are not mere technical tools but true narrative protagonists. Our aesthetic embraces contrast and a sensitivity that bridges cultural and emotional expression through a contemporary lens.
+
+We offer services in creative direction and full-scale production, as well as graphic design, photography, editing, and color correction. Each project is approached with a transversal mindset, combining concept and form to create visual pieces that communicate, challenge, and transform.
+
+We collaborate with brands, artistic projects, and editorial platforms seeking a visual identity that is solid, coherent, and purposeful. If your project requires creative direction with intention and presence, we are ready to build it together.`,
+      it: `Kiku Cream è uno studio creativo multidisciplinare fondato nel 2023. Il suo nome deriva dalla parola giapponese kiku (菊), che significa crisantemo — un fiore associato al sole e adottato come emblema della famiglia imperiale giapponese. Simboleggia potere, luce e forza, ma evoca anche l'idea di una bellezza in transizione: quella che cambia, si trasforma, invecchia, si spezza e, a volte, svanisce. In Kiku Cream non cerchiamo la bellezza classica; perseguiamo un'estetica trasparente, onesta, grezza ed emotiva.
+
+Kiku incarna l'essenza del nostro approccio creativo: un linguaggio visivo guidato dall'intensità e dalla vitalità, in cui luce e colore non sono semplici strumenti tecnici, ma veri protagonisti narrativi. La nostra estetica abbraccia il contrasto e una sensibilità che unisce espressione culturale ed emotiva attraverso uno sguardo contemporaneo.
+
+Offriamo servizi di direzione creativa e produzione integrale, oltre a design grafico, fotografia, editing e correzione del colore. Ogni progetto è affrontato con una mentalità trasversale, combinando concetto e forma per creare opere visive che comunichino, sfidino e trasformino.
+
+Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano un'identità visiva solida, coerente e con uno scopo preciso. Se il tuo progetto richiede una direzione creativa con intenzione e presenza, siamo pronti a costruirla insieme.`
+    }
+
+    const AboutTerminal = () => {
+      const [selectedLang, setSelectedLang] = useState<'es' | 'en' | 'it'>('es')
+      const [displayedText, setDisplayedText] = useState('')
+      const [isTyping, setIsTyping] = useState(false)
+      const [showCursor, setShowCursor] = useState(true)
+
+      useEffect(() => {
+        // Cursor parpadeante
+        const cursorInterval = setInterval(() => {
+          setShowCursor(prev => !prev)
+        }, 530)
+        return () => clearInterval(cursorInterval)
+      }, [])
+
+      useEffect(() => {
+        // Efecto de escritura
+        setIsTyping(true)
+        setDisplayedText('')
+        const text = aboutTexts[selectedLang]
+        let currentIndex = 0
+
+        const typingInterval = setInterval(() => {
+          if (currentIndex < text.length) {
+            setDisplayedText(text.substring(0, currentIndex + 1))
+            currentIndex++
+          } else {
+            setIsTyping(false)
+            clearInterval(typingInterval)
+          }
+        }, 15) // Velocidad de escritura (15ms por carácter = relativamente rápido)
+
+        return () => clearInterval(typingInterval)
+      }, [selectedLang])
+
+      return (
+        <div className="h-full bg-black p-4 font-mono text-sm overflow-hidden flex flex-col">
+          {/* Header estilo CMD */}
+          <div className="bg-white text-black px-2 py-1 mb-2 text-xs flex justify-between items-center">
+            <span>C:\KIKU\about.exe</span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSelectedLang('es')}
+                className={`px-2 py-0.5 ${selectedLang === 'es' ? 'bg-[#000080] text-white' : 'bg-gray-300'}`}
+              >
+                ES
+              </button>
+              <button
+                onClick={() => setSelectedLang('en')}
+                className={`px-2 py-0.5 ${selectedLang === 'en' ? 'bg-[#000080] text-white' : 'bg-gray-300'}`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => setSelectedLang('it')}
+                className={`px-2 py-0.5 ${selectedLang === 'it' ? 'bg-[#000080] text-white' : 'bg-gray-300'}`}
+              >
+                IT
+              </button>
+            </div>
+          </div>
+
+          {/* Terminal content */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="text-white mb-2">
+              <span className="text-yellow-400">kiku@cream:~$</span> cat about.txt
+            </div>
+            <div className="text-white whitespace-pre-wrap leading-relaxed">
+              {displayedText}
+              {isTyping && showCursor && <span className="bg-white text-black">_</span>}
+              {!isTyping && showCursor && <span className="text-white">█</span>}
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="text-gray-500 text-xs mt-2 border-t border-gray-700 pt-2">
+            {isTyping ? '⌨️  Typing...' : '✓ Complete'}
+          </div>
+        </div>
+      )
+    }
+
+    const aboutContent = <AboutTerminal />
+    openCenteredWindow("About - KIKU CREAM", aboutContent, {
+      width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 700,
+      height: isMobile ? Math.min(550, window.innerHeight * 0.85) : 600,
+    })
+    setIsMenuOpen(false)
+  }
+
+  const handleShopClick = () => {
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768
+    const shopContent = (
+      <div className="p-6 md:p-8 bg-[#c0c0c0] h-full overflow-y-auto font-sans flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="bg-[#000080] text-white px-3 py-2 mb-6 font-bold text-base inline-block">
+            🛍️ SHOP
+          </div>
+          
+          <div className="bg-white border-2 border-[#808080] p-8" style={{ borderStyle: "inset" }}>
+            <div className="text-6xl mb-4">🛒</div>
+            <h2 className="text-2xl font-bold text-black mb-4">Coming Soon...</h2>
+            <p className="text-black mb-6">
+              Nuestra tienda online está en construcción. Pronto podrás comprar prints, stickers y productos exclusivos de KIKU.
+            </p>
+            
+            <div className="bg-yellow-200 border-2 border-yellow-400 p-4" style={{ borderStyle: "outset" }}>
+              <p className="text-black font-bold text-sm">⏳ Disponible próximamente</p>
+              <p className="text-xs text-gray-700 mt-1">Mientras tanto, contáctanos para pedidos personalizados</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+    openCenteredWindow("Shop - KIKU", shopContent, {
+      width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 550,
+      height: isMobile ? Math.min(450, window.innerHeight * 0.85) : 500,
+    })
+    setIsMenuOpen(false)
+  }
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen)
   }
 
   const updateWindow = (id: string, updates: Partial<WindowState>) => {
@@ -488,8 +686,57 @@ export default function MacDesktop() {
             height={60}
             className="object-contain w-[50px] h-[50px] md:w-[60px] md:h-[60px] lg:w-[80px] lg:h-[80px] cursor-pointer hover:scale-110 transition-transform"
             draggable={false}
-            onClick={resetDesktop}
+            onClick={toggleMenu}
           />
+          {/* Menú desplegable Desktop - Estilo Dinette */}
+          <AnimatePresence>
+            {isMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="absolute top-full left-0 mt-3 bg-[#FFE500] rounded-3xl shadow-2xl px-6 py-5 min-w-[280px] border-4 border-black"
+              >
+                <div className="space-y-1">
+                  <button
+                    onClick={handleAboutClick}
+                    className="w-full text-left py-3 px-4 text-black hover:bg-black hover:text-[#FFE500] transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group"
+                  >
+                    <span className="text-black group-hover:text-[#FFE500] text-xl">▶</span>
+                    <span>¿Qué somos?</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleContactFolderClick()
+                      setIsMenuOpen(false)
+                    }}
+                    className="w-full text-left py-3 px-4 text-black hover:bg-black hover:text-[#FFE500] transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group"
+                  >
+                    <span className="text-black group-hover:text-[#FFE500] text-xl">▶</span>
+                    <span>Contacto</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      window.open('https://www.instagram.com/kiku.cream/', '_blank')
+                      setIsMenuOpen(false)
+                    }}
+                    className="w-full text-left py-3 px-4 text-black hover:bg-black hover:text-[#FFE500] transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group"
+                  >
+                    <span className="text-black group-hover:text-[#FFE500] text-xl">▶</span>
+                    <span>Instagram</span>
+                  </button>
+                  <button
+                    onClick={handleShopClick}
+                    className="w-full text-left py-3 px-4 text-black hover:bg-black hover:text-[#FFE500] transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group"
+                  >
+                    <span className="text-black group-hover:text-[#FFE500] text-xl">▶</span>
+                    <span>Shop</span>
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
         <div className="absolute top-2 right-1 md:hidden z-[1000]">
           <Image
@@ -499,8 +746,57 @@ export default function MacDesktop() {
             height={60}
             className="object-contain w-[60px] h-[60px] cursor-pointer hover:scale-110 transition-transform"
             draggable={false}
-            onClick={resetDesktop}
+            onClick={toggleMenu}
           />
+          {/* Menú desplegable Mobile - Estilo Dinette */}
+          <AnimatePresence>
+            {isMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="absolute top-full right-0 mt-3 bg-[#FFE500] rounded-3xl shadow-2xl px-5 py-4 min-w-[240px] border-4 border-black"
+              >
+                <div className="space-y-1">
+                  <button
+                    onClick={handleAboutClick}
+                    className="w-full text-left py-2.5 px-3 text-black hover:bg-black hover:text-[#FFE500] transition-all duration-200 rounded-xl font-black text-base tracking-tight flex items-center gap-2.5 group"
+                  >
+                    <span className="text-black group-hover:text-[#FFE500] text-lg">▶</span>
+                    <span>¿Qué somos?</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleContactFolderClick()
+                      setIsMenuOpen(false)
+                    }}
+                    className="w-full text-left py-2.5 px-3 text-black hover:bg-black hover:text-[#FFE500] transition-all duration-200 rounded-xl font-black text-base tracking-tight flex items-center gap-2.5 group"
+                  >
+                    <span className="text-black group-hover:text-[#FFE500] text-lg">▶</span>
+                    <span>Contacto</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      window.open('https://www.instagram.com/kiku.cream/', '_blank')
+                      setIsMenuOpen(false)
+                    }}
+                    className="w-full text-left py-2.5 px-3 text-black hover:bg-black hover:text-[#FFE500] transition-all duration-200 rounded-xl font-black text-base tracking-tight flex items-center gap-2.5 group"
+                  >
+                    <span className="text-black group-hover:text-[#FFE500] text-lg">▶</span>
+                    <span>Instagram</span>
+                  </button>
+                  <button
+                    onClick={handleShopClick}
+                    className="w-full text-left py-2.5 px-3 text-black hover:bg-black hover:text-[#FFE500] transition-all duration-200 rounded-xl font-black text-base tracking-tight flex items-center gap-2.5 group"
+                  >
+                    <span className="text-black group-hover:text-[#FFE500] text-lg">▶</span>
+                    <span>Shop</span>
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Contacto y Signos - Desktop: arriba derecha, Mobile: abajo derecha */}
