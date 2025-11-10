@@ -704,16 +704,14 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
                 transition={{ duration: 0.2 }}
-                className="absolute top-full left-0 mt-3 bg-black rounded-3xl shadow-2xl px-4 py-3 min-w-[220px] border-4 border-white"
+                className="absolute top-full left-0 mt-3 bg-black rounded-3xl shadow-2xl px-6 py-5 min-w-[280px] border-4 border-white"
               >
-                <div className="space-y-0.5">
+                <div className="space-y-1">
                   <button
                     onClick={handleAboutClick}
-                    className="w-full text-left py-2 px-3 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-base tracking-tight flex items-center gap-2 group border border-transparent hover:border-black"
+                    className="w-full text-left py-3 px-4 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group border border-transparent hover:border-black"
                   >
-                    <svg className="w-5 h-5 text-white group-hover:text-black transition-colors flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
-                    </svg>
+                    <span className="text-white group-hover:text-black text-xl transition-colors">▶</span>
                     <span>¿Qué somos?</span>
                   </button>
                   <button
@@ -721,11 +719,9 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
                       handleContactFolderClick()
                       setIsMenuOpen(false)
                     }}
-                    className="w-full text-left py-2 px-3 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-base tracking-tight flex items-center gap-2 group border border-transparent hover:border-black"
+                    className="w-full text-left py-3 px-4 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group border border-transparent hover:border-black"
                   >
-                    <svg className="w-5 h-5 text-white group-hover:text-black transition-colors flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
-                    </svg>
+                    <span className="text-white group-hover:text-black text-xl transition-colors">▶</span>
                     <span>Contacto</span>
                   </button>
                   <button
@@ -733,20 +729,16 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
                       window.open('https://www.instagram.com/kiku.cream/', '_blank')
                       setIsMenuOpen(false)
                     }}
-                    className="w-full text-left py-2 px-3 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-base tracking-tight flex items-center gap-2 group border border-transparent hover:border-black"
+                    className="w-full text-left py-3 px-4 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group border border-transparent hover:border-black"
                   >
-                    <svg className="w-5 h-5 text-white group-hover:text-black transition-colors flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
-                    </svg>
+                    <span className="text-white group-hover:text-black text-xl transition-colors">▶</span>
                     <span>Instagram</span>
                   </button>
                   <button
                     onClick={handleShopClick}
-                    className="w-full text-left py-2 px-3 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-base tracking-tight flex items-center gap-2 group border border-transparent hover:border-black"
+                    className="w-full text-left py-3 px-4 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group border border-transparent hover:border-black"
                   >
-                    <svg className="w-5 h-5 text-white group-hover:text-black transition-colors flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
-                    </svg>
+                    <span className="text-white group-hover:text-black text-xl transition-colors">▶</span>
                     <span>Shop</span>
                   </button>
                 </div>
@@ -780,7 +772,7 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
                     className="w-full text-left py-2 px-2 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-sm tracking-tight flex items-center gap-2 group border border-transparent hover:border-black"
                   >
                     <svg className="w-4 h-4 text-white group-hover:text-black transition-colors flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                      <path d="M7 4l10 8-10 8z"/>
                     </svg>
                     <span>¿Qué somos?</span>
                   </button>
@@ -792,7 +784,7 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
                     className="w-full text-left py-2 px-2 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-sm tracking-tight flex items-center gap-2 group border border-transparent hover:border-black"
                   >
                     <svg className="w-4 h-4 text-white group-hover:text-black transition-colors flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                      <path d="M7 4l10 8-10 8z"/>
                     </svg>
                     <span>Contacto</span>
                   </button>
@@ -804,7 +796,7 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
                     className="w-full text-left py-2 px-2 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-sm tracking-tight flex items-center gap-2 group border border-transparent hover:border-black"
                   >
                     <svg className="w-4 h-4 text-white group-hover:text-black transition-colors flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                      <path d="M7 4l10 8-10 8z"/>
                     </svg>
                     <span>Instagram</span>
                   </button>
@@ -813,7 +805,7 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
                     className="w-full text-left py-2 px-2 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-sm tracking-tight flex items-center gap-2 group border border-transparent hover:border-black"
                   >
                     <svg className="w-4 h-4 text-white group-hover:text-black transition-colors flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                      <path d="M7 4l10 8-10 8z"/>
                     </svg>
                     <span>Shop</span>
                   </button>
