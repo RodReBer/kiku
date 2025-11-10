@@ -45,14 +45,19 @@ export default function RetroWindow({
   const windowRef = useRef<HTMLDivElement>(null)
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget || (e.target as HTMLElement).classList.contains("window-header")) {
-      onFocus()
-      setIsDragging(true)
-      setDragStart({
-        x: e.clientX - position.x,
-        y: e.clientY - position.y,
-      })
+    // Solo permitir drag desde el header, excluyendo botones
+    const target = e.target as HTMLElement
+    if (target.tagName === 'BUTTON' || target.closest('button')) {
+      return
     }
+    
+    onFocus()
+    setIsDragging(true)
+    setDragStart({
+      x: e.clientX - position.x,
+      y: e.clientY - position.y,
+    })
+    e.preventDefault() // Prevenir selección de texto
   }
 
   const handleResizeMouseDown = (e: React.MouseEvent) => {
@@ -70,12 +75,14 @@ export default function RetroWindow({
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isDragging && !isMaximized) {
+        e.preventDefault()
         const newX = Math.max(0, Math.min(window.innerWidth - size.width, e.clientX - dragStart.x))
         const newY = Math.max(0, Math.min(window.innerHeight - size.height, e.clientY - dragStart.y))
         onMove({ x: newX, y: newY })
       }
 
       if (isResizing && !isMaximized) {
+        e.preventDefault()
         const newWidth = Math.max(300, resizeStart.width + (e.clientX - resizeStart.x))
         const newHeight = Math.max(200, resizeStart.height + (e.clientY - resizeStart.y))
         onResize({ width: newWidth, height: newHeight })
@@ -90,11 +97,16 @@ export default function RetroWindow({
     if (isDragging || isResizing) {
       document.addEventListener("mousemove", handleMouseMove)
       document.addEventListener("mouseup", handleMouseUp)
+      // Prevenir selección mientras se arrastra
+      document.body.style.userSelect = 'none'
+    } else {
+      document.body.style.userSelect = ''
     }
 
     return () => {
       document.removeEventListener("mousemove", handleMouseMove)
       document.removeEventListener("mouseup", handleMouseUp)
+      document.body.style.userSelect = ''
     }
   }, [isDragging, isResizing, dragStart, resizeStart, position, size, isMaximized, onMove, onResize])
 

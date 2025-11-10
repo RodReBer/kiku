@@ -2,12 +2,11 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import RetroWindow from "./retro-window"
 import Finder from "./finder"
-import TopMenuBar from "./top-menu-bar"
 import DraggableDesktopIcon from "./draggable-desktop-icon"
 import DrawingApp from "./drawing-app"
 
@@ -38,6 +37,7 @@ export default function MacDesktop() {
   const [nextZIndex, setNextZIndex] = useState(3000) // Base alto para ventanas (por encima de UI)
   const [isDragging, setIsDragging] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const imageCache = useRef<Map<string, { width: number; height: number }>>(new Map())
 
   // Scroll hacia arriba al montar el componente
   useEffect(() => {
@@ -50,8 +50,13 @@ export default function MacDesktop() {
     setNextZIndex(3000)
   }
 
-  // Función para obtener dimensiones de imagen - COMPLETAMENTE CORREGIDA
+  // Función para obtener dimensiones de imagen - OPTIMIZADA con cache
   const getImageDimensions = (src: string): Promise<{ width: number; height: number }> => {
+    // Verificar si ya tenemos las dimensiones en cache
+    if (imageCache.current.has(src)) {
+      return Promise.resolve(imageCache.current.get(src)!)
+    }
+
     return new Promise((resolve) => {
       const img = new window.Image() // Usar window.Image para acceder al constructor nativo
       img.crossOrigin = "anonymous"
@@ -83,7 +88,10 @@ export default function MacDesktop() {
           width = Math.max(isMobile ? 250 : 300, width)
           height = Math.max(isMobile ? 150 : 200, height)
 
-          resolve({ width: Math.round(width), height: Math.round(height) })
+          const dimensions = { width: Math.round(width), height: Math.round(height) }
+          // Guardar en cache para evitar recargas
+          imageCache.current.set(src, dimensions)
+          resolve(dimensions)
         } catch (error) {
           console.error("Error processing image dimensions:", error)
           resolve({ width: 400, height: 300 })
@@ -458,8 +466,8 @@ export default function MacDesktop() {
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768
     const drawingContent = <DrawingApp />
     openCenteredWindow("KIKU Paint", drawingContent, {
-      width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 1000,
-      height: isMobile ? Math.min(500, window.innerHeight * 0.8) : 700,
+      width: isMobile ? Math.min(window.innerWidth - 10, 420) : 1000,
+      height: isMobile ? Math.min(window.innerHeight - 50, 650) : 700,
     })
   }
 
@@ -815,13 +823,14 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
           />
           <Image
             src="/escritorio-inicio/signos.svg"
-            alt="Qué es Kiku Cream"
+            alt="Abrir KIKU Paint"
             width={60}
             height={60}
             className="object-contain w-[40px] h-[40px] md:w-[50px] md:h-[50px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform pointer-events-auto"
             draggable={false}
             onClick={(e) => {
               e.stopPropagation();
+              handleDrawingAppOpen();
             }}
           />
         </div>
@@ -849,13 +858,14 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
           />
           <Image
             src="/escritorio-celu/signos.svg"
-            alt="Qué es Kiku Cream"
+            alt="Abrir KIKU Paint"
             width={60}
             height={60}
             className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform -mt-4 pointer-events-auto z-[200]"
             draggable={false}
             onClick={(e) => {
               e.stopPropagation();
+              handleDrawingAppOpen();
             }}
           />
         </div>

@@ -91,8 +91,24 @@ export default function DrawingTool({ width = 800, height = 600, initialImage }:
   }, [brushSize, brushColor, isErasing, getCanvasContext])
 
   const startDrawing = useCallback(
-    ({ nativeEvent }: React.MouseEvent<HTMLCanvasElement>) => {
-      const { offsetX, offsetY } = nativeEvent
+    (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+      const canvas = canvasRef.current
+      if (!canvas) return
+
+      const rect = canvas.getBoundingClientRect()
+      let offsetX: number, offsetY: number
+
+      if ('touches' in e) {
+        // Touch event
+        const touch = e.touches[0]
+        offsetX = touch.clientX - rect.left
+        offsetY = touch.clientY - rect.top
+      } else {
+        // Mouse event
+        offsetX = e.nativeEvent.offsetX
+        offsetY = e.nativeEvent.offsetY
+      }
+
       const ctx = getCanvasContext()
       if (ctx) {
         ctx.beginPath()
@@ -104,9 +120,27 @@ export default function DrawingTool({ width = 800, height = 600, initialImage }:
   )
 
   const draw = useCallback(
-    ({ nativeEvent }: React.MouseEvent<HTMLCanvasElement>) => {
+    (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
       if (!isDrawing) return
-      const { offsetX, offsetY } = nativeEvent
+      
+      const canvas = canvasRef.current
+      if (!canvas) return
+
+      const rect = canvas.getBoundingClientRect()
+      let offsetX: number, offsetY: number
+
+      if ('touches' in e) {
+        // Touch event
+        e.preventDefault() // Prevenir scroll en móvil
+        const touch = e.touches[0]
+        offsetX = touch.clientX - rect.left
+        offsetY = touch.clientY - rect.top
+      } else {
+        // Mouse event
+        offsetX = e.nativeEvent.offsetX
+        offsetY = e.nativeEvent.offsetY
+      }
+
       const ctx = getCanvasContext()
       if (ctx) {
         ctx.lineTo(offsetX, offsetY)
@@ -162,56 +196,61 @@ export default function DrawingTool({ width = 800, height = 600, initialImage }:
 
   return (
     <div className="flex flex-col h-full bg-gray-200 border-2 border-gray-400" style={{ borderStyle: "inset" }}>
-      {/* Toolbar */}
+      {/* Toolbar - Responsive */}
       <div
-        className="flex flex-wrap items-center gap-2 p-2 bg-gray-300 border-b-2 border-gray-400"
+        className="flex flex-wrap items-center gap-1 md:gap-2 p-1 md:p-2 bg-gray-300 border-b-2 border-gray-400"
         style={{ borderStyle: "outset" }}
       >
-        <Button
-          onClick={() => setIsErasing(false)}
-          className={`p-2 ${!isErasing ? "bg-blue-500 text-white" : "bg-gray-200 text-black"} border border-gray-400`}
-          style={{ borderStyle: !isErasing ? "inset" : "outset" }}
-          size="sm"
-        >
-          <Paintbrush className="h-4 w-4" />
-          <span className="sr-only">Pincel</span>
-        </Button>
-        <Button
-          onClick={() => setIsErasing(true)}
-          className={`p-2 ${isErasing ? "bg-blue-500 text-white" : "bg-gray-200 text-black"} border border-gray-400`}
-          style={{ borderStyle: isErasing ? "inset" : "outset" }}
-          size="sm"
-        >
-          <Eraser className="h-4 w-4" />
-          <span className="sr-only">Borrador</span>
-        </Button>
+        {/* Pincel y Borrador */}
+        <div className="flex gap-1">
+          <Button
+            onClick={() => setIsErasing(false)}
+            className={`p-1.5 md:p-2 ${!isErasing ? "bg-blue-500 text-white" : "bg-gray-200 text-black"} border border-gray-400`}
+            style={{ borderStyle: !isErasing ? "inset" : "outset" }}
+            size="sm"
+          >
+            <Paintbrush className="h-3 w-3 md:h-4 md:w-4" />
+            <span className="sr-only">Pincel</span>
+          </Button>
+          <Button
+            onClick={() => setIsErasing(true)}
+            className={`p-1.5 md:p-2 ${isErasing ? "bg-blue-500 text-white" : "bg-gray-200 text-black"} border border-gray-400`}
+            style={{ borderStyle: isErasing ? "inset" : "outset" }}
+            size="sm"
+          >
+            <Eraser className="h-3 w-3 md:h-4 md:w-4" />
+            <span className="sr-only">Borrador</span>
+          </Button>
+        </div>
 
+        {/* Tamaño del pincel */}
         <div
-          className="flex items-center gap-1 bg-gray-200 border border-gray-400 p-1"
+          className="flex items-center gap-0.5 md:gap-1 bg-gray-200 border border-gray-400 p-0.5 md:p-1"
           style={{ borderStyle: "inset" }}
         >
           <Button
             onClick={() => setBrushSize((prev) => Math.max(1, prev - 1))}
-            className="p-1 h-auto w-auto bg-gray-200 text-black border border-gray-400"
+            className="p-0.5 md:p-1 h-auto w-auto bg-gray-200 text-black border border-gray-400"
             style={{ borderStyle: "outset" }}
             size="sm"
           >
-            <Minus className="h-3 w-3" />
+            <Minus className="h-2.5 w-2.5 md:h-3 md:w-3" />
             <span className="sr-only">Reducir tamaño</span>
           </Button>
-          <span className="text-sm text-black">{brushSize}px</span>
+          <span className="text-xs md:text-sm text-black min-w-[35px] md:min-w-[40px] text-center">{brushSize}px</span>
           <Button
             onClick={() => setBrushSize((prev) => Math.min(50, prev + 1))}
-            className="p-1 h-auto w-auto bg-gray-200 text-black border border-gray-400"
+            className="p-0.5 md:p-1 h-auto w-auto bg-gray-200 text-black border border-gray-400"
             style={{ borderStyle: "outset" }}
             size="sm"
           >
-            <Plus className="h-3 w-3" />
+            <Plus className="h-2.5 w-2.5 md:h-3 md:w-3" />
             <span className="sr-only">Aumentar tamaño</span>
           </Button>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Color picker */}
+        <div className="flex items-center gap-1">
           <Label htmlFor="color-picker" className="sr-only">
             Color
           </Label>
@@ -220,54 +259,62 @@ export default function DrawingTool({ width = 800, height = 600, initialImage }:
             type="color"
             value={brushColor}
             onChange={(e) => setBrushColor(e.target.value)}
-            className="h-8 w-8 p-0 border-none cursor-pointer"
+            className="h-6 w-6 md:h-8 md:w-8 p-0 border-none cursor-pointer"
             title="Seleccionar color"
           />
-          <Palette className="h-4 w-4 text-black" />
+          <Palette className="h-3 w-3 md:h-4 md:w-4 text-black" />
         </div>
 
-        <Button
-          onClick={undo}
-          disabled={historyIndex <= 0}
-          className="p-2 bg-gray-200 text-black border border-gray-400 disabled:opacity-50"
-          style={{ borderStyle: "outset" }}
-          size="sm"
-        >
-          <Undo2 className="h-4 w-4" />
-          <span className="sr-only">Deshacer</span>
-        </Button>
-        <Button
-          onClick={redo}
-          disabled={historyIndex >= history.length - 1}
-          className="p-2 bg-gray-200 text-black border border-gray-400 disabled:opacity-50"
-          style={{ borderStyle: "outset" }}
-          size="sm"
-        >
-          <Redo2 className="h-4 w-4" />
-          <span className="sr-only">Rehacer</span>
-        </Button>
-        <Button
-          onClick={clearCanvas}
-          className="p-2 bg-gray-200 text-black border border-gray-400"
-          style={{ borderStyle: "outset" }}
-          size="sm"
-        >
-          Limpiar
-          <span className="sr-only">Limpiar lienzo</span>
-        </Button>
-        <Button
-          onClick={downloadImage}
-          className="p-2 bg-gray-200 text-black border border-gray-400"
-          style={{ borderStyle: "outset" }}
-          size="sm"
-        >
-          <Download className="h-4 w-4" />
-          <span className="sr-only">Descargar</span>
-        </Button>
+        {/* Undo/Redo */}
+        <div className="flex gap-1">
+          <Button
+            onClick={undo}
+            disabled={historyIndex <= 0}
+            className="p-1.5 md:p-2 bg-gray-200 text-black border border-gray-400 disabled:opacity-50"
+            style={{ borderStyle: "outset" }}
+            size="sm"
+          >
+            <Undo2 className="h-3 w-3 md:h-4 md:w-4" />
+            <span className="sr-only">Deshacer</span>
+          </Button>
+          <Button
+            onClick={redo}
+            disabled={historyIndex >= history.length - 1}
+            className="p-1.5 md:p-2 bg-gray-200 text-black border border-gray-400 disabled:opacity-50"
+            style={{ borderStyle: "outset" }}
+            size="sm"
+          >
+            <Redo2 className="h-3 w-3 md:h-4 md:w-4" />
+            <span className="sr-only">Rehacer</span>
+          </Button>
+        </div>
+
+        {/* Limpiar y Descargar */}
+        <div className="flex gap-1">
+          <Button
+            onClick={clearCanvas}
+            className="p-1.5 md:p-2 bg-gray-200 text-black border border-gray-400 text-xs md:text-sm"
+            style={{ borderStyle: "outset" }}
+            size="sm"
+          >
+            <span className="hidden md:inline">Limpiar</span>
+            <span className="md:hidden">🗑️</span>
+            <span className="sr-only">Limpiar lienzo</span>
+          </Button>
+          <Button
+            onClick={downloadImage}
+            className="p-1.5 md:p-2 bg-gray-200 text-black border border-gray-400"
+            style={{ borderStyle: "outset" }}
+            size="sm"
+          >
+            <Download className="h-3 w-3 md:h-4 md:w-4" />
+            <span className="sr-only">Descargar</span>
+          </Button>
+        </div>
       </div>
 
       {/* Canvas Area */}
-      <div className="flex-1 flex items-center justify-center p-4 overflow-auto">
+      <div className="flex-1 flex items-center justify-center p-2 md:p-4 overflow-auto">
         <canvas
           ref={canvasRef}
           width={width}
@@ -276,8 +323,11 @@ export default function DrawingTool({ width = 800, height = 600, initialImage }:
           onMouseMove={draw}
           onMouseUp={stopDrawing}
           onMouseLeave={stopDrawing}
-          className="bg-white border-2 border-gray-400 cursor-crosshair"
-          style={{ borderStyle: "inset" }}
+          onTouchStart={startDrawing}
+          onTouchMove={draw}
+          onTouchEnd={stopDrawing}
+          className="bg-white border-2 border-gray-400 cursor-crosshair touch-none"
+          style={{ borderStyle: "inset", maxWidth: '100%', maxHeight: '100%' }}
         />
       </div>
     </div>
