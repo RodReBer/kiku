@@ -696,14 +696,14 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
                 transition={{ duration: 0.2 }}
-                className="absolute top-full left-0 mt-3 bg-[#ffff00] rounded-3xl shadow-2xl px-6 py-5 min-w-[280px] border-4 border-black"
+                className="absolute top-full left-0 mt-3 bg-black rounded-3xl shadow-2xl px-6 py-5 min-w-[280px] border-4 border-white"
               >
                 <div className="space-y-1">
                   <button
                     onClick={handleAboutClick}
-                    className="w-full text-left py-3 px-4 text-black hover:bg-black hover:text-[#FFE500] transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group"
+                    className="w-full text-left py-3 px-4 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group border border-transparent hover:border-black"
                   >
-                    <span className="text-black group-hover:text-[#FFE500] text-xl">▶</span>
+                    <span className="text-white group-hover:text-black text-xl transition-colors">▶</span>
                     <span>¿Qué somos?</span>
                   </button>
                   <button
@@ -711,9 +711,9 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
                       handleContactFolderClick()
                       setIsMenuOpen(false)
                     }}
-                    className="w-full text-left py-3 px-4 text-black hover:bg-black hover:text-[#FFE500] transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group"
+                    className="w-full text-left py-3 px-4 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group border border-transparent hover:border-black"
                   >
-                    <span className="text-black group-hover:text-[#FFE500] text-xl">▶</span>
+                    <span className="text-white group-hover:text-black text-xl transition-colors">▶</span>
                     <span>Contacto</span>
                   </button>
                   <button
@@ -721,16 +721,16 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
                       window.open('https://www.instagram.com/kiku.cream/', '_blank')
                       setIsMenuOpen(false)
                     }}
-                    className="w-full text-left py-3 px-4 text-black hover:bg-black hover:text-[#FFE500] transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group"
+                    className="w-full text-left py-3 px-4 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group border border-transparent hover:border-black"
                   >
-                    <span className="text-black group-hover:text-[#FFE500] text-xl">▶</span>
+                    <span className="text-white group-hover:text-black text-xl transition-colors">▶</span>
                     <span>Instagram</span>
                   </button>
                   <button
                     onClick={handleShopClick}
-                    className="w-full text-left py-3 px-4 text-black hover:bg-black hover:text-[#FFE500] transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group"
+                    className="w-full text-left py-3 px-4 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group border border-transparent hover:border-black"
                   >
-                    <span className="text-black group-hover:text-[#FFE500] text-xl">▶</span>
+                    <span className="text-white group-hover:text-black text-xl transition-colors">▶</span>
                     <span>Shop</span>
                   </button>
                 </div>
@@ -756,14 +756,14 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
                 transition={{ duration: 0.2 }}
-                className="absolute top-full right-0 mt-3 bg-[#FFE500] rounded-3xl shadow-2xl px-5 py-4 min-w-[240px] border-4 border-black"
+                className="absolute top-full right-0 mt-3 bg-black rounded-3xl shadow-2xl px-5 py-4 min-w-[240px] border-4 border-white"
               >
                 <div className="space-y-1">
                   <button
                     onClick={handleAboutClick}
-                    className="w-full text-left py-2.5 px-3 text-black hover:bg-black hover:text-[#FFE500] transition-all duration-200 rounded-xl font-black text-base tracking-tight flex items-center gap-2.5 group"
+                    className="w-full text-left py-2.5 px-3 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-base tracking-tight flex items-center gap-2.5 group border border-transparent hover:border-black"
                   >
-                    <span className="text-black group-hover:text-[#FFE500] text-lg">▶</span>
+                    <span className="text-white group-hover:text-black text-lg transition-colors">▶</span>
                     <span>¿Qué somos?</span>
                   </button>
                   <button
@@ -771,9 +771,9 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
                       handleContactFolderClick()
                       setIsMenuOpen(false)
                     }}
-                    className="w-full text-left py-2.5 px-3 text-black hover:bg-black hover:text-[#FFE500] transition-all duration-200 rounded-xl font-black text-base tracking-tight flex items-center gap-2.5 group"
+                    className="w-full text-left py-2.5 px-3 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-base tracking-tight flex items-center gap-2.5 group border border-transparent hover:border-black"
                   >
-                    <span className="text-black group-hover:text-[#FFE500] text-lg">▶</span>
+                    <span className="text-white group-hover:text-black text-lg transition-colors">▶</span>
                     <span>Contacto</span>
                   </button>
                   <button
@@ -781,16 +781,16 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
                       window.open('https://www.instagram.com/kiku.cream/', '_blank')
                       setIsMenuOpen(false)
                     }}
-                    className="w-full text-left py-2.5 px-3 text-black hover:bg-black hover:text-[#FFE500] transition-all duration-200 rounded-xl font-black text-base tracking-tight flex items-center gap-2.5 group"
+                    className="w-full text-left py-2.5 px-3 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-base tracking-tight flex items-center gap-2.5 group border border-transparent hover:border-black"
                   >
-                    <span className="text-black group-hover:text-[#FFE500] text-lg">▶</span>
+                    <span className="text-white group-hover:text-black text-lg transition-colors">▶</span>
                     <span>Instagram</span>
                   </button>
                   <button
                     onClick={handleShopClick}
-                    className="w-full text-left py-2.5 px-3 text-black hover:bg-black hover:text-[#FFE500] transition-all duration-200 rounded-xl font-black text-base tracking-tight flex items-center gap-2.5 group"
+                    className="w-full text-left py-2.5 px-3 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-base tracking-tight flex items-center gap-2.5 group border border-transparent hover:border-black"
                   >
-                    <span className="text-black group-hover:text-[#FFE500] text-lg">▶</span>
+                    <span className="text-white group-hover:text-black text-lg transition-colors">▶</span>
                     <span>Shop</span>
                   </button>
                 </div>
