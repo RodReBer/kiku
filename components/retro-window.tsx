@@ -111,7 +111,7 @@ export default function RetroWindow({
   }, [isDragging, isResizing, dragStart, resizeStart, position, size, isMaximized, onMove, onResize])
 
   const windowStyle = isMaximized
-    ? { x: 0, y: 32, width: "100vw", height: "calc(100vh - 32px)" }
+    ? { x: 0, y: 0, width: "100vw", height: "100vh" }
     : { x: position.x, y: position.y, width: size.width, height: size.height }
 
   if (isMinimized) {
@@ -124,7 +124,7 @@ export default function RetroWindow({
         ref={windowRef}
         className="absolute bg-gray-200 shadow-md"
         style={{
-          left: windowStyle.x,
+          left: windowStyle.x - 8,
           top: windowStyle.y,
           width: windowStyle.width,
           height: windowStyle.height,
@@ -208,7 +208,7 @@ export default function RetroWindow({
         </div>
 
         {/* Contenido de la ventana */}
-        <div className="flex-1 overflow-hidden" style={{ height: "calc(100% - 32px)" }}>
+        <div className="flex-1 overflow-hidden w-full" style={{ height: "calc(100% - 28px)" }}>
           {children}
         </div>
 

@@ -124,14 +124,19 @@ export default function MacDesktop() {
 
     if (typeof window !== "undefined") {
       if (centered) {
-        // Asegurarnos de que las ventanas centradas estén realmente en el centro
+        // Centrar ventanas correctamente
         position = {
-          x: Math.max(0, Math.floor((window.innerWidth - defaultSize.width) / 2)),
-          y: Math.max(0, Math.floor((window.innerHeight - defaultSize.height) / 2)),
+          x: Math.max(0, (window.innerWidth - defaultSize.width) / 2),
+          y: Math.max(40, (window.innerHeight - defaultSize.height) / 2),
         }
-        console.log("Ventana centrada en:", position);
-      } else if (!isMobile) {
-        // En dispositivos no móviles, posición aleatoria para efecto cascada
+      } else if (isMobile) {
+        // En móvil, también centrar si no se especifica lo contrario
+        position = {
+          x: Math.max(0, (window.innerWidth - defaultSize.width) / 2),
+          y: Math.max(60, (window.innerHeight - defaultSize.height) / 2),
+        }
+      } else {
+        // En desktop no centrado, posición aleatoria para efecto cascada
         position = {
           x: Math.floor(Math.random() * Math.max(0, window.innerWidth - defaultSize.width - 50) + 25),
           y: Math.floor(Math.random() * Math.max(0, window.innerHeight - defaultSize.height - 100) + 50),
@@ -194,12 +199,21 @@ export default function MacDesktop() {
         const viewportWidth = window.innerWidth
         const viewportHeight = window.innerHeight
         
-        // Generar posición aleatoria pero asegurando que la ventana esté visible
-        const randomX = Math.random() * (viewportWidth - windowDimensions.width - 50)
-        const randomY = Math.random() * (viewportHeight - windowDimensions.height - 100)
+        // Generar posición completamente aleatoria - más dispersión
+        // Usar el índice para agregar más variación y evitar superposiciones
+        const minMargin = 20
+        const maxX = viewportWidth - windowDimensions.width - minMargin
+        const maxY = viewportHeight - windowDimensions.height - minMargin - 60
+        
+        // Agregar variación basada en el índice para que no se superpongan tanto
+        const randomSeedX = Math.random() + (index * 0.123) // Seed diferente por índice
+        const randomSeedY = Math.random() + (index * 0.456)
+        
+        const randomX = Math.max(minMargin, (randomSeedX % 1) * Math.max(maxX, minMargin))
+        const randomY = Math.max(60, (randomSeedY % 1) * Math.max(maxY, 60))
 
         const content = (
-          <div className="w-full h-full flex items-center justify-center bg-black p-0">
+          <div className="w-full h-full bg-black flex items-center justify-center overflow-hidden">
             <Image
               src={imagePath || "/placeholder.svg"}
               alt={title}
@@ -327,8 +341,8 @@ export default function MacDesktop() {
     };
 
     openCenteredWindow("Explorador KIKU - Diseños", <FinderWithDesignCategory />, {
-      width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 900,
-      height: isMobile ? Math.min(500, window.innerHeight * 0.8) : 700,
+      width: isMobile ? Math.min(window.innerWidth - 20, 350) : 900,
+      height: isMobile ? Math.min(window.innerHeight - 100, 500) : 700,
     })
   }
 
@@ -341,8 +355,8 @@ export default function MacDesktop() {
     };
 
     openCenteredWindow("Explorador KIKU - Fotografía", <FinderWithPhotoCategory />, {
-      width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 900,
-      height: isMobile ? Math.min(500, window.innerHeight * 0.8) : 700,
+      width: isMobile ? Math.min(window.innerWidth - 20, 350) : 900,
+      height: isMobile ? Math.min(window.innerHeight - 100, 500) : 700,
     })
   }
 
@@ -355,8 +369,8 @@ export default function MacDesktop() {
     };
 
     openCenteredWindow("Explorador KIKU - Videos", <FinderWithVideoCategory />, {
-      width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 900,
-      height: isMobile ? Math.min(500, window.innerHeight * 0.8) : 700,
+      width: isMobile ? Math.min(window.innerWidth - 20, 350) : 900,
+      height: isMobile ? Math.min(window.innerHeight - 100, 500) : 700,
     })
   }
 
