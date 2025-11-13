@@ -70,14 +70,14 @@ export default function InteractivePhotoGallery({ photos, projectName }: Interac
 
       {/* Modal for full-size photo */}
       {isModalOpen && currentPhoto && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[1000]">
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[1000]" style={{ height: '100vh', minHeight: '100vh' }}>
           <div
             className="relative bg-gray-200 border-4 border-gray-400 shadow-lg p-2"
             style={{ borderStyle: "outset" }}
           >
             <button
               onClick={closeModal}
-              className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center border-2 border-red-700"
+              className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center border-2 border-red-700 z-10"
               style={{ borderStyle: "outset" }}
             >
               <X size={20} />

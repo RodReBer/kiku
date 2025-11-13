@@ -13,9 +13,10 @@ ensureFirebaseInitialized();
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "KIKU Cream - Portfolio Retro",
-  description: "Portfolio retro aesthetic de KIKU Cream",
-  generator: 'Rodrigo Rey'
+  title: "Kiku Cream Studio",
+  description: "© All rights reserved.",
+  authors: [{ name: 'Rodrigo Rey', url: 'https://rodrigorey.info' }],
+  keywords: ['Kiku Cream Studio', 'Kiku Cream', 'Kiku', 'Cream', 'Drawing App', 'Painting App', 'Art App', 'Creative Studio', 'Digital Art', 'Art Software'],
 }
 
 export default function RootLayout({

@@ -123,17 +123,11 @@ export default function MacDesktop() {
     let position = { x: 10, y: 60 }
 
     if (typeof window !== "undefined") {
-      if (centered) {
-        // Centrar ventanas correctamente
+      if (centered || isMobile) {
+        // En móvil SIEMPRE centrar, en desktop solo si se especifica centered
         position = {
           x: Math.max(0, (window.innerWidth - defaultSize.width) / 2),
           y: Math.max(40, (window.innerHeight - defaultSize.height) / 2),
-        }
-      } else if (isMobile) {
-        // En móvil, también centrar si no se especifica lo contrario
-        position = {
-          x: Math.max(0, (window.innerWidth - defaultSize.width) / 2),
-          y: Math.max(60, (window.innerHeight - defaultSize.height) / 2),
         }
       } else {
         // En desktop no centrado, posición aleatoria para efecto cascada
@@ -199,18 +193,18 @@ export default function MacDesktop() {
         const viewportWidth = window.innerWidth
         const viewportHeight = window.innerHeight
         
-        // Generar posición completamente aleatoria - más dispersión
+        // Generar posición completamente aleatoria - MÁS dispersión
         // Usar el índice para agregar más variación y evitar superposiciones
-        const minMargin = 20
+        const minMargin = isMobile ? 10 : 20
         const maxX = viewportWidth - windowDimensions.width - minMargin
         const maxY = viewportHeight - windowDimensions.height - minMargin - 60
         
-        // Agregar variación basada en el índice para que no se superpongan tanto
-        const randomSeedX = Math.random() + (index * 0.123) // Seed diferente por índice
-        const randomSeedY = Math.random() + (index * 0.456)
+        // Múltiples seeds aleatorios para mayor dispersión
+        const randomSeedX = Math.random() + (index * 0.789) + Math.sin(index * 2.5) * 0.3
+        const randomSeedY = Math.random() + (index * 0.654) + Math.cos(index * 3.2) * 0.3
         
-        const randomX = Math.max(minMargin, (randomSeedX % 1) * Math.max(maxX, minMargin))
-        const randomY = Math.max(60, (randomSeedY % 1) * Math.max(maxY, 60))
+        const randomX = Math.max(minMargin, (Math.abs(randomSeedX) % 1) * Math.max(maxX, minMargin))
+        const randomY = Math.max(60, (Math.abs(randomSeedY) % 1) * Math.max(maxY, 60))
 
         const content = (
           <div className="w-full h-full bg-black flex items-center justify-center overflow-hidden">

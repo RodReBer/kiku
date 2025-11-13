@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  cacheComponents: true,
+  output: 'export', // Exportación estática para Hostinger
+
   eslint: {
     ignoreDuringBuilds: true,
   },

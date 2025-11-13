@@ -9,9 +9,9 @@ export default function DrawingApp() {
     const updateDimensions = () => {
       const isMobile = window.innerWidth < 768
       if (isMobile) {
-        // En móvil: usar casi todo el espacio disponible
-        const width = Math.min(window.innerWidth - 20, 400)
-        const height = Math.min(window.innerHeight - 150, 500)
+        // En móvil: expandir completamente usando toda la ventana disponible
+        const width = window.innerWidth - 20
+        const height = window.innerHeight - 100
         setDimensions({ width, height })
       } else {
         // En desktop: tamaño más grande
@@ -25,7 +25,7 @@ export default function DrawingApp() {
   }, [])
 
   return (
-    <div className="w-full h-full flex items-center justify-center bg-gray-100 p-2 md:p-4">
+    <div className="w-full h-full flex items-start justify-center bg-gray-100 p-1 md:p-4">
       <DrawingTool width={dimensions.width} height={dimensions.height} />
     </div>
   )
