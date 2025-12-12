@@ -125,7 +125,7 @@ export default function WelcomeScreen({ onEnterDesktop }: WelcomeScreenProps) {
           <img
             src="/inicio celu/CELULAR INICIO.svg"
             alt="KIKUCREAM mobile composition"
-            className="mobile-composition block w-full h-[122dvh] max-[376px]:h-[118dvh] max-[480px]:h-[120dvh] max-[380px]:h-[118.5dvh] max-[340px]:h-[116.5dvh] object-contain pointer-events-none select-none origin-center"
+            className="mobile-composition block w-full h-[122dvh] max-[376px]:h-[118dvh] max-[480px]:h-[122dvh] max-[380px]:h-[122dvh] max-[340px]:h-[116.5dvh] object-contain pointer-events-none select-none origin-center"
             draggable={false}
             aria-hidden="true"
           />
