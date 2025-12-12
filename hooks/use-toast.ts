@@ -189,16 +189,17 @@ function useToast() {
 
 export { useToast, toast }
 
-export function useToastDemo() {
-  const { toast } = useToast()
+// Demo function commented out to avoid JSX in .ts file
+// export function useToastDemo() {
+//   const { toast } = useToast()
 
-  const showToast = () => {
-    toast({
-      title: "Scheduled: Catch up",
-      description: "Friday, February 10, 2023 at 5:57 PM",
-      action: <ToastAction altText="Goto schedule to undo">Undo</ToastAction>,
-    })
-  }
+//   const showToast = () => {
+//     toast({
+//       title: "Scheduled: Catch up",
+//       description: "Friday, February 10, 2023 at 5:57 PM",
+//       action: <ToastAction altText="Goto schedule to undo">Undo</ToastAction>,
+//     })
+//   }
 
-  return showToast
-}
+//   return showToast
+// }

@@ -37,7 +37,7 @@ export default function FilePreview({ isOpen, onClose, file }: FilePreviewProps)
             <X className="h-4 w-4" />
           </Button>
         </DialogHeader>
-        <div className="p-4 bg-white overflow-auto max-h-[70vh]">
+        <div className="p-4 bg-white overflow-auto max-h-[70dvh]">
           {file.type === "image" && (
             <div className="flex justify-center items-center">
               <Image

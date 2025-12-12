@@ -16,6 +16,8 @@ interface DesktopIconProps {
 export default function DesktopIcon({ id, name, icon, onClick, initialPosition }: DesktopIconProps) {
   const [position, setPosition] = useState(initialPosition)
   const [isDragging, setIsDragging] = useState(false)
+  const iconRef = useRef<HTMLDivElement | null>(null)
+  const rafRef = useRef<number | null>(null)
 
   const dragDataRef = useRef({
     isDragging: false,
@@ -29,7 +31,7 @@ export default function DesktopIcon({ id, name, icon, onClick, initialPosition }
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault()
-      const rect = e.currentTarget.getBoundingClientRect()
+      const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect()
 
       dragDataRef.current = {
         isDragging: true,
@@ -42,39 +44,51 @@ export default function DesktopIcon({ id, name, icon, onClick, initialPosition }
 
       setIsDragging(true)
 
+      let latestX = position.x
+      let latestY = position.y
+      const originX = position.x
+      const originY = position.y
+
+      const applyTransform = () => {
+        if (iconRef.current) {
+          iconRef.current.style.transform = `translate(${latestX - originX}px, ${latestY - originY}px)`
+        }
+        rafRef.current = null
+      }
+
       const handleMouseMove = (e: MouseEvent) => {
         if (!dragDataRef.current.isDragging) return
-
         const deltaX = Math.abs(e.clientX - dragDataRef.current.startX)
         const deltaY = Math.abs(e.clientY - dragDataRef.current.startY)
-
         if (deltaX > 5 || deltaY > 5) {
           dragDataRef.current.hasMoved = true
-
           const newX = e.clientX - dragDataRef.current.offsetX
           const newY = e.clientY - dragDataRef.current.offsetY
-
-          setPosition({
-            x: Math.max(0, Math.min(newX, window.innerWidth - 100)),
-            y: Math.max(0, Math.min(newY, window.innerHeight - 120)),
-          })
+          latestX = Math.max(0, Math.min(newX, window.innerWidth - 100))
+          latestY = Math.max(0, Math.min(newY, window.innerHeight - 120))
+          if (rafRef.current == null) {
+            rafRef.current = requestAnimationFrame(applyTransform)
+          }
         }
       }
 
       const handleMouseUp = () => {
         setIsDragging(false)
-
-        // Solo ejecutar onClick si NO se movió el ícono
         if (!dragDataRef.current.hasMoved) {
           onClick()
+        } else {
+          // Commit final position
+          setPosition({ x: latestX, y: latestY })
         }
-
+        if (iconRef.current) {
+          iconRef.current.style.transform = ""
+        }
         dragDataRef.current.isDragging = false
         document.removeEventListener("mousemove", handleMouseMove)
         document.removeEventListener("mouseup", handleMouseUp)
       }
 
-      document.addEventListener("mousemove", handleMouseMove)
+      document.addEventListener("mousemove", handleMouseMove, { passive: true })
       document.addEventListener("mouseup", handleMouseUp)
     },
     [onClick],
@@ -91,6 +105,7 @@ export default function DesktopIcon({ id, name, icon, onClick, initialPosition }
         width: "100px", // Más ancho para íconos más grandes
       }}
       onMouseDown={handleMouseDown}
+      ref={iconRef}
     >
       <div
         className={`w-16 h-16 mb-2 flex items-center justify-center transition-all duration-200 ${

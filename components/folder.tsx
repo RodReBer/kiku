@@ -20,6 +20,9 @@ export default function Folder({ id, name, iconSrc, onDoubleClick, initialPositi
   const [isClicked, setIsClicked] = useState(false)
   const dragOffset = useRef({ x: 0, y: 0 })
   const clickTimeout = useRef<NodeJS.Timeout | null>(null)
+  const folderRef = useRef<HTMLDivElement | null>(null)
+  const rafRef = useRef<number | null>(null)
+  const draftPosRef = useRef({ x: initialPosition.x, y: initialPosition.y })
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true)
@@ -27,36 +30,55 @@ export default function Folder({ id, name, iconSrc, onDoubleClick, initialPositi
       x: e.clientX - position.x,
       y: e.clientY - position.y,
     }
+    draftPosRef.current = { x: position.x, y: position.y }
 
     if (clickTimeout.current) {
       clearTimeout(clickTimeout.current)
       clickTimeout.current = null
-      onDoubleClick(id) // Double click detected
-      setIsClicked(false) // Reset click state
+      onDoubleClick(id)
+      setIsClicked(false)
     } else {
       setIsClicked(true)
       clickTimeout.current = setTimeout(() => {
         setIsClicked(false)
         clickTimeout.current = null
-      }, 300) // Adjust double-click speed
+      }, 300)
     }
   }
 
+  const commitPosition = () => {
+    setPosition({ x: draftPosRef.current.x, y: draftPosRef.current.y })
+    if (folderRef.current) folderRef.current.style.transform = ""
+  }
+
+  const applyTransform = () => {
+    if (folderRef.current) {
+      const dx = draftPosRef.current.x - position.x
+      const dy = draftPosRef.current.y - position.y
+      folderRef.current.style.transform = `translate(${dx}px, ${dy}px)`
+    }
+    rafRef.current = null
+  }
+
   const handleMouseMove = (e: MouseEvent) => {
-    if (isDragging) {
-      const newX = e.clientX - dragOffset.current.x
-      const newY = e.clientY - dragOffset.current.y
-      setPosition({ x: newX, y: newY })
+    if (!isDragging) return
+    draftPosRef.current.x = e.clientX - dragOffset.current.x
+    draftPosRef.current.y = e.clientY - dragOffset.current.y
+    if (rafRef.current == null) {
+      rafRef.current = requestAnimationFrame(applyTransform)
     }
   }
 
   const handleMouseUp = () => {
+    if (isDragging) {
+      commitPosition()
+    }
     setIsDragging(false)
   }
 
   useEffect(() => {
     if (isDragging) {
-      window.addEventListener("mousemove", handleMouseMove)
+      window.addEventListener("mousemove", handleMouseMove, { passive: true })
       window.addEventListener("mouseup", handleMouseUp)
     } else {
       window.removeEventListener("mousemove", handleMouseMove)
@@ -80,6 +102,7 @@ export default function Folder({ id, name, iconSrc, onDoubleClick, initialPositi
         zIndex: isDragging ? 1000 : 1, // Bring to front when dragging
       }}
       onMouseDown={handleMouseDown}
+      ref={folderRef}
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.2 }}

@@ -7,6 +7,9 @@ import { db } from "@/lib/firebase"
 export interface Photo {
   id: string
   url: string
+  thumbUrl?: string // URL del thumbnail para carga rápida en cascadas
+  width?: number
+  height?: number
   title: string
   description?: string
 }
@@ -20,6 +23,7 @@ export interface Project {
   description?: string
   status: "active" | "archived"
   coverImage?: string
+  coverImageThumb?: string
   createdAt?: Date
   updatedAt?: Date
 }
@@ -62,17 +66,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
   // Cargar datos iniciales y configurar listeners en tiempo real
   useEffect(() => {
     console.log("Initializing Firebase listeners");
-    
+
     const projectsCollectionRef = collection(db, "projects");
     console.log("Projects collection reference:", projectsCollectionRef);
-    
+
     const unsubscribeProjects = onSnapshot(
       projectsCollectionRef,
       (snapshot) => {
-        console.log("Firebase projects snapshot received:", snapshot.size, "documents");
         const projectsData = snapshot.docs.map((doc) => {
           const data = doc.data();
-          console.log("Project document:", doc.id, data);
           return {
             id: doc.id,
             ...data,
@@ -80,7 +82,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
             updatedAt: data.updatedAt?.toDate(),
           };
         }) as Project[];
-        
+
         setProjects(projectsData);
         console.log("Projects set in state:", projectsData.length);
         setLoading(false);
@@ -95,17 +97,21 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const unsubscribeProducts = onSnapshot(
       collection(db, "products"),
       (snapshot) => {
-        const productsData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-          createdAt: doc.data().createdAt?.toDate(),
-          updatedAt: doc.data().updatedAt?.toDate(),
-        })) as Product[]
-        setProducts(productsData)
+        // Si hay productos en Firebase, usarlos; sino, mantener mocks
+        if (snapshot.docs.length > 0) {
+          const productsData = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            createdAt: doc.data().createdAt?.toDate(),
+            updatedAt: doc.data().updatedAt?.toDate(),
+          })) as Product[]
+          setProducts(productsData)
+        }
+        // Si no hay productos en Firebase, mantener los mocks (ya inicializados)
       },
       (err) => {
         console.error("Error loading products:", err)
-        setError("Error cargando productos")
+        // Mantener mocks en caso de error
       },
     )
 

@@ -6,6 +6,8 @@ export interface Photo {
   id: string
   name: string
   url: string
+  width?: number
+  height?: number
 }
 
 export interface Project {
@@ -16,6 +18,7 @@ export interface Project {
   status: "active" | "archived"
   category: "design" | "photography" | "general" // Añadido para Finder
   coverImage?: string
+  coverImageThumb?: string
   photos?: Photo[]
 }
 

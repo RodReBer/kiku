@@ -22,6 +22,16 @@ export default function DrawingTool({ width = 800, height = 600, initialImage }:
   const [history, setHistory] = useState<ImageData[]>([])
   const [historyIndex, setHistoryIndex] = useState(-1)
 
+  // Refs to access history inside useEffect without triggering re-renders
+  const historyRef = useRef<ImageData[]>([])
+  const historyIndexRef = useRef(-1)
+
+  // Sync refs with state
+  useEffect(() => {
+    historyRef.current = history
+    historyIndexRef.current = historyIndex
+  }, [history, historyIndex])
+
   const getCanvasContext = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return null
@@ -57,6 +67,15 @@ export default function DrawingTool({ width = 800, height = 600, initialImage }:
     if (ctx) {
       ctx.lineCap = "round"
       ctx.lineJoin = "round"
+
+      // If we have history, we are resizing. Restore the last state.
+      if (historyRef.current.length > 0) {
+        const lastState = historyRef.current[historyIndexRef.current]
+        if (lastState) {
+          ctx.putImageData(lastState, 0, 0)
+        }
+        return
+      }
 
       // Load initial image if provided
       if (initialImage) {
@@ -96,17 +115,20 @@ export default function DrawingTool({ width = 800, height = 600, initialImage }:
       if (!canvas) return
 
       const rect = canvas.getBoundingClientRect()
+      const scaleX = canvas.width / rect.width
+      const scaleY = canvas.height / rect.height
+
       let offsetX: number, offsetY: number
 
       if ('touches' in e) {
         // Touch event
         const touch = e.touches[0]
-        offsetX = touch.clientX - rect.left
-        offsetY = touch.clientY - rect.top
+        offsetX = (touch.clientX - rect.left) * scaleX
+        offsetY = (touch.clientY - rect.top) * scaleY
       } else {
         // Mouse event
-        offsetX = e.nativeEvent.offsetX
-        offsetY = e.nativeEvent.offsetY
+        offsetX = (e.clientX - rect.left) * scaleX
+        offsetY = (e.clientY - rect.top) * scaleY
       }
 
       const ctx = getCanvasContext()
@@ -122,23 +144,26 @@ export default function DrawingTool({ width = 800, height = 600, initialImage }:
   const draw = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
       if (!isDrawing) return
-      
+
       const canvas = canvasRef.current
       if (!canvas) return
 
       const rect = canvas.getBoundingClientRect()
+      const scaleX = canvas.width / rect.width
+      const scaleY = canvas.height / rect.height
+
       let offsetX: number, offsetY: number
 
       if ('touches' in e) {
         // Touch event
         e.preventDefault() // Prevenir scroll en móvil
         const touch = e.touches[0]
-        offsetX = touch.clientX - rect.left
-        offsetY = touch.clientY - rect.top
+        offsetX = (touch.clientX - rect.left) * scaleX
+        offsetY = (touch.clientY - rect.top) * scaleY
       } else {
         // Mouse event
-        offsetX = e.nativeEvent.offsetX
-        offsetY = e.nativeEvent.offsetY
+        offsetX = (e.clientX - rect.left) * scaleX
+        offsetY = (e.clientY - rect.top) * scaleY
       }
 
       const ctx = getCanvasContext()

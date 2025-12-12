@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
 interface RetroWindowProps {
@@ -11,7 +9,7 @@ interface RetroWindowProps {
   children: React.ReactNode
   isMinimized: boolean
   isMaximized: boolean
-  position: { x: number; y: number }
+  position: { x: number; y: number; centered?: boolean }
   size: { width: number; height: number }
   zIndex: number
   onClose: () => void
@@ -20,6 +18,9 @@ interface RetroWindowProps {
   onMove: (position: { x: number; y: number }) => void
   onResize: (size: { width: number; height: number }) => void
   onFocus: () => void
+  preserveAspect?: boolean
+  aspectRatio?: number
+  backgroundTransparent?: boolean
 }
 
 export default function RetroWindow({
@@ -37,6 +38,9 @@ export default function RetroWindow({
   onMove,
   onResize,
   onFocus,
+  preserveAspect,
+  aspectRatio,
+  backgroundTransparent,
 }: RetroWindowProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
@@ -45,19 +49,34 @@ export default function RetroWindow({
   const windowRef = useRef<HTMLDivElement>(null)
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    // Solo permitir drag desde el header, excluyendo botones
     const target = e.target as HTMLElement
     if (target.tagName === 'BUTTON' || target.closest('button')) {
       return
     }
-    
+
     onFocus()
     setIsDragging(true)
     setDragStart({
       x: e.clientX - position.x,
       y: e.clientY - position.y,
     })
-    e.preventDefault() // Prevenir selección de texto
+    e.preventDefault()
+  }
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const target = e.target as HTMLElement
+    if (target.tagName === 'BUTTON' || target.closest('button')) {
+      return
+    }
+
+    onFocus()
+    setIsDragging(true)
+    const touch = e.touches[0]
+    setDragStart({
+      x: touch.clientX - position.x,
+      y: touch.clientY - position.y,
+    })
+    e.preventDefault()
   }
 
   const handleResizeMouseDown = (e: React.MouseEvent) => {
@@ -72,20 +91,122 @@ export default function RetroWindow({
     })
   }
 
+  const handleResizeTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation()
+    onFocus()
+    setIsResizing(true)
+    const touch = e.touches[0]
+    setResizeStart({
+      x: touch.clientX,
+      y: touch.clientY,
+      width: size.width,
+      height: size.height,
+    })
+  }
+
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isDragging && !isMaximized) {
         e.preventDefault()
-        const newX = Math.max(0, Math.min(window.innerWidth - size.width, e.clientX - dragStart.x))
-        const newY = Math.max(0, Math.min(window.innerHeight - size.height, e.clientY - dragStart.y))
+        // Usar tamaño real del DOM para bounds precisos
+        const el = windowRef.current
+        if (!el) return
+
+        // Permitir arrastrar hasta los bordes, teniendo en cuenta el borde del contenedor (7px por lado)
+        const containerBorder = 19 // 7px * 2
+        const maxX = window.innerWidth - el.offsetWidth - containerBorder
+        const maxY = window.innerHeight - el.offsetHeight - containerBorder
+
+        const newX = Math.max(0, Math.min(maxX, e.clientX - dragStart.x))
+        const newY = Math.max(0, Math.min(maxY, e.clientY - dragStart.y))
         onMove({ x: newX, y: newY })
       }
 
       if (isResizing && !isMaximized) {
         e.preventDefault()
-        const newWidth = Math.max(300, resizeStart.width + (e.clientX - resizeStart.x))
-        const newHeight = Math.max(200, resizeStart.height + (e.clientY - resizeStart.y))
-        onResize({ width: newWidth, height: newHeight })
+
+        if (preserveAspect && aspectRatio) {
+          const deltaX = e.clientX - resizeStart.x
+          const deltaY = e.clientY - resizeStart.y
+
+          const newWidth = Math.max(300, resizeStart.width + deltaX)
+          const newHeight = Math.max(200, resizeStart.height + deltaY)
+
+          const widthChange = Math.abs(newWidth - resizeStart.width)
+          const heightChange = Math.abs(newHeight - resizeStart.height)
+
+          let finalWidth, finalHeight
+
+          if (widthChange > heightChange) {
+            finalWidth = newWidth
+            finalHeight = finalWidth / aspectRatio
+          } else {
+            finalHeight = newHeight
+            finalWidth = finalHeight * aspectRatio
+          }
+
+          finalWidth = Math.max(300, finalWidth)
+          finalHeight = Math.max(200, finalHeight)
+
+          onResize({ width: finalWidth, height: finalHeight })
+        } else {
+          const newWidth = Math.max(300, resizeStart.width + (e.clientX - resizeStart.x))
+          const newHeight = Math.max(200, resizeStart.height + (e.clientY - resizeStart.y))
+          onResize({ width: newWidth, height: newHeight })
+        }
+      }
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const touch = e.touches[0]
+      if (isDragging && !isMaximized) {
+        e.preventDefault()
+        // Usar tamaño real del DOM para bounds precisos
+        const el = windowRef.current
+        if (!el) return
+
+        // Permitir arrastrar hasta los bordes, teniendo en cuenta el borde del contenedor (7px por lado)
+        const containerBorder = 19 // 7px * 2
+        const maxX = window.innerWidth - el.offsetWidth - containerBorder
+        const maxY = window.innerHeight - el.offsetHeight - containerBorder
+
+        const newX = Math.max(0, Math.min(maxX, touch.clientX - dragStart.x))
+        const newY = Math.max(0, Math.min(maxY, touch.clientY - dragStart.y))
+        onMove({ x: newX, y: newY })
+      }
+
+      if (isResizing && !isMaximized) {
+        e.preventDefault()
+
+        if (preserveAspect && aspectRatio) {
+          const deltaX = touch.clientX - resizeStart.x
+          const deltaY = touch.clientY - resizeStart.y
+
+          const newWidth = Math.max(300, resizeStart.width + deltaX)
+          const newHeight = Math.max(200, resizeStart.height + deltaY)
+
+          const widthChange = Math.abs(newWidth - resizeStart.width)
+          const heightChange = Math.abs(newHeight - resizeStart.height)
+
+          let finalWidth, finalHeight
+
+          if (widthChange > heightChange) {
+            finalWidth = newWidth
+            finalHeight = finalWidth / aspectRatio
+          } else {
+            finalHeight = newHeight
+            finalWidth = finalHeight * aspectRatio
+          }
+
+          finalWidth = Math.max(300, finalWidth)
+          finalHeight = Math.max(200, finalHeight)
+
+          onResize({ width: finalWidth, height: finalHeight })
+        } else {
+          const newWidth = Math.max(300, resizeStart.width + (touch.clientX - resizeStart.x))
+          const newHeight = Math.max(200, resizeStart.height + (touch.clientY - resizeStart.y))
+          onResize({ width: newWidth, height: newHeight })
+        }
       }
     }
 
@@ -94,10 +215,16 @@ export default function RetroWindow({
       setIsResizing(false)
     }
 
+    const handleTouchEnd = () => {
+      setIsDragging(false)
+      setIsResizing(false)
+    }
+
     if (isDragging || isResizing) {
       document.addEventListener("mousemove", handleMouseMove)
       document.addEventListener("mouseup", handleMouseUp)
-      // Prevenir selección mientras se arrastra
+      document.addEventListener("touchmove", handleTouchMove, { passive: false })
+      document.addEventListener("touchend", handleTouchEnd)
       document.body.style.userSelect = 'none'
     } else {
       document.body.style.userSelect = ''
@@ -106,12 +233,17 @@ export default function RetroWindow({
     return () => {
       document.removeEventListener("mousemove", handleMouseMove)
       document.removeEventListener("mouseup", handleMouseUp)
+      document.removeEventListener("touchmove", handleTouchMove)
+      document.removeEventListener("touchend", handleTouchEnd)
       document.body.style.userSelect = ''
     }
-  }, [isDragging, isResizing, dragStart, resizeStart, position, size, isMaximized, onMove, onResize])
+  }, [isDragging, isResizing, dragStart, resizeStart, position, size, isMaximized, onMove, onResize, preserveAspect, aspectRatio])
 
+  // Estilo para ventana (maximizada usa viewport completo salvo que preserveAspect ajuste posición desde el padre)
   const windowStyle = isMaximized
-    ? { x: 0, y: 0, width: "100vw", height: "100vh" }
+    ? (preserveAspect
+      ? { x: position.x, y: position.y, width: size.width, height: size.height }
+      : { x: 0, y: 0, width: "100%", height: "100%" }) // Usa 100% del contenedor padre
     : { x: position.x, y: position.y, width: size.width, height: size.height }
 
   if (isMinimized) {
@@ -122,9 +254,9 @@ export default function RetroWindow({
     <AnimatePresence>
       <motion.div
         ref={windowRef}
-        className="absolute bg-gray-200 shadow-md"
+        className="absolute bg-gray-200 shadow-md flex flex-col"
         style={{
-          left: windowStyle.x - 8,
+          left: windowStyle.x,
           top: windowStyle.y,
           width: windowStyle.width,
           height: windowStyle.height,
@@ -133,31 +265,37 @@ export default function RetroWindow({
           borderWidth: "2px",
           borderColor: "#FFFFFF #808080 #808080 #FFFFFF",
           boxShadow: "2px 2px 5px rgba(0,0,0,0.2)",
+          backgroundColor: backgroundTransparent ? 'transparent' : '#C0C0C0',
+          willChange: 'transform, opacity',
+          backfaceVisibility: 'hidden',
         }}
-        initial={{ opacity: 0, scale: 0.8 }}
+        initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.8 }}
-        transition={{ duration: 0.2 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{
+          duration: 0.15,
+          ease: "easeOut"
+        }}
         onMouseDown={() => onFocus()}
       >
-        {/* Barra de título estilo Windows 2000 */}
         <div
           className="window-header h-7 border-b border-gray-500 flex items-center justify-between px-2 cursor-move"
-          style={{ 
+          style={{
             borderStyle: "solid",
             background: "#C0C0C0",
             borderColor: "#D9D9D9 #434343 #434343 #D9D9D9"
           }}
           onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
         >
-          <span className="text-black font-bold text-xs truncate flex-1 ml-2">{title}</span>          <div className="flex space-x-1">
-            {/* Botón minimizar estilo Windows 2000 */}
+          <span className="text-black font-bold text-xs truncate flex-1 ml-2">{title}</span>
+          <div className="flex space-x-1">
             <button
               className="w-5 h-5 bg-gray-300 border border-gray-500 hover:bg-gray-400 transition-colors flex items-center justify-center"
-              style={{ 
-                borderStyle: "outset", 
-                borderWidth: "1px", 
-                borderColor: "#D9D9D9 #434343 #434343 #D9D9D9" 
+              style={{
+                borderStyle: "outset",
+                borderWidth: "1px",
+                borderColor: "#D9D9D9 #434343 #434343 #D9D9D9"
               }}
               onClick={(e) => {
                 e.stopPropagation()
@@ -167,13 +305,12 @@ export default function RetroWindow({
               <div className="w-2 h-0.5 bg-black"></div>
             </button>
 
-            {/* Botón maximizar */}
             <button
               className="w-5 h-5 bg-gray-300 border border-gray-500 hover:bg-gray-400 transition-colors flex items-center justify-center"
-              style={{ 
-                borderStyle: "outset", 
-                borderWidth: "1px", 
-                borderColor: "#D9D9D9 #434343 #434343 #D9D9D9" 
+              style={{
+                borderStyle: "outset",
+                borderWidth: "1px",
+                borderColor: "#D9D9D9 #434343 #434343 #D9D9D9"
               }}
               onClick={(e) => {
                 e.stopPropagation()
@@ -187,13 +324,12 @@ export default function RetroWindow({
               </div>
             </button>
 
-            {/* Botón cerrar */}
             <button
               className="w-5 h-5 bg-gray-300 border border-gray-500 hover:bg-gray-400 transition-colors flex items-center justify-center"
-              style={{ 
-                borderStyle: "outset", 
-                borderWidth: "1px", 
-                borderColor: "#D9D9D9 #434343 #434343 #D9D9D9" 
+              style={{
+                borderStyle: "outset",
+                borderWidth: "1px",
+                borderColor: "#D9D9D9 #434343 #434343 #D9D9D9"
               }}
               onClick={(e) => {
                 e.stopPropagation()
@@ -207,17 +343,21 @@ export default function RetroWindow({
           </div>
         </div>
 
-        {/* Contenido de la ventana */}
-        <div className="flex-1 overflow-hidden w-full" style={{ height: "calc(100% - 28px)" }}>
-          {children}
+        <div className="flex-1 overflow-hidden w-full">
+          {React.Children.map(children, (child) => {
+            if (React.isValidElement(child)) {
+              return React.cloneElement(child, { isMaximized } as any)
+            }
+            return child
+          })}
         </div>
 
-        {/* Handle de redimensionamiento */}
         {!isMaximized && (
           <div
             className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize bg-gray-300 border-l border-t border-gray-400"
             style={{ borderStyle: "inset" }}
             onMouseDown={handleResizeMouseDown}
+            onTouchStart={handleResizeTouchStart}
           >
             <div className="w-full h-full flex items-end justify-end p-0.5">
               <div className="w-2 h-2 bg-gray-500"></div>

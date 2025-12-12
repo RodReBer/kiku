@@ -2,14 +2,16 @@ import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage
 import { storage } from "./firebase"
 
 /**
- * Sube una imagen a Firebase Storage
- * @param file - Archivo a subir
+ * Sube una imagen a Firebase Storage SIN COMPRIMIR
+ * La imagen se guarda con CALIDAD 100% (exactamente como el archivo original)
+ * @param file - Archivo a subir (se mantiene la calidad original)
  * @param path - Ruta donde se guardará (ej: 'projects/design/imagen.jpg')
  * @returns URL de descarga de la imagen
  */
 export async function uploadImage(file: File, path: string): Promise<string> {
   try {
     const storageRef = ref(storage, path)
+    // uploadBytes sube el archivo SIN modificar ni comprimir
     const snapshot = await uploadBytes(storageRef, file)
     const downloadURL = await getDownloadURL(snapshot.ref)
     return downloadURL
@@ -39,8 +41,9 @@ export async function deleteImage(url: string): Promise<void> {
 }
 
 /**
- * Sube múltiples imágenes a Firebase Storage
- * @param files - Array de archivos a subir
+ * Sube múltiples imágenes a Firebase Storage SIN COMPRIMIR
+ * Las imágenes se guardan con CALIDAD 100% (exactamente como los archivos originales)
+ * @param files - Array de archivos a subir (se mantiene la calidad original de cada uno)
  * @param basePath - Ruta base donde se guardarán (ej: 'projects/photography/album-1')
  * @returns Array de URLs de descarga
  */
@@ -53,6 +56,7 @@ export async function uploadMultipleImages(
       const timestamp = Date.now()
       const fileName = `${timestamp}-${index}-${file.name}`
       const path = `${basePath}/${fileName}`
+      // Cada archivo se sube SIN comprimir
       return uploadImage(file, path)
     })
     

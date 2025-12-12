@@ -13,6 +13,22 @@ import { Trash2, Edit, Plus, Save, X, RefreshCw, ImageIcon, Folder, Check, Archi
 import { useToast } from "@/components/ui/use-toast"
 import type { Project, Product, Photo } from "@/context/data-context"
 import { uploadImage, uploadMultipleImages, generateProjectPath } from "@/lib/storage-utils"
+import { generateThumbnails } from "@/lib/thumbnail-utils"
+
+// Helper para obtener dimensiones de una imagen
+const getImageDimensions = (file: File): Promise<{ width: number; height: number }> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => {
+      resolve({ width: img.width, height: img.height })
+    }
+    img.onerror = (err) => {
+      console.error("Error getting image dimensions:", err)
+      resolve({ width: 800, height: 600 }) // Fallback seguro
+    }
+    img.src = URL.createObjectURL(file)
+  })
+}
 
 export default function AdminPanel() {
   const { toast } = useToast()
@@ -52,7 +68,6 @@ export default function AdminPanel() {
     stock: 0,
   })
 
-  const [photoUrls, setPhotoUrls] = useState("")
   const [uploadingFiles, setUploadingFiles] = useState(false)
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null)
@@ -87,46 +102,75 @@ export default function AdminPanel() {
       let uploadedPhotoUrls: string[] = []
 
       // Subir cover image si se seleccionó un archivo
+      let coverImageThumbUrl = ""
       if (coverImageFile) {
         const basePath = generateProjectPath(
           newProject.category as "design" | "photography" | "video" | "general",
           newProject.name
         )
+
+        // Subir imagen original
         coverImageUrl = await uploadImage(coverImageFile, `${basePath}/cover-${coverImageFile.name}`)
+
+        // Generar y subir thumbnail para el cover
+        try {
+          const coverThumb = await generateThumbnails([coverImageFile], 400)
+          if (coverThumb.length > 0) {
+            coverImageThumbUrl = await uploadImage(coverThumb[0], `${basePath}/thumbs/cover-${coverImageFile.name}`)
+          }
+        } catch (e) {
+          console.error("Error generating cover thumbnail:", e)
+        }
+
         toast({
           title: "✓ Cover image subida",
-          description: "Imagen de portada subida correctamente",
+          description: "Imagen de portada y miniatura subidas correctamente",
         })
       }
 
       // Subir archivos seleccionados si los hay
+      let photos: Photo[] = []
       if (selectedFiles.length > 0) {
         const basePath = generateProjectPath(
           newProject.category as "design" | "photography" | "video" | "general",
           newProject.name
         )
+
+        // Generar thumbnails (400px, calidad 95%) para carga rápida en cascadas
+        toast({
+          title: "Generando miniaturas...",
+          description: "Creando versiones optimizadas de las imágenes",
+        })
+
+        const thumbnails = await generateThumbnails(selectedFiles, 400)
+
+        // Subir imágenes originales SIN COMPRIMIR (calidad 100%)
+        // Firebase Storage las guarda exactamente como están
         uploadedPhotoUrls = await uploadMultipleImages(selectedFiles, basePath)
+
+        // Subir thumbnails en paralelo (estos sí están optimizados)
+        const thumbUrls = await uploadMultipleImages(thumbnails, `${basePath}/thumbs`)
+
+        // Obtener dimensiones de las imágenes originales
+        const dimensionsPromises = selectedFiles.map(file => getImageDimensions(file))
+        const dimensions = await Promise.all(dimensionsPromises)
+
         toast({
           title: `✓ ${uploadedPhotoUrls.length} archivos subidos`,
-          description: "Todos los archivos se subieron correctamente",
+          description: "Imágenes originales (calidad 100%) y miniaturas guardadas",
         })
+
+        // Crear objetos Photo con ambas URLs y dimensiones
+        photos = uploadedPhotoUrls.map((url, index) => ({
+          id: `photo-${Date.now()}-${index}`,
+          url: url,
+          thumbUrl: thumbUrls[index], // URL del thumbnail
+          width: dimensions[index].width,
+          height: dimensions[index].height,
+          title: `Foto ${index + 1}`,
+          description: "",
+        }))
       }
-
-      // Procesar URLs manuales si se ingresaron (del textarea photoUrls state)
-      const manualUrlsFromTextarea = photoUrls
-        .split("\n")
-        .filter((url: string) => url.trim())
-        .map((url: string) => url.trim())
-
-      // Combinar URLs subidas y manuales
-      const allUrls = [...uploadedPhotoUrls, ...manualUrlsFromTextarea]
-
-      const photos: Photo[] = allUrls.map((url, index) => ({
-        id: `photo-${Date.now()}-${index}`,
-        url: url,
-        title: `Foto ${index + 1}`,
-        description: "",
-      }))
 
       await addProject({
         name: newProject.name!,
@@ -135,6 +179,7 @@ export default function AdminPanel() {
         status: "active",
         description: "",
         coverImage: coverImageUrl,
+        coverImageThumb: coverImageThumbUrl,
         photos,
       } as Omit<Project, "id">)
 
@@ -150,7 +195,6 @@ export default function AdminPanel() {
         photos: [],
         coverImage: "",
       })
-      setPhotoUrls("")
       setSelectedFiles([])
       setCoverImageFile(null)
       setShowNewProject(false)
@@ -311,17 +355,15 @@ export default function AdminPanel() {
                   </div>
 
                   <div>
-                    <label className="block text-purple-200 text-sm font-medium mb-2">Imagen Principal (cover)</label>
-                    <Input
-                      placeholder="URL de la imagen principal"
-                      value={newProject.coverImage || ""}
-                      onChange={(e) => setNewProject({ ...newProject, coverImage: e.target.value })}
-                      className="bg-white/20 border-white/30 text-white placeholder-purple-300 mb-2"
-                    />
+                    <label className="block text-purple-200 text-sm font-medium mb-2">
+                      📸 Imagen Principal (Cover)
+                    </label>
                     <div className="flex items-center gap-2">
-                      <label className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded cursor-pointer transition-colors">
+                      <label className="flex-1 flex items-center gap-2 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded cursor-pointer transition-colors">
                         <Upload size={16} />
-                        <span className="text-sm">O subir archivo</span>
+                        <span className="text-sm">
+                          {coverImageFile ? `✓ ${coverImageFile.name}` : "Seleccionar imagen de portada"}
+                        </span>
                         <input
                           type="file"
                           accept="image/*"
@@ -330,10 +372,19 @@ export default function AdminPanel() {
                         />
                       </label>
                       {coverImageFile && (
-                        <span className="text-sm text-purple-200">✓ {coverImageFile.name}</span>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setCoverImageFile(null)}
+                          className="bg-red-500/20 border-red-500/30 text-red-200 hover:bg-red-500/30"
+                        >
+                          <X size={14} />
+                        </Button>
                       )}
                     </div>
-                    <p className="text-purple-300 text-xs mt-1">Se mostrará como miniatura en el explorador.</p>
+                    <p className="text-purple-300 text-xs mt-1">
+                      🔥 Se subirá a Firebase Storage automáticamente
+                    </p>
                   </div>
 
                   <div>
@@ -532,17 +583,152 @@ export default function AdminPanel() {
           </TabsContent>
 
           <TabsContent value="products" className="space-y-6 mt-6">
-            <Card className="bg-white/10 backdrop-blur-md border border-white/20">
-              <CardContent className="py-16 text-center">
-                <div className="max-w-md mx-auto space-y-4">
-                  <div className="text-6xl">🛍️</div>
-                  <h3 className="text-3xl font-bold text-white">Próximamente...</h3>
-                  <p className="text-purple-200">
-                    La tienda KIKU está en construcción. Pronto podrás gestionar tus productos desde aquí.
-                  </p>
+            {/* NOTA: Funcionalidad deshabilitada hasta completar pago */}
+            <Card className="bg-yellow-500/20 backdrop-blur-md border-2 border-yellow-500/50">
+              <CardContent className="py-4">
+                <div className="flex items-center gap-3">
+                  <div className="text-3xl">⏳</div>
+                  <div>
+                    <h3 className="text-lg font-bold text-yellow-200">Función en Desarrollo</h3>
+                    <p className="text-yellow-100 text-sm">
+                      La gestión de productos estará disponible próximamente. Por ahora puedes ver los productos mock en el shop.
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
+
+            <div className="flex justify-between items-center opacity-50 pointer-events-none">
+              <h2 className="text-2xl font-semibold text-white">Gestión de Productos</h2>
+              <Button
+                disabled
+                className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
+              >
+                <Plus size={16} className="mr-2" />
+                Nuevo Producto
+              </Button>
+            </div>
+
+            {/* Grid de productos mock - Solo visualización */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 opacity-50 pointer-events-none">
+              {products.map((product) => (
+                <Card key={product.id} className="bg-white/10 backdrop-blur-md border border-white/20">
+                  <CardHeader className="pb-3">
+                    <div className="flex justify-between items-start">
+                      <CardTitle className="text-lg text-white">{product.name}</CardTitle>
+                      <Badge
+                        variant={
+                          product.status === "available"
+                            ? "default"
+                            : product.status === "sold_out"
+                            ? "destructive"
+                            : "secondary"
+                        }
+                        className="text-xs"
+                      >
+                        {product.status === "available"
+                          ? "Disponible"
+                          : product.status === "sold_out"
+                          ? "Agotado"
+                          : "Próximamente"}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="text-sm text-purple-200">
+                      <strong>Precio:</strong> ${product.price}
+                    </div>
+                    <div className="text-sm text-purple-200">
+                      <strong>Categoría:</strong> {product.category}
+                    </div>
+                    <div className="text-sm text-purple-200 line-clamp-2">
+                      <strong>Descripción:</strong> {product.description}
+                    </div>
+                    <div className="text-sm text-purple-200">
+                      <strong>Stock:</strong> {product.stock || 0} unidades
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <Button disabled size="sm" variant="outline" className="flex-1">
+                        <Edit size={14} className="mr-1" />
+                        Editar
+                      </Button>
+                      <Button disabled size="sm" variant="destructive" className="flex-1">
+                        <Trash2 size={14} className="mr-1" />
+                        Eliminar
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Formulario de nuevo producto (deshabilitado) */}
+            {showNewProduct && (
+              <Card className="bg-white/10 backdrop-blur-md border border-white/20 opacity-50 pointer-events-none">
+                <CardHeader>
+                  <CardTitle className="text-white">Agregar Nuevo Producto</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-purple-200 mb-1 block">Nombre del Producto *</label>
+                      <Input disabled placeholder="Ej: Camiseta KIKU Limited" className="bg-white/5 border-white/20 text-white" />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-purple-200 mb-1 block">Precio ($) *</label>
+                      <Input disabled type="number" placeholder="45" className="bg-white/5 border-white/20 text-white" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-purple-200 mb-1 block">Descripción *</label>
+                    <Textarea disabled placeholder="Descripción del producto..." className="bg-white/5 border-white/20 text-white" rows={3} />
+                  </div>
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-purple-200 mb-1 block">Categoría *</label>
+                      <Select disabled>
+                        <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                          <SelectValue placeholder="Seleccionar" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ropa">Ropa</SelectItem>
+                          <SelectItem value="accesorios">Accesorios</SelectItem>
+                          <SelectItem value="arte">Arte</SelectItem>
+                          <SelectItem value="libros">Libros</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-purple-200 mb-1 block">Estado *</label>
+                      <Select disabled>
+                        <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                          <SelectValue placeholder="Seleccionar" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="available">Disponible</SelectItem>
+                          <SelectItem value="sold_out">Agotado</SelectItem>
+                          <SelectItem value="coming_soon">Próximamente</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-purple-200 mb-1 block">Stock</label>
+                      <Input disabled type="number" placeholder="0" className="bg-white/5 border-white/20 text-white" />
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button disabled className="bg-gradient-to-r from-pink-500 to-purple-600">
+                      <Save size={16} className="mr-2" />
+                      Guardar Producto
+                    </Button>
+                    <Button disabled variant="outline">
+                      <X size={16} className="mr-2" />
+                      Cancelar
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       </div>
@@ -573,9 +759,9 @@ function ProjectEditForm({
       })
       return
     }
-    
+
     setIsSaving(true)
-    
+
     const photos: Photo[] = photoUrls
       .split("\n")
       .filter((url) => url.trim())
@@ -591,7 +777,7 @@ function ProjectEditForm({
         ...formData,
         photos,
       })
-      
+
       toast({
         title: "Proyecto actualizado",
         description: `El proyecto "${formData.name}" ha sido actualizado correctamente.`,
@@ -648,7 +834,7 @@ function ProjectEditForm({
             </SelectContent>
           </Select>
         </div>
-        
+
         <div className="space-y-2">
           <label className="text-sm text-purple-200">Estado</label>
           <Select

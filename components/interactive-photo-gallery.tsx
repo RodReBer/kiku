@@ -34,7 +34,7 @@ export default function InteractivePhotoGallery({ photos, projectName }: Interac
   const currentPhoto = photos[currentPhotoIndex]
 
   return (
-    <div className="h-full flex flex-col bg-gray-200 font-mono">
+    <div className="h-full flex flex-col bg-gray-200 font-sans">
       {/* Gallery Header */}
       <div
         className="bg-gray-300 p-2 border-b-2 border-gray-400 text-black font-bold"

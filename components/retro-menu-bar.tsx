@@ -6,9 +6,10 @@ import { ChevronDown } from "lucide-react"
 interface RetroMenuBarProps {
   onWallpaperChange: () => void
   onOpenAbout: () => void
+  onJoinClick?: () => void
 }
 
-export default function RetroMenuBar({ onWallpaperChange, onOpenAbout }: RetroMenuBarProps) {
+export default function RetroMenuBar({ onWallpaperChange, onOpenAbout, onJoinClick }: RetroMenuBarProps) {
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
 
   const handleMenuClick = (menu: string) => {
@@ -20,8 +21,13 @@ export default function RetroMenuBar({ onWallpaperChange, onOpenAbout }: RetroMe
     setActiveMenu(null)
   }
 
+  const handleJoinClick = () => {
+    onJoinClick?.()
+    setActiveMenu(null)
+  }
+
   return (
-    <div className="bg-gray-200 border-b-2 border-gray-400 px-2 py-1 flex items-center text-sm font-bold relative z-50">
+    <div className="bg-gray-200 border-b-2 border-gray-400 px-2 py-1 flex items-center text-sm font-bold relative z-50 ">
       {/* KIKU CREAM Menu */}
       <div className="relative">
         <button
@@ -45,6 +51,13 @@ export default function RetroMenuBar({ onWallpaperChange, onOpenAbout }: RetroMe
               onClick={() => setActiveMenu(null)}
             >
               Preferencias...
+            </button>
+            <hr className="border-gray-300" />
+            <button
+              className="block w-full text-left px-4 py-2 hover:bg-blue-500 hover:text-white text-sm"
+              onClick={handleJoinClick}
+            >
+              ✨ Únete a nosotros
             </button>
           </div>
         )}

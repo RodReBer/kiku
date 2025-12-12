@@ -2,7 +2,6 @@
 
 import React from "react"
 
-import { ChartContainer, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
 import { cn } from "@/lib/utils"
 import * as RechartsPrimitive from "recharts"
 
@@ -2918,3 +2917,31 @@ const ChartTooltipContent = React.forwardRef<
           if (!key || key === "name") {
             return null
           }
+
+          return (
+            <div key={key} className="flex items-center gap-2">
+              {!hideIndicator && (
+                <div
+                  className="h-2 w-2 shrink-0 rounded-[2px]"
+                  style={{
+                    backgroundColor: item.color,
+                  }}
+                />
+              )}
+              <div className="flex flex-1 items-center justify-between gap-2">
+                <span className="text-muted-foreground">{key}</span>
+                <span className="font-mono font-medium tabular-nums text-foreground">
+                  {val}
+                </span>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    )
+  },
+)
+ChartTooltipContent.displayName = "ChartTooltipContent"
+
+export { ChartTooltipContent }
+
