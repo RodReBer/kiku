@@ -372,9 +372,6 @@ export default function Finder({ onFileClick, onFolderClick, initialCategory = "
                   {getItemIcon(item)}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-800 truncate">{item.name}</p>
-                    <p className="text-xs text-gray-600 capitalize">
-                      {item.category} • {item.type}
-                    </p>
                   </div>
                 </div>
               ))}

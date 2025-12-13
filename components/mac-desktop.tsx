@@ -8,7 +8,6 @@ import Finder from "./finder"
 import DrawingApp from "./drawing-app"
 import { PhotoWindowContent } from "./photo-window-content"
 import ShopGrid from "./shop-grid"
-import { ErrorBoundary } from "./error-boundary"
 
 import "../styles/nube-pos.css"
 import { useData } from "@/context/data-context"
@@ -455,11 +454,11 @@ export default function MacDesktop() {
       return
     }
 
-    // Delay entre cada ventana (ms) - aumentado para reducir pico de peticiones
+    // Delay entre cada ventana (ms) - más corto para apertura fluida
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768
-    const delayBetween = isMobile ? 400 : 300
+    const delayBetween = isMobile ? 150 : 120
 
-    // Abrir cada ventana con un delay fijo - el sistema de cola controla las peticiones
+    // Abrir cada ventana con un delay fijo - las imágenes cargan en paralelo
     photosToOpen.forEach((photo, index) => {
       setTimeout(() => {
         console.log(`📷 Abriendo ventana ${index + 1}/${photosToOpen.length}`)
@@ -566,25 +565,6 @@ export default function MacDesktop() {
     })
   }
 
-  const handlePhotoFolderClick = () => {
-    // Prevent duplicate windows
-    if (windows.some(w => w.title === "Explorador KIKU - Fotografía")) {
-      console.log("Photo explorer already open")
-      return
-    }
-    const isMobile = typeof window !== "undefined" && window.innerWidth < 768
-    // Configuramos el finder para mostrar específicamente la categoría de fotografía
-    const FinderWithPhotoCategory = () => {
-      const [initialCategory] = useState<"design" | "photography" | "video" | "general" | "all">("photography");
-      return <Finder onFileClick={handleFileClick} onFolderClick={handleFolderClick} initialCategory={initialCategory} />;
-    };
-
-    openCenteredWindow("Explorador KIKU - Fotografía", <FinderWithPhotoCategory />, {
-      width: isMobile ? Math.min(window.innerWidth - 20, 350) : 900,
-      height: isMobile ? Math.min(window.innerHeight - 100, 500) : 700,
-    })
-  }
-
   const handleVideoFolderClick = () => {
     // Prevent duplicate windows
     if (windows.some(w => w.title === "Explorador KIKU - Videos")) {
@@ -606,7 +586,7 @@ export default function MacDesktop() {
 
   const handleContactFolderClick = () => {
     // Prevent duplicate windows
-    if (windows.some(w => w.title === "Contact - KIKU")) {
+    if (windows.some(w => w.title === "Contacto")) {
       console.log("Contact window already open")
       return
     }
@@ -699,7 +679,7 @@ export default function MacDesktop() {
         </div>
       </div>
     )
-    openCenteredWindow("Contact - KIKU", contactContent, {
+    openCenteredWindow("Contacto", contactContent, {
       width: isMobile ? Math.min(window.innerWidth * 0.85, 320) : 600,
       height: isMobile ? Math.min(window.innerHeight * 0.7, 500) : 650,
     })
@@ -721,7 +701,7 @@ export default function MacDesktop() {
 
   const handleAboutClick = () => {
     // Prevent duplicate windows
-    if (windows.some(w => w.title === "About - KIKU CREAM")) {
+    if (windows.some(w => w.title === "About")) {
       console.log("About window already open")
       return
     }
@@ -833,7 +813,7 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
     }
 
     const aboutContent = <AboutTerminal />
-    openCenteredWindow("About - KIKU CREAM", aboutContent, {
+    openCenteredWindow("About", aboutContent, {
       width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 700,
       height: isMobile ? Math.min(550, window.innerHeight * 0.85) : 600,
     })
@@ -842,14 +822,14 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
 
   const handleShopClick = () => {
     // Prevent duplicate windows
-    if (windows.some(w => w.title === "Shop - KIKU")) {
+    if (windows.some(w => w.title === "Shop")) {
       console.log("Shop window already open")
       return
     }
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768
     const shopContent = <ShopGrid products={products} />
     
-    openCenteredWindow("Shop - KIKU", shopContent, {
+    openCenteredWindow("Shop", shopContent, {
       width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 900,
       height: isMobile ? Math.min(500, window.innerHeight * 0.85) : 700,
     })
@@ -858,7 +838,7 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
 
   const handleJoinClick = () => {
     // Prevent duplicate windows
-    if (windows.some(w => w.title === "Join KIKU CREAM")) {
+    if (windows.some(w => w.title === "Únete a Nosotros")) {
       console.log("Join window already open")
       return
     }
@@ -896,7 +876,7 @@ Se vuoi unirti al team creativo, contattaci :)`
 
       return (
         <div className="p-6 md:p-8 bg-[#c0c0c0] h-full overflow-y-auto font-sans">
-          <div className=" mx-auto">
+          <div className=" mx-auto flex flex-col items-center max-w-3xl">
             {/* Header con selector de idioma */}
             <div className="flex flex-col justify-center items-center mb-6 flex-wrap gap-1">
               <div className="bg-[#000080] text-white px-3 py-2 font-bold text-base">
@@ -935,8 +915,8 @@ Se vuoi unirti al team creativo, contattaci :)`
             </div>
 
             {/* Footer con botón de contacto */}
-            <div className="mt-4 bg-[#dfdfdf] border-2 border-[#808080] p-4" style={{ borderStyle: "groove" }}>
-              <p className="text-black font-bold text-sm mb-2">📱 Contacto:</p>
+            <div className="mt-4 bg-[#dfdfdf] border-2 border-[#808080] p-4 w-full " style={{ borderStyle: "groove" }}>
+              <p className="text-black font-bold text-sm mb-2">Contacto:</p>
               <p className="text-xs text-gray-700">Instagram: @kiku.cream</p>
               <p className="text-xs text-gray-700">Email: kiku.creamm@gmail.com</p>
             </div>
@@ -946,7 +926,7 @@ Se vuoi unirti al team creativo, contattaci :)`
     }
 
     const joinContent = <JoinContent />
-    openCenteredWindow("Únete a nosotros - KIKU", joinContent, {
+    openCenteredWindow("Únete a Nosotros", joinContent, {
       width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 550,
       height: isMobile ? Math.min(500, window.innerHeight * 0.85) : 520,
     })
@@ -1064,7 +1044,7 @@ Se vuoi unirti al team creativo, contattaci :)`
                     className="w-full text-left py-3 px-4 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group border border-transparent hover:border-black"
                   >
                     <span className="text-white group-hover:text-black text-xl transition-colors">▶</span>
-                    <span>¿Qué somos?</span>
+                    <span>About</span>
                   </button>
                   <button
                     onClick={() => {
@@ -1098,7 +1078,7 @@ Se vuoi unirti al team creativo, contattaci :)`
                     className="w-full text-left py-3 px-4 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group border border-transparent hover:border-black"
                   >
                     <span className="text-white group-hover:text-black text-xl transition-colors">▶</span>
-                    <span>Únete a nosotros</span>
+                    <span>Únete a Nosotros</span>
                   </button>
                 </div>
               </motion.div>
@@ -1133,7 +1113,7 @@ Se vuoi unirti al team creativo, contattaci :)`
                     <svg className="w-4 h-4 text-white group-hover:text-black transition-colors flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M7 4l10 8-10 8z" />
                     </svg>
-                    <span>¿Qué somos?</span>
+                    <span>About</span>
                   </button>
                   <button
                     onClick={() => {
@@ -1175,7 +1155,7 @@ Se vuoi unirti al team creativo, contattaci :)`
                     <svg className="w-4 h-4 text-white group-hover:text-black transition-colors flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M7 4l10 8-10 8z" />
                     </svg>
-                    <span>Únete a nosotros</span>
+                    <span>Únete a Nosotros</span>
                   </button>
                 </div>
               </motion.div>
@@ -1190,7 +1170,7 @@ Se vuoi unirti al team creativo, contattaci :)`
             alt="Contacto"
             width={60}
             height={60}
-            className="object-contain w-[40px] h-[40px] md:w-[50px] md:h-[50px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform pointer-events-auto -mb-4"
+            className="object-contain w-[35px] h-[35px] md:w-[45px] md:h-[45px] lg:w-[55px] lg:h-[55px] cursor-pointer hover:scale-110 transition-transform pointer-events-auto -mb-4"
             draggable={false}
             onClick={(e) => {
               e.stopPropagation();
@@ -1202,7 +1182,7 @@ Se vuoi unirti al team creativo, contattaci :)`
             alt="Abrir KIKU Paint"
             width={60}
             height={60}
-            className="object-contain w-[40px] h-[40px] md:w-[50px] md:h-[50px] lg:w-[65px] lg:h-[65px] cursor-pointer hover:scale-110 transition-transform pointer-events-auto"
+            className="object-contain w-[35px] h-[35px] md:w-[45px] md:h-[45px] lg:w-[55px] lg:h-[55px] cursor-pointer hover:scale-110 transition-transform pointer-events-auto"
             draggable={false}
             onClick={(e) => {
               e.stopPropagation();
@@ -1211,7 +1191,7 @@ Se vuoi unirti al team creativo, contattaci :)`
           />
         </div>
         {/* Papelera Móvil - Centrada abajo, solo si hay ventanas y no son Contact o Drawing */}
-        {windows.length > 0 && !windows.some(w => w.title === "Contact - KIKU" || w.title === "KIKU Paint" || w.title === "Únete a nosotros - KIKU" || w.title === "About - KIKU CREAM") && (
+        {windows.length > 0 && !windows.some(w => w.title === "Contacto" || w.title === "KIKU Paint" || w.title === "Únete a Nosotros" || w.title === "About") && (
           <div
             className="md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-[9999] cursor-pointer"
             onClick={(e) => {
@@ -1246,7 +1226,7 @@ Se vuoi unirti al team creativo, contattaci :)`
             alt="Contacto"
             width={60}
             height={60}
-            className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform pointer-events-auto z-[200]"
+            className="object-contain w-[38px] h-[38px] cursor-pointer hover:scale-110 transition-transform pointer-events-auto z-[200]"
             draggable={false}
             onClick={(e) => {
               e.stopPropagation();
@@ -1336,7 +1316,18 @@ Se vuoi unirti al team creativo, contattaci :)`
             whileTap={{ scale: 0.95 }}
             onClick={() => {
               if (!isDragging) {
-                handlePhotoFolderClick();
+                // Open general file explorer
+                if (windows.some(w => w.title === "Explorador KIKU")) {
+                  return
+                }
+                const isMobile = typeof window !== "undefined" && window.innerWidth < 768
+                const FinderWithAllCategory = () => {
+                  return <Finder onFileClick={handleFileClick} onFolderClick={handleFolderClick} initialCategory="all" />;
+                };
+                openCenteredWindow("Explorador KIKU", <FinderWithAllCategory />, {
+                  width: isMobile ? Math.min(window.innerWidth - 20, 350) : 900,
+                  height: isMobile ? Math.min(window.innerHeight - 100, 500) : 700,
+                })
               }
             }}
           >
@@ -1355,7 +1346,7 @@ Se vuoi unirti al team creativo, contattaci :)`
               {/* Desktop image */}
               <Image
                 src="/escritorio-inicio/NUBE 2 COMPU.svg"
-                alt="Carpeta Fotografía"
+                alt="Explorador de Archivos"
                 width={460}
                 height={460}
                 className="hidden md:block object-contain group-hover:drop-shadow-3xl transition-all duration-300 md:w-[300px] lg:w-[380px] xl:w-[460px]"
@@ -1364,7 +1355,7 @@ Se vuoi unirti al team creativo, contattaci :)`
               {/* Mobile image */}
               <Image
                 src="/escritorio-celu/NUBE 2 CELU.svg"
-                alt="Carpeta Fotografía"
+                alt="Explorador de Archivos"
                 width={180}
                 height={0}
                 className="md:hidden object-contain group-hover:drop-shadow-3xl transition-all duration-300 nube-2-mobile-size h-auto"
@@ -1429,7 +1420,7 @@ Se vuoi unirti al team creativo, contattaci :)`
 
         {/* Papelera Desktop */}
         <div
-          className="hidden md:block absolute bottom-6 right-6 z-[9999] cursor-pointer group"
+          className="hidden md:block absolute bottom-4 right-4 z-[9999] cursor-pointer group"
           onClick={(e) => {
             e.stopPropagation()
             e.preventDefault()
@@ -1464,28 +1455,27 @@ Se vuoi unirti al team creativo, contattaci :)`
             const isMobile = typeof window !== "undefined" && window.innerWidth < 768
 
             return (
-              <ErrorBoundary key={win.id}>
-                <RetroWindow
-                  id={win.id}
-                  title={win.title}
-                  isMinimized={win.isMinimized}
-                  isMaximized={win.isMaximized}
-                  position={win.position}
-                  size={win.size}
-                  zIndex={win.zIndex}
-                  onClose={() => closeWindow(win.id)}
-                  onMinimize={() => updateWindow(win.id, { isMinimized: !win.isMinimized })}
-                  onMaximize={() => handleMaximizeWindow(win.id)}
-                  onMove={(newPosition) => updateWindow(win.id, { position: newPosition })}
-                  onResize={(newSize) => updateWindow(win.id, { size: newSize })}
-                  onFocus={() => bringToFront(win.id)}
-                  preserveAspect={win.preserveAspect}
-                  aspectRatio={win.aspectRatio}
-                  backgroundTransparent={win.backgroundTransparent}
-                >
-                  {windowContent}
-                </RetroWindow>
-              </ErrorBoundary>
+              <RetroWindow
+                key={win.id}
+                id={win.id}
+                title={win.title}
+                isMinimized={win.isMinimized}
+                isMaximized={win.isMaximized}
+                position={win.position}
+                size={win.size}
+                zIndex={win.zIndex}
+                onClose={() => closeWindow(win.id)}
+                onMinimize={() => updateWindow(win.id, { isMinimized: !win.isMinimized })}
+                onMaximize={() => handleMaximizeWindow(win.id)}
+                onMove={(newPosition) => updateWindow(win.id, { position: newPosition })}
+                onResize={(newSize) => updateWindow(win.id, { size: newSize })}
+                onFocus={() => bringToFront(win.id)}
+                preserveAspect={win.preserveAspect}
+                aspectRatio={win.aspectRatio}
+                backgroundTransparent={win.backgroundTransparent}
+              >
+                {windowContent}
+              </RetroWindow>
             )
           })}
         </AnimatePresence>
