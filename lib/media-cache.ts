@@ -7,10 +7,22 @@ export interface MediaItem {
     type: 'image' | 'video'
 }
 
+interface QueuedRequest {
+    url: string
+    isVideo: boolean
+    onProgress?: (percent: number) => void
+    resolve: (item: MediaItem) => void
+    reject: (error: Error) => void
+    abortController: AbortController
+}
+
 class MediaCache {
     private static instance: MediaCache
     private cache: Map<string, MediaItem> = new Map()
     private pendingRequests: Map<string, Promise<MediaItem>> = new Map()
+    private requestQueue: QueuedRequest[] = []
+    private activeRequests = 0
+    private readonly MAX_CONCURRENT = 5
 
     private constructor() { }
 
@@ -29,10 +41,9 @@ class MediaCache {
         return this.cache.get(url)
     }
 
-    private maxSize = 20 // Limit cache to 20 items to prevent OOM
+    private maxSize = 30
 
     public set(url: string, item: MediaItem): void {
-        // If cache is full, remove oldest item (first key in Map)
         if (this.cache.size >= this.maxSize) {
             const firstKey = this.cache.keys().next().value
             if (firstKey) {
@@ -58,12 +69,48 @@ class MediaCache {
         this.pendingRequests.delete(url)
     }
 
-    private async loadFallback(src: string, isVideo: boolean, onProgress?: (percent: number) => void): Promise<MediaItem> {
+    private processQueue() {
+        while (this.activeRequests < this.MAX_CONCURRENT && this.requestQueue.length > 0) {
+            const request = this.requestQueue.shift()
+            if (request) {
+                this.activeRequests++
+                this.executeRequest(request)
+            }
+        }
+    }
+
+    private async executeRequest(request: QueuedRequest) {
+        try {
+            const item = await this.loadInternal(
+                request.url,
+                request.isVideo,
+                request.onProgress,
+                request.abortController
+            )
+            request.resolve(item)
+        } catch (error) {
+            request.reject(error as Error)
+        } finally {
+            this.activeRequests--
+            this.processQueue()
+        }
+    }
+
+    private async loadFallback(
+        src: string,
+        isVideo: boolean,
+        onProgress?: (percent: number) => void,
+        abortController?: AbortController
+    ): Promise<MediaItem> {
         let width = 0
         let height = 0
         let progress = 0
 
         const progressInterval = setInterval(() => {
+            if (abortController?.signal.aborted) {
+                clearInterval(progressInterval)
+                return
+            }
             progress += Math.random() * 10
             if (progress > 90) progress = 90
             onProgress?.(progress)
@@ -72,11 +119,23 @@ class MediaCache {
         const cleanup = () => clearInterval(progressInterval)
 
         try {
+            if (abortController?.signal.aborted) {
+                // Silenciosamente devolver resultado vacío si ya está abortado
+                return { src, width: 0, height: 0, isVideo }
+            }
+
             if (isVideo) {
                 const video = document.createElement('video')
                 video.src = src
                 video.preload = 'metadata'
-                await new Promise<void>((res) => {
+                await new Promise<void>((res, rej) => {
+                    const abortHandler = () => {
+                        video.src = ''
+                        // Resolver silenciosamente en lugar de rechazar
+                        res()
+                    }
+                    abortController?.signal.addEventListener('abort', abortHandler)
+                    
                     video.onloadedmetadata = () => {
                         width = video.videoWidth
                         height = video.videoHeight
@@ -88,7 +147,14 @@ class MediaCache {
             } else {
                 const img = new Image()
                 img.src = src
-                await new Promise<void>((res) => {
+                await new Promise<void>((res, rej) => {
+                    const abortHandler = () => {
+                        img.src = ''
+                        // Resolver silenciosamente en lugar de rechazar para evitar errores no capturados
+                        res()
+                    }
+                    abortController?.signal.addEventListener('abort', abortHandler)
+                    
                     img.onload = () => {
                         width = img.naturalWidth
                         height = img.naturalHeight
@@ -114,37 +180,36 @@ class MediaCache {
         }
     }
 
-    public load(src: string, isVideo: boolean = false, onProgress?: (percent: number) => void): Promise<MediaItem> {
-        if (this.cache.has(src)) {
-            onProgress?.(100)
-            return Promise.resolve(this.cache.get(src)!)
-        }
-
-        if (this.pendingRequests.has(src)) {
-            return this.pendingRequests.get(src)!
-        }
-
+    private async loadInternal(
+        src: string,
+        isVideo: boolean,
+        onProgress?: (percent: number) => void,
+        abortController?: AbortController
+    ): Promise<MediaItem> {
         const isFirebaseStorage = src.includes('firebasestorage.googleapis.com')
 
         if (isFirebaseStorage) {
-            const promise = this.loadFallback(src, isVideo, onProgress)
-            this.pendingRequests.set(src, promise)
-
-            promise.then(item => {
-                this.cache.set(src, item)
-                this.pendingRequests.delete(src)
-            }).catch(() => {
-                this.pendingRequests.delete(src)
-            })
-
-            return promise
+            return this.loadFallback(src, isVideo, onProgress, abortController)
         }
 
-        const promise = new Promise<MediaItem>(async (resolve, reject) => {
+        return new Promise<MediaItem>(async (resolve, reject) => {
+            if (abortController?.signal.aborted) {
+                // Resolver silenciosamente si ya está abortado
+                resolve({ src, width: 0, height: 0, isVideo })
+                return
+            }
+
             try {
                 const xhr = new XMLHttpRequest()
                 xhr.open('GET', src, true)
                 xhr.responseType = 'blob'
+
+                const abortHandler = () => {
+                    xhr.abort()
+                    // Resolver silenciosamente en lugar de rechazar
+                    resolve({ src, width: 0, height: 0, isVideo })
+                }
+                abortController?.signal.addEventListener('abort', abortHandler)
 
                 xhr.onprogress = (event) => {
                     if (event.lengthComputable && onProgress) {
@@ -202,20 +267,54 @@ class MediaCache {
                 }
 
                 xhr.onerror = () => {
-                    this.loadFallback(src, isVideo, onProgress)
+                    this.loadFallback(src, isVideo, onProgress, abortController)
                         .then(resolve)
                         .catch(reject)
                 }
 
                 xhr.send()
             } catch (error) {
-                this.loadFallback(src, isVideo, onProgress)
+                this.loadFallback(src, isVideo, onProgress, abortController)
                     .then(resolve)
                     .catch(reject)
             }
         })
+    }
+
+    public load(
+        src: string,
+        isVideo: boolean = false,
+        onProgress?: (percent: number) => void,
+        abortController?: AbortController
+    ): Promise<MediaItem> {
+        if (this.cache.has(src)) {
+            onProgress?.(100)
+            return Promise.resolve(this.cache.get(src)!)
+        }
+
+        if (this.pendingRequests.has(src)) {
+            return this.pendingRequests.get(src)!
+        }
+
+        const promise = new Promise<MediaItem>((resolve, reject) => {
+            const controller = abortController || new AbortController()
+            this.requestQueue.push({
+                url: src,
+                isVideo,
+                onProgress,
+                resolve,
+                reject,
+                abortController: controller
+            })
+            this.processQueue()
+        })
 
         this.pendingRequests.set(src, promise)
+        
+        promise.finally(() => {
+            this.pendingRequests.delete(src)
+        })
+
         return promise
     }
 
@@ -227,6 +326,8 @@ class MediaCache {
         })
         this.cache.clear()
         this.pendingRequests.clear()
+        this.requestQueue = []
+        this.activeRequests = 0
     }
 }
 

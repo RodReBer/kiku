@@ -8,6 +8,7 @@ import Finder from "./finder"
 import DrawingApp from "./drawing-app"
 import { PhotoWindowContent } from "./photo-window-content"
 import ShopGrid from "./shop-grid"
+import { ErrorBoundary } from "./error-boundary"
 
 import "../styles/nube-pos.css"
 import { useData } from "@/context/data-context"
@@ -454,11 +455,11 @@ export default function MacDesktop() {
       return
     }
 
-    // Delay entre cada ventana (ms) - más corto para apertura fluida
+    // Delay entre cada ventana (ms) - aumentado para reducir pico de peticiones
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768
-    const delayBetween = isMobile ? 150 : 120
+    const delayBetween = isMobile ? 400 : 300
 
-    // Abrir cada ventana con un delay fijo - las imágenes cargan en paralelo
+    // Abrir cada ventana con un delay fijo - el sistema de cola controla las peticiones
     photosToOpen.forEach((photo, index) => {
       setTimeout(() => {
         console.log(`📷 Abriendo ventana ${index + 1}/${photosToOpen.length}`)
@@ -1463,28 +1464,28 @@ Se vuoi unirti al team creativo, contattaci :)`
             const isMobile = typeof window !== "undefined" && window.innerWidth < 768
 
             return (
-              <RetroWindow
-                key={win.id}
-                id={win.id}
-                title={win.title}
-                isMinimized={win.isMinimized}
-                isMaximized={win.isMaximized}
-                position={win.position}
-                size={win.size}
-                zIndex={win.zIndex}
-                onClose={() => closeWindow(win.id)}
-                onMinimize={() => updateWindow(win.id, { isMinimized: !win.isMinimized })}
-                onMaximize={() => handleMaximizeWindow(win.id)}
-                onMove={(newPosition) => updateWindow(win.id, { position: newPosition })}
-                onResize={(newSize) => updateWindow(win.id, { size: newSize })}
-                onFocus={() => bringToFront(win.id)}
-                preserveAspect={win.preserveAspect}
-                aspectRatio={win.aspectRatio}
-                backgroundTransparent={win.backgroundTransparent}
-                disableResize={isMobile && win.id.startsWith('photo-') && !win.isMaximized}
-              >
-                {windowContent}
-              </RetroWindow>
+              <ErrorBoundary key={win.id}>
+                <RetroWindow
+                  id={win.id}
+                  title={win.title}
+                  isMinimized={win.isMinimized}
+                  isMaximized={win.isMaximized}
+                  position={win.position}
+                  size={win.size}
+                  zIndex={win.zIndex}
+                  onClose={() => closeWindow(win.id)}
+                  onMinimize={() => updateWindow(win.id, { isMinimized: !win.isMinimized })}
+                  onMaximize={() => handleMaximizeWindow(win.id)}
+                  onMove={(newPosition) => updateWindow(win.id, { position: newPosition })}
+                  onResize={(newSize) => updateWindow(win.id, { size: newSize })}
+                  onFocus={() => bringToFront(win.id)}
+                  preserveAspect={win.preserveAspect}
+                  aspectRatio={win.aspectRatio}
+                  backgroundTransparent={win.backgroundTransparent}
+                >
+                  {windowContent}
+                </RetroWindow>
+              </ErrorBoundary>
             )
           })}
         </AnimatePresence>

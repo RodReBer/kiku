@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useCallback, memo, useEffect, useRef } from "react"
+import { mediaCache, type MediaItem } from "@/lib/media-cache"
 
 interface PhotoWindowContentProps {
   src: string
@@ -20,121 +21,122 @@ function isVideoFile(src: string): boolean {
   return videoExtensions.some(ext => cleanSrc.toLowerCase().endsWith(ext)) || (src.includes('%2F') && /\.(mp4|webm|mov|avi|mkv)/i.test(cleanSrc))
 }
 
-export function PhotoWindowContent({ src, highQualitySrc, isHighQuality, alt, isMaximized, isMinimized, onLoad, isVideo: isVideoProp }: PhotoWindowContentProps) {
+export function PhotoWindowContent({ 
+  src, 
+  highQualitySrc, 
+  isHighQuality, 
+  alt, 
+  isMaximized, 
+  isMinimized, 
+  onLoad, 
+  isVideo: isVideoProp 
+}: PhotoWindowContentProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [progress, setProgress] = useState(0)
-  const [shouldLoad, setShouldLoad] = useState(true)
+  const [shouldLoad, setShouldLoad] = useState(false)
+  const [imageSrc, setImageSrc] = useState<string>('')
+  
   const imgRef = useRef<HTMLImageElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const observerRef = useRef<IntersectionObserver | null>(null)
 
   const displaySrc = (isHighQuality && highQualitySrc) ? highQualitySrc : src
   const isVideo = isVideoProp ?? isVideoFile(displaySrc)
 
+  // Intersection Observer para lazy loading
   useEffect(() => {
-    if (isMinimized || !containerRef.current) return
-    const observer = new IntersectionObserver(
+    if (!containerRef.current || shouldLoad) return
+
+    observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setShouldLoad(true)
-            observer.disconnect()
+            observerRef.current?.disconnect()
           }
         })
       },
-      { threshold: 0.1 }
+      { threshold: 0.01, rootMargin: '50px' }
     )
-    observer.observe(containerRef.current)
-    return () => observer.disconnect()
-  }, [isMinimized])
 
-  useEffect(() => {
-    if (isMinimized && imgRef.current) {
-      // Clear src to free memory
-      imgRef.current.src = ''
+    observerRef.current.observe(containerRef.current)
+
+    return () => {
+      observerRef.current?.disconnect()
     }
-  }, [isMinimized])
+  }, [shouldLoad])
 
+  // Cargar imagen cuando shouldLoad es true
   useEffect(() => {
-    if (!loading) return
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 90) {
-          clearInterval(interval)
-          return 90
-        }
-        const increment = prev < 50 ? 12 : 4
-        return Math.min(90, prev + increment)
-      })
-    }, 80)
-    return () => clearInterval(interval)
-  }, [loading])
+    if (!shouldLoad || isMinimized) return
 
-  const handleLoad = useCallback((e: Event) => {
-    setLoading(false)
-    setProgress(100)
-    let dimensions: { width: number; height: number } | undefined
-    const target = e.target as HTMLImageElement | HTMLVideoElement
-    if (target instanceof HTMLVideoElement) {
-      const width = target.videoWidth || target.clientWidth || 800
-      const height = target.videoHeight || target.clientHeight || 600
-      dimensions = { width, height }
-    } else {
-      const img = target as HTMLImageElement
-      dimensions = {
-        width: img.naturalWidth || img.width || 800,
-        height: img.naturalHeight || img.height || 600,
-      }
-    }
-    onLoad?.(dimensions)
-  }, [onLoad])
-
-  const handleError = useCallback(() => {
-    setLoading(false)
-    setProgress(100)
-    setError(true)
-    onLoad?.()
-  }, [onLoad])
-
-  useEffect(() => {
-    const img = imgRef.current
-    if (!img || isVideo) return
+    abortControllerRef.current = new AbortController()
+    const controller = abortControllerRef.current
 
     setLoading(true)
     setError(false)
     setProgress(0)
 
-    img.addEventListener('load', handleLoad as EventListener)
-    img.addEventListener('error', handleError)
-
-    // Check if image is already loaded/cached
-    // This handles cases where browser loads from cache before React attaches listeners
-    if (img.complete && img.naturalWidth > 0) {
-      // Image is already loaded, trigger handleLoad immediately
-      setLoading(false)
-      setProgress(100)
-      const dimensions = {
-        width: img.naturalWidth || img.width || 800,
-        height: img.naturalHeight || img.height || 600,
-      }
-      onLoad?.(dimensions)
-    }
+    mediaCache.load(
+      displaySrc,
+      isVideo,
+      (percent: number) => {
+        if (!controller.signal.aborted) {
+          setProgress(percent)
+        }
+      },
+      controller
+    )
+      .then((item: MediaItem) => {
+        if (!controller.signal.aborted) {
+          setImageSrc(item.objectUrl)
+          setLoading(false)
+          setProgress(100)
+          onLoad?.({ width: item.width, height: item.height })
+        }
+      })
+      .catch((err: any) => {
+        // Ignorar errores de abort - son esperados
+        if (controller.signal.aborted || err?.message === 'Request aborted') {
+          return
+        }
+        console.error('Error loading media:', err)
+        setError(true)
+        setLoading(false)
+        onLoad?.()
+      })
 
     return () => {
-      img.removeEventListener('load', handleLoad as EventListener)
-      img.removeEventListener('error', handleError)
+      try {
+        controller.abort()
+      } catch (e) {
+        // Ignorar errores de abort durante cleanup
+      }
     }
-  }, [displaySrc, handleLoad, handleError, isVideo, onLoad])
+  }, [shouldLoad, displaySrc, isVideo, isMinimized, onLoad])
+
+  // Limpiar src cuando se minimiza
+  useEffect(() => {
+    if (isMinimized) {
+      setImageSrc('')
+      abortControllerRef.current?.abort()
+    }
+  }, [isMinimized])
 
   return (
-    <div ref={containerRef} className={`w-full h-full relative overflow-hidden flex items-center justify-center`}>
+    <div 
+      ref={containerRef} 
+      className="w-full h-full relative overflow-hidden flex items-center justify-center"
+    >
       {isMinimized ? (
         <div className="absolute inset-0 bg-gray-300 flex items-center justify-center">
           <span className="text-xs text-gray-500">Minimizado</span>
         </div>
       ) : (
         <>
-          {loading && !error && shouldLoad && (
+          {loading && !error && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-300 gap-4 z-10">
               <div className="animate-spin rounded-full h-8 w-8 border-3 border-gray-400 border-t-gray-600"></div>
               <div className="w-3/4 max-w-xs">
@@ -160,42 +162,43 @@ export function PhotoWindowContent({ src, highQualitySrc, isHighQuality, alt, is
             </div>
           )}
 
-          {isVideo && shouldLoad ? (
-            <video
-              src={displaySrc}
-              controls
-              playsInline
-              autoPlay={false}
-              loop
-              muted={false}
-              className={`w-full h-full ${loading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
-              style={{ objectFit: 'cover' }}
-              onLoadedMetadata={handleLoad as any}
-              onLoadedData={handleLoad as any}
-              onError={handleError}
-              preload="auto"
-            >
-              Tu navegador no soporta el tag de video.
-            </video>
-          ) : !isVideo && shouldLoad ? (
-            <img
-              ref={imgRef}
-              src={displaySrc}
-              alt={alt}
-              loading="eager"
-              className={`w-full h-full ${loading ? "opacity-0" : "opacity-100"} transition-opacity duration-300`}
-              style={{ objectFit: 'cover', display: loading ? 'none' : 'block' }}
-            />
-          ) : !shouldLoad ? (
+          {!shouldLoad && !loading && !error && (
             <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
               <span className="text-xs text-gray-400">Cargando...</span>
             </div>
-          ) : null}
+          )}
+
+          {shouldLoad && imageSrc && (
+            <>
+              {isVideo ? (
+                <video
+                  src={imageSrc}
+                  controls
+                  playsInline
+                  autoPlay={false}
+                  loop
+                  muted={false}
+                  className={`w-full h-full ${loading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+                  style={{ objectFit: 'cover' }}
+                  preload="auto"
+                >
+                  Tu navegador no soporta el tag de video.
+                </video>
+              ) : (
+                <img
+                  ref={imgRef}
+                  src={imageSrc}
+                  alt={alt}
+                  className={`w-full h-full ${loading ? "opacity-0" : "opacity-100"} transition-opacity duration-300`}
+                  style={{ objectFit: 'cover' }}
+                />
+              )}
+            </>
+          )}
         </>
       )}
     </div>
   )
 }
 
-// Memoizar para evitar re-renders durante drag
-export default memo(PhotoWindowContent);
+export default memo(PhotoWindowContent)
