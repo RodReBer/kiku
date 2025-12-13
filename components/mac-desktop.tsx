@@ -8,6 +8,7 @@ import Finder from "./finder"
 import DrawingApp from "./drawing-app"
 import { PhotoWindowContent } from "./photo-window-content"
 import ShopGrid from "./shop-grid"
+import DesignCarousel from "./design-carousel"
 
 import "../styles/nube-pos.css"
 import { useData } from "@/context/data-context"
@@ -42,6 +43,7 @@ export default function MacDesktop() {
   const [nextZIndex, setNextZIndex] = useState(3000) // Base alto para ventanas (por encima de UI)
   const [isDragging, setIsDragging] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [designCarousel, setDesignCarousel] = useState<{ images: string[], projectName: string } | null>(null)
   const imageCache = useRef<Map<string, { width: number; height: number }>>(new Map())
   const openImagesRef = useRef<Set<string>>(new Set()) // Track de imágenes abiertas
   const windowToImageRef = useRef<Map<string, string>>(new Map()) // windowId -> imagePath
@@ -511,6 +513,16 @@ export default function MacDesktop() {
     console.log("Proyecto seleccionado:", project)
 
     if (project && project.photos && project.photos.length > 0) {
+      // Si es diseño, abrir en modo fullscreen con carrusel
+      if (project.category === 'design') {
+        const imageUrls = project.photos.map(p => p.url)
+        setDesignCarousel({
+          images: imageUrls,
+          projectName: project.name
+        })
+        return
+      }
+
       // Pasar objetos de foto con dimensiones si están disponibles
       const photoData = project.photos.map(p => ({
         url: p.url,
@@ -986,7 +998,15 @@ Se vuoi unirti al team creativo, contattaci :)`
               alt="Fondo nubes"
               width={400}
               height={400}
-              className="absolute z-0 w-[130%] h-auto object-contain max-w-full max-h-[106.5%] pointer-events-none"
+              className="absolute z-10 w-[130%] h-auto object-contain max-w-full max-h-[100%] pointer-events-none"
+              priority
+            />
+              <Image
+              src="/escritorio-inicio/studio.svg"
+              alt="Fondo nubes"
+              width={400}
+              height={400}
+              className="absolute bottom-5 -z-0 w-[40%] h-auto object-contain max-w-full max-h-[40%] pointer-events-none"
               priority
             />
           </div>
@@ -1480,6 +1500,15 @@ Se vuoi unirti al team creativo, contattaci :)`
           })}
         </AnimatePresence>
       </div>
+
+      {/* Design Carousel Overlay */}
+      {designCarousel && (
+        <DesignCarousel
+          images={designCarousel.images}
+          projectName={designCarousel.projectName}
+          onClose={() => setDesignCarousel(null)}
+        />
+      )}
     </div>
   )
 }

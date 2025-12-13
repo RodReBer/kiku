@@ -417,6 +417,13 @@ export default function AdminPanel() {
                     <p className="text-purple-300 text-xs">
                       🔥 Los archivos se subirán automáticamente a Firebase Storage
                     </p>
+                    {newProject.category === 'design' && (
+                      <div className="bg-blue-500/20 border border-blue-400/30 rounded p-3 mt-2">
+                        <p className="text-blue-200 text-sm">
+                          💡 <strong>Diseños:</strong> Puedes subir múltiples imágenes (ej: diseños en diferentes colores). Se mostrarán en un carrusel con flechas para navegar.
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex gap-3 pt-4">
@@ -851,13 +858,52 @@ function ProjectEditForm({
           </Select>
         </div>
       </div>
+      
+      {/* Mostrar fotos existentes */}
+      {project.photos && project.photos.length > 0 && (
+        <div className="space-y-2">
+          <label className="text-sm text-purple-200 font-semibold">Fotos actuales ({project.photos.length})</label>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-3 bg-white/10 rounded-lg border border-white/20">
+            {project.photos.map((photo, index) => (
+              <div key={photo.id} className="relative group">
+                <img 
+                  src={photo.url} 
+                  alt={photo.title || `Foto ${index + 1}`}
+                  className="w-full h-24 object-cover rounded border border-white/30"
+                />
+                <button
+                  onClick={() => {
+                    const urls = photoUrls.split("\n").filter(url => url.trim() !== photo.url)
+                    setPhotoUrls(urls.join("\n"))
+                    toast({
+                      title: "Foto eliminada",
+                      description: "La foto se eliminará al guardar los cambios",
+                    })
+                  }}
+                  className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="Eliminar foto"
+                >
+                  <Trash2 size={14} />
+                </button>
+                <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1 text-center">
+                  {index + 1}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <Textarea
         value={photoUrls}
         onChange={(e) => setPhotoUrls(e.target.value)}
-        placeholder="URLs de fotos (una por línea)"
+        placeholder="URLs de fotos (una por línea) - Pega nuevas URLs aquí"
         className="bg-white/20 border-white/30 text-white placeholder-purple-300"
         rows={4}
       />
+      <div className="text-xs text-purple-300">
+        💡 Tip: Para diseños, puedes agregar múltiples URLs para crear un carrusel
+      </div>
       <div className="flex gap-2">
         <Button
           onClick={handleSave}

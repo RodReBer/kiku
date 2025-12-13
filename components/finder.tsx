@@ -75,9 +75,13 @@ export default function Finder({ onFileClick, onFolderClick, initialCategory = "
       return
     }
     if (item.category === 'design') {
-      // Abrir imagen individual (si tiene coverImage)
       const project = projects.find(p => p.id === item.id)
-      // Prefer high-res image for expanded view
+      // Si tiene múltiples fotos, abrir como carpeta/carrusel
+      if (project?.photos && project.photos.length > 1) {
+        onFolderClick(item)
+        return
+      }
+      // Si solo tiene una foto o coverImage, mostrar imagen expandida
       const image = project?.coverImage || project?.photos?.[0]?.url
       if (image) setExpandedImage(image)
       return
