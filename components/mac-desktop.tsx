@@ -548,7 +548,7 @@ export default function MacDesktop() {
 
   const handleDesignFolderClick = () => {
     // Prevent duplicate windows
-    if (windows.some(w => w.title === "Explorador KIKU - Diseño")) {
+    if (windows.some(w => w.title === "Explorador KIKU")) {
       console.log("Design explorer already open")
       return
     }
@@ -559,7 +559,7 @@ export default function MacDesktop() {
       return <Finder onFileClick={handleFileClick} onFolderClick={handleFolderClick} initialCategory={initialCategory} />;
     };
 
-    openCenteredWindow("Explorador KIKU - Diseños", <FinderWithDesignCategory />, {
+    openCenteredWindow("Explorador KIKU ", <FinderWithDesignCategory />, {
       width: isMobile ? Math.min(window.innerWidth - 20, 350) : 900,
       height: isMobile ? Math.min(window.innerHeight - 100, 500) : 700,
     })
@@ -567,7 +567,7 @@ export default function MacDesktop() {
 
   const handleVideoFolderClick = () => {
     // Prevent duplicate windows
-    if (windows.some(w => w.title === "Explorador KIKU - Videos")) {
+    if (windows.some(w => w.title === "Explorador KIKU")) {
       console.log("Video explorer already open")
       return
     }
@@ -578,7 +578,7 @@ export default function MacDesktop() {
       return <Finder onFileClick={handleFileClick} onFolderClick={handleFolderClick} initialCategory={initialCategory} />;
     };
 
-    openCenteredWindow("Explorador KIKU - Videos", <FinderWithVideoCategory />, {
+    openCenteredWindow("Explorador KIKU", <FinderWithVideoCategory />, {
       width: isMobile ? Math.min(window.innerWidth - 20, 350) : 900,
       height: isMobile ? Math.min(window.innerHeight - 100, 500) : 700,
     })
@@ -964,7 +964,7 @@ Se vuoi unirti al team creativo, contattaci :)`
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768
 
   const top3PhotoIds = isMobile
-    ? new Set(photoWindows.sort((a, b) => b.zIndex - a.zIndex).slice(0, 2).map(w => w.id))
+    ? new Set(photoWindows.sort((a, b) => b.zIndex - a.zIndex).slice(0, 4).map(w => w.id))
     : new Set(photoWindows.map(w => w.id)) // Desktop: todas HD
 
   return (
@@ -986,7 +986,7 @@ Se vuoi unirti al team creativo, contattaci :)`
               alt="Fondo nubes"
               width={400}
               height={400}
-              className="absolute z-0 w-[130%] h-auto object-contain max-w-full max-h-[105%] pointer-events-none"
+              className="absolute z-0 w-[130%] h-auto object-contain max-w-full max-h-[106.5%] pointer-events-none"
               priority
             />
           </div>
@@ -1218,7 +1218,7 @@ Se vuoi unirti al team creativo, contattaci :)`
             alt="Fondo nubes móvil"
             width={400}
             height={400}
-            className="w-[185px] h-[185px] object-contain pointer-events-none mobile-nubes-bg z-[100]"
+            className="w-[177px] h-[177px] object-contain pointer-events-none mobile-nubes-bg z-[100]"
             priority
           />
           <Image
@@ -1238,7 +1238,7 @@ Se vuoi unirti al team creativo, contattaci :)`
             alt="Abrir KIKU Paint"
             width={60}
             height={60}
-            className="object-contain w-[45px] h-[45px] cursor-pointer hover:scale-110 transition-transform -mt-4 pointer-events-auto z-[200]"
+            className="object-contain w-[39px] h-[39px] cursor-pointer hover:scale-110 transition-transform -mt-[13px] pointer-events-auto z-[200] "
             draggable={false}
             onClick={(e) => {
               e.stopPropagation();

@@ -23,7 +23,7 @@
 
 /* Ajuste para pantallas pequeñas - el nubes.svg pequeño de abajo */
 .mobile-nubes-container {
-  right: 0.25rem; /* default (right-1) */
+  right: 2rem; /* default (right-1) */
 }
 
 .mobile-nubes-bg {
@@ -42,7 +42,7 @@
 }
 
 /* iPhone 12 mini, 13 mini (375px - 389px) */
-@media (min-width: 375px) and (max-width: 389px) {
+@media (min-width: 376px) and (max-width: 389px) {
   .mobile-nubes-container {
     right: 3.5rem;
   }
@@ -431,7 +431,7 @@
 
 @media (min-width: 1524px) {
   .nube-pos-3 {
-    top: 24%;
+    top: 20%;
     right: 12%;
   }
 }
