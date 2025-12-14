@@ -23,8 +23,13 @@
 
 /* Ajuste para pantallas pequeñas - el nubes.svg pequeño de abajo */
 .mobile-nubes-container {
+  right: 1;
+}
+@media (min-width: 390px) {
+.mobile-nubes-container {
   right: -2.5rem; /* default (right-1) */
   top: 1.5rem;
+}
 }
 
 .mobile-nubes-bg {
