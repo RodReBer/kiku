@@ -826,8 +826,8 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
 
     const aboutContent = <AboutTerminal />
     openCenteredWindow("About", aboutContent, {
-      width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 700,
-      height: isMobile ? Math.min(550, window.innerHeight * 0.85) : 600,
+      width: isMobile ? Math.min(window.innerWidth * 0.85, 320) : 700,
+      height: isMobile ? Math.min(window.innerHeight * 0.7, 500) : 600,
     })
     setIsMenuOpen(false)
   }
@@ -1238,7 +1238,7 @@ Se vuoi unirti al team creativo, contattaci :)`
             alt="Fondo nubes móvil"
             width={400}
             height={400}
-            className="w-[177px] h-[177px] object-contain pointer-events-none mobile-nubes-bg z-[100]"
+            className="w-[165px] h-[165px] object-contain pointer-events-none mobile-nubes-bg z-[100]"
             priority
           />
           <Image
@@ -1258,7 +1258,7 @@ Se vuoi unirti al team creativo, contattaci :)`
             alt="Abrir KIKU Paint"
             width={60}
             height={60}
-            className="object-contain w-[39px] h-[39px] cursor-pointer hover:scale-110 transition-transform -mt-[13px] pointer-events-auto z-[200] "
+            className="object-contain w-[37px] h-[37px] cursor-pointer hover:scale-110 transition-transform -mt-[13px] pointer-events-auto z-[200] "
             draggable={false}
             onClick={(e) => {
               e.stopPropagation();
@@ -1336,15 +1336,15 @@ Se vuoi unirti al team creativo, contattaci :)`
             whileTap={{ scale: 0.95 }}
             onClick={() => {
               if (!isDragging) {
-                // Open general file explorer
-                if (windows.some(w => w.title === "Explorador KIKU")) {
+                // Open photography file explorer
+                if (windows.some(w => w.title === "Explorador KIKU - Fotografía")) {
                   return
                 }
                 const isMobile = typeof window !== "undefined" && window.innerWidth < 768
-                const FinderWithAllCategory = () => {
-                  return <Finder onFileClick={handleFileClick} onFolderClick={handleFolderClick} initialCategory="all" />;
+                const FinderWithPhotoCategory = () => {
+                  return <Finder onFileClick={handleFileClick} onFolderClick={handleFolderClick} initialCategory="photography" />;
                 };
-                openCenteredWindow("Explorador KIKU", <FinderWithAllCategory />, {
+                openCenteredWindow("Explorador KIKU - Fotografía", <FinderWithPhotoCategory />, {
                   width: isMobile ? Math.min(window.innerWidth - 20, 350) : 900,
                   height: isMobile ? Math.min(window.innerHeight - 100, 500) : 700,
                 })
