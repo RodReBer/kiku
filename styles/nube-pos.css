@@ -132,6 +132,25 @@
   pointer-events: none;
 }
 
+/* Samsung Galaxy S8+ (360x740) */
+@media (min-width: 360px) and (max-width: 365px) and (max-height: 750px) {
+  .nube-pos-1 {
+    top: 18%;
+    left: calc(60% - 50px);
+  }
+  .mobile-nubes-bg{
+    margin-right: -1rem; /* mover hacia la derecha */
+  }
+  .nube-pos-2 {
+    top: 45% !important;
+    left: calc(60% - 50px) !important;
+  }
+  .nube-pos-3 {
+    bottom: 4% !important;
+    left: 18% !important;
+  }
+}
+
 .nube-pos-1>* {
   animation: floatBounce1 4s ease-in-out infinite;
   will-change: transform;
