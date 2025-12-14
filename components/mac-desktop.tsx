@@ -1015,15 +1015,7 @@ Se vuoi unirti al team creativo, contattaci :)`
               alt="Fondo nubes"
               width={400}
               height={400}
-              className="absolute z-10 w-[130%] h-auto object-contain max-w-full max-h-[100%] pointer-events-none"
-              priority
-            />
-              <Image
-              src="/escritorio-inicio/studio.svg"
-              alt="Fondo nubes"
-              width={400}
-              height={400}
-              className="absolute bottom-5 -z-0 w-[40%] h-auto object-contain max-w-full max-h-[40%] pointer-events-none"
+              className="absolute z-10 w-[130%] h-auto object-contain max-w-full max-h-[106.5%] pointer-events-none"
               priority
             />
           </div>
