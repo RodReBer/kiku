@@ -1346,7 +1346,7 @@ Se vuoi unirti al team creativo, contattaci :)`
             onClick={() => {
               if (!isDragging) {
                 // Open photography file explorer
-                if (windows.some(w => w.title === "Explorador KIKU - Fotografía")) {
+                if (windows.some(w => w.title === "Explorador KIKU")) {
                   return
                 }
                 const isMobile = typeof window !== "undefined" && window.innerWidth < 768
