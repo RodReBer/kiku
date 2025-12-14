@@ -23,7 +23,8 @@
 
 /* Ajuste para pantallas pequeñas - el nubes.svg pequeño de abajo */
 .mobile-nubes-container {
-  right: 1rem; /* default (right-1) */
+  right: -2.5rem; /* default (right-1) */
+  top: 1.5rem;
 }
 
 .mobile-nubes-bg {
@@ -135,7 +136,7 @@
 /* iPhone 12 mini, 13 mini (375px - 389px) */
 @media (min-width: 375px) and (max-width: 389px) {
   .nube-pos-1 {
-    top: 15%;
+    top: 16%;
     left: calc(55% - 30px);
   }
   .nube-1-mobile-size {
@@ -159,7 +160,7 @@
 /* iPhone 14 Plus, 12/13 Pro Max (414px - 479px) */
 @media (min-width: 414px) and (max-width: 479px) {
   .nube-pos-1 {
-    top: 16%;
+    top: 17%;
     left: calc(50% - 20px);
   }
   .nube-1-mobile-size {
