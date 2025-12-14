@@ -369,15 +369,32 @@ export default function MacDesktop() {
     let position = { x: 10, y: 40 }
     if (typeof window !== "undefined") {
       if (isMobile) {
-        // Mobile: Random position dentro de la pantalla visible
-        const minX = 10
-        const minY = 60
-        const maxX = Math.max(minX, window.innerWidth - finalWidth - 10)
-        const maxY = Math.max(minY, window.innerHeight - finalHeight - 100)
+        // Mobile: Posición con tendencia al centro, con variación irregular
+        const margin = 15
+        
+        // Centro de la pantalla
+        const centerX = (window.innerWidth - finalWidth) / 2
+        const centerY = (window.innerHeight - finalHeight) / 2
+        
+        // Espacio disponible desde el centro a los bordes
+        const maxOffsetX = centerX - margin
+        const maxOffsetY = centerY - 60 // Más espacio arriba
+        
+        // Variación aleatoria desde el centro (±70% del espacio disponible)
+        const variationX = (Math.random() - 0.5) * 2 * maxOffsetX * 0.7
+        const variationY = (Math.random() - 0.5) * 2 * maxOffsetY * 0.7
+        
+        // Aplicar variación al centro con un offset hacia la izquierda
+        let x = centerX + variationX - 30 // Mover 30px a la izquierda
+        let y = centerY + variationY
+        
+        // Asegurar que esté dentro de los límites visibles
+        x = Math.max(margin, Math.min(window.innerWidth - finalWidth - margin, x))
+        y = Math.max(60, Math.min(window.innerHeight - finalHeight - 60, y))
         
         position = {
-          x: Math.floor(Math.random() * (maxX - minX)) + minX,
-          y: Math.floor(Math.random() * (maxY - minY)) + minY
+          x: Math.floor(x),
+          y: Math.floor(y)
         }
       } else {
         // Desktop: Random position with proper margins based on FINAL size
