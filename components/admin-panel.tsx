@@ -769,17 +769,54 @@ function ProjectEditForm({
 
     setIsSaving(true)
 
-    const photos: Photo[] = photoUrls
+    // Preservar las dimensiones existentes de las fotos que ya están
+    const existingPhotoMap = new Map(
+      project.photos?.map(p => [p.url, { width: p.width, height: p.height }]) || []
+    )
+
+    const urlList = photoUrls
       .split("\n")
       .filter((url) => url.trim())
-      .map((url, index) => ({
-        id: `photo-${Date.now()}-${index}`,
-        url: url.trim(),
-        title: `Foto ${index + 1}`,
-        description: "",
-      }))
+      .map((url) => url.trim())
+
+    // Función para obtener dimensiones de una imagen desde URL
+    const getImageDimensionsFromUrl = (url: string): Promise<{ width: number; height: number }> => {
+      return new Promise((resolve) => {
+        const img = new Image()
+        img.crossOrigin = "anonymous"
+        img.onload = () => {
+          resolve({ width: img.naturalWidth || img.width, height: img.naturalHeight || img.height })
+        }
+        img.onerror = () => {
+          console.error(`Error loading image: ${url}`)
+          resolve({ width: 800, height: 600 }) // Fallback
+        }
+        img.src = url
+      })
+    }
+
+    // Obtener dimensiones para URLs nuevas en paralelo
+    const dimensionsPromises = urlList.map(async (url) => {
+      const existingDimensions = existingPhotoMap.get(url)
+      if (existingDimensions && existingDimensions.width && existingDimensions.height) {
+        return existingDimensions
+      }
+      // Si es nueva URL o no tiene dimensiones, obtenerlas
+      return await getImageDimensionsFromUrl(url)
+    })
 
     try {
+      const dimensions = await Promise.all(dimensionsPromises)
+
+      const photos: Photo[] = urlList.map((url, index) => ({
+        id: `photo-${Date.now()}-${index}`,
+        url: url,
+        title: `Foto ${index + 1}`,
+        description: "",
+        width: dimensions[index].width,
+        height: dimensions[index].height,
+      }))
+
       await onSave({
         ...formData,
         photos,
@@ -787,7 +824,7 @@ function ProjectEditForm({
 
       toast({
         title: "Proyecto actualizado",
-        description: `El proyecto "${formData.name}" ha sido actualizado correctamente.`,
+        description: `El proyecto "${formData.name}" ha sido actualizado correctamente con dimensiones.`,
       })
     } catch (error) {
       toast({
