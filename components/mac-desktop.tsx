@@ -873,8 +873,8 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
     const shopContent = <ShopGrid products={products} />
     
     openCenteredWindow("Shop", shopContent, {
-      width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 900,
-      height: isMobile ? Math.min(500, window.innerHeight * 0.85) : 700,
+      width: isMobile ? Math.min(window.innerWidth * 0.85, 320) : 900,
+      height: isMobile ? Math.min(window.innerHeight * 0.7, 500) : 700,
     })
     setIsMenuOpen(false)
   }
@@ -970,8 +970,8 @@ Se vuoi unirti al team creativo, contattaci :)`
 
     const joinContent = <JoinContent />
     openCenteredWindow("Únete a Nosotros", joinContent, {
-      width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 550,
-      height: isMobile ? Math.min(500, window.innerHeight * 0.85) : 520,
+      width: isMobile ? Math.min(window.innerWidth * 0.85, 320) : 550,
+      height: isMobile ? Math.min(window.innerHeight * 0.7, 500) : 520,
     })
     setIsMenuOpen(false)
   }
