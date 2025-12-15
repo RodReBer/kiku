@@ -329,6 +329,9 @@ export default function MacDesktop() {
 
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768
 
+    // Determinar si esta foto será HD en móvil (primeras 4)
+    const willBeHighQuality = isMobile ? index < 4 : true
+
     // Use dimensions from Firebase if available, otherwise calculate
     let finalWidth: number
     let finalHeight: number
@@ -339,7 +342,7 @@ export default function MacDesktop() {
       let height = photoDimensions.height
       const aspectRatio = width / height
 
-      // Apply same scaling logic as getImageDimensions
+      // Apply same scaling logic as getImageDimensions - todas las fotos igual tamaño
       const maxWidth = isMobile ? Math.min(300, window.innerWidth * 0.9) : Math.min(800, window.innerWidth * 0.8)
       const maxHeight = isMobile ? Math.min(400, window.innerHeight * 0.6) : Math.min(600, window.innerHeight * 0.8)
 
@@ -369,32 +372,43 @@ export default function MacDesktop() {
     let position = { x: 10, y: 40 }
     if (typeof window !== "undefined") {
       if (isMobile) {
-        // Mobile: Posición con tendencia al centro, con variación irregular
-        const margin = 15
+        // Márgenes de seguridad
+        const marginLeft = 15
+        const marginRight = 15
+        const marginTop = 60
+        const marginBottom = 80
         
-        // Centro de la pantalla
-        const centerX = (window.innerWidth - finalWidth) / 2
-        const centerY = (window.innerHeight - finalHeight) / 2
+        // Calcular espacio disponible según dimensiones del dispositivo y de la foto
+        const minX = marginLeft
+        const maxX = window.innerWidth - finalWidth - marginRight
+        const minY = marginTop
+        const maxY = window.innerHeight - finalHeight - marginBottom
         
-        // Espacio disponible desde el centro a los bordes
-        const maxOffsetX = centerX - margin
-        const maxOffsetY = centerY - 60 // Más espacio arriba
-        
-        // Variación aleatoria desde el centro (±70% del espacio disponible)
-        const variationX = (Math.random() - 0.5) * 2 * maxOffsetX * 0.7
-        const variationY = (Math.random() - 0.5) * 2 * maxOffsetY * 0.7
-        
-        // Aplicar variación al centro con un offset hacia la izquierda
-        let x = centerX + variationX - 30 // Mover 30px a la izquierda
-        let y = centerY + variationY
-        
-        // Asegurar que esté dentro de los límites visibles
-        x = Math.max(margin, Math.min(window.innerWidth - finalWidth - margin, x))
-        y = Math.max(60, Math.min(window.innerHeight - finalHeight - 60, y))
-        
-        position = {
-          x: Math.floor(x),
-          y: Math.floor(y)
+        if (willBeHighQuality) {
+          // HD: Posición completamente aleatoria dentro de todo el espacio disponible
+          const x = Math.random() * (maxX - minX) + minX
+          const y = Math.random() * (maxY - minY) + minY
+          
+          position = {
+            x: Math.floor(Math.max(minX, Math.min(x, maxX))),
+            y: Math.floor(Math.max(minY, Math.min(y, maxY)))
+          }
+        } else {
+          // Low quality: También aleatorias pero más centradas para que queden tapadas
+          const centerX = (window.innerWidth - finalWidth) / 2
+          const centerY = (window.innerHeight - finalHeight) / 2
+          
+          // Rango reducido alrededor del centro (±40% del espacio)
+          const rangeX = (maxX - minX) * 0.40
+          const rangeY = (maxY - minY) * 0.40
+          
+          const x = centerX + (Math.random() - 0.5) * rangeX
+          const y = centerY + (Math.random() - 0.5) * rangeY
+          
+          position = {
+            x: Math.floor(Math.max(minX, Math.min(x, maxX))),
+            y: Math.floor(Math.max(minY, Math.min(y, maxY)))
+          }
         }
       } else {
         // Desktop: Random position with proper margins based on FINAL size

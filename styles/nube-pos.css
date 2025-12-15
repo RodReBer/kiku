@@ -118,7 +118,6 @@
 /* ============================================
    NUBE 1 - DISEÑOS
    ============================================ */
-
 /* Control de tamaño de imagen mobile - Solo ancho, altura automática */
 .nube-1-mobile-size {
   width: 160px;
@@ -160,7 +159,7 @@
 /* iPhone 12 mini, 13 mini (375px - 389px) */
 @media (min-width: 375px) and (max-width: 389px) {
   .nube-pos-1 {
-    top: 16%;
+    top: 17%;
     left: calc(55% - 30px);
   }
   .nube-1-mobile-size {
@@ -270,7 +269,7 @@
 
 /* MOBILE BASE - iPhone SE, iPhone 5 (320px - 374px) */
 .nube-pos-2 {
-  top: 35%;
+  top: 37%;
   left: calc(50% - 80px);
   right: auto;
   pointer-events: none;
@@ -285,7 +284,7 @@
 /* iPhone 12 mini, 13 mini (375px - 389px) */
 @media (min-width: 375px) and (max-width: 389px) {
   .nube-pos-2 {
-    top: 43%;
+    top: 45%;
     left: calc(53% - 75px);
   }
   .nube-2-mobile-size {
@@ -383,8 +382,8 @@
 /* iPhone 12 mini, 13 mini (375px - 389px) */
 @media (min-width: 375px) and (max-width: 389px) {
   .nube-pos-3 {
-    bottom: 3%;
-    left: calc(50% - 110px);
+    bottom: 4.5%;
+    left: calc(50% - 120px);
   }
   .nube-3-mobile-size {
     width: 220px;
