@@ -341,11 +341,24 @@ export default function MacDesktop() {
       let width = photoDimensions.width
       let height = photoDimensions.height
       const aspectRatio = width / height
+      
+      // Detectar si es una foto vertical (más alta que ancha)
+      const isVertical = height > width
 
-      // Apply same scaling logic as getImageDimensions - todas las fotos igual tamaño
-      const maxWidth = isMobile ? Math.min(300, window.innerWidth * 0.9) : Math.min(800, window.innerWidth * 0.8)
-      const maxHeight = isMobile ? Math.min(400, window.innerHeight * 0.6) : Math.min(600, window.innerHeight * 0.8)
+      // Límites máximos basados en espacio real disponible
+      const chromeHeight = 28
+      const maxWidth = isMobile 
+        ? Math.min(window.innerWidth * 0.9, 320) 
+        : Math.min(window.innerWidth * 0.45, 500) // Desktop: 45% y 500px max
+      
+      // Para desktop: si es vertical, limitar más el alto para que siempre quepa
+      const maxHeight = isMobile 
+        ? Math.min(window.innerHeight * 0.6, 450) 
+        : (isVertical 
+            ? Math.min(window.innerHeight - chromeHeight - 30, 600) // Vertical: alto disponible menos chrome y margen
+            : Math.min(window.innerHeight * 0.55, 480)) // Horizontal: 55% o 480px max
 
+      // Escalar para que quepa en los límites
       if (width > maxWidth) {
         height = maxWidth / aspectRatio
         width = maxWidth
@@ -356,12 +369,25 @@ export default function MacDesktop() {
         height = maxHeight
       }
 
-      // Minimum size
-      width = Math.max(isMobile ? 250 : 300, width)
-      height = Math.max(isMobile ? 150 : 200, height)
+      // Minimum size (pero sin exceder máximos)
+      const minWidth = Math.min(isMobile ? 250 : 300, maxWidth)
+      const minHeight = Math.min(isMobile ? 150 : 200, maxHeight)
+      
+      width = Math.max(minWidth, width)
+      height = Math.max(minHeight, height)
+
+      // Verificar una vez más que no excede máximos después del mínimo
+      if (height > maxHeight) {
+        height = maxHeight
+        width = height * aspectRatio
+      }
+      if (width > maxWidth) {
+        width = maxWidth
+        height = width / aspectRatio
+      }
 
       finalWidth = Math.round(width)
-      finalHeight = Math.round(height) + 28 // +28 for window chrome
+      finalHeight = Math.round(height) + chromeHeight
     } else {
       // Fallback to default sizes if no dimensions provided
       finalWidth = isMobile ? 300 : 500
@@ -372,55 +398,73 @@ export default function MacDesktop() {
     let position = { x: 10, y: 40 }
     if (typeof window !== "undefined") {
       if (isMobile) {
-        // Márgenes de seguridad
-        const marginLeft = 15
-        const marginRight = 15
-        const marginTop = 60
-        const marginBottom = 80
+        // Márgenes mínimos
+        const margin = 5
+        const topMargin = 10
+        const bottomMargin = 10
         
-        // Calcular espacio disponible según dimensiones del dispositivo y de la foto
-        const minX = marginLeft
-        const maxX = window.innerWidth - finalWidth - marginRight
-        const minY = marginTop
-        const maxY = window.innerHeight - finalHeight - marginBottom
+        // Límites absolutos donde puede aparecer la ventana
+        const minX = margin
+        const maxPossibleX = window.innerWidth - finalWidth - margin
+        const minY = topMargin  
+        const maxPossibleY = window.innerHeight - finalHeight - bottomMargin
         
-        if (willBeHighQuality) {
-          // HD: Posición completamente aleatoria dentro de todo el espacio disponible
-          const x = Math.random() * (maxX - minX) + minX
-          const y = Math.random() * (maxY - minY) + minY
-          
+        // Si la foto no cabe, centrarla
+        if (maxPossibleX < minX || maxPossibleY < minY) {
           position = {
-            x: Math.floor(Math.max(minX, Math.min(x, maxX))),
-            y: Math.floor(Math.max(minY, Math.min(y, maxY)))
+            x: Math.max(0, Math.floor((window.innerWidth - finalWidth) / 2)),
+            y: Math.max(topMargin, Math.floor((window.innerHeight - finalHeight) / 2))
           }
+        } else if (willBeHighQuality) {
+          // HD: Posición COMPLETAMENTE aleatoria por TODO el rectángulo de la pantalla
+          // Generar X aleatorio entre minX y maxPossibleX
+          const x = minX + Math.floor(Math.random() * (maxPossibleX - minX + 1))
+          // Generar Y aleatorio entre minY y maxPossibleY  
+          const y = minY + Math.floor(Math.random() * (maxPossibleY - minY + 1))
+          
+          position = { x, y }
         } else {
-          // Low quality: También aleatorias pero más centradas para que queden tapadas
+          // Low quality: Más centradas para que queden tapadas
           const centerX = (window.innerWidth - finalWidth) / 2
           const centerY = (window.innerHeight - finalHeight) / 2
+          const rangeX = (maxPossibleX - minX) * 0.30
+          const rangeY = (maxPossibleY - minY) * 0.30
           
-          // Rango reducido alrededor del centro (±40% del espacio)
-          const rangeX = (maxX - minX) * 0.40
-          const rangeY = (maxY - minY) * 0.40
-          
-          const x = centerX + (Math.random() - 0.5) * rangeX
-          const y = centerY + (Math.random() - 0.5) * rangeY
+          const x = Math.floor(centerX + (Math.random() - 0.5) * rangeX)
+          const y = Math.floor(centerY + (Math.random() - 0.5) * rangeY)
           
           position = {
-            x: Math.floor(Math.max(minX, Math.min(x, maxX))),
-            y: Math.floor(Math.max(minY, Math.min(y, maxY)))
+            x: Math.max(minX, Math.min(x, maxPossibleX)),
+            y: Math.max(minY, Math.min(y, maxPossibleY))
           }
         }
       } else {
-        // Desktop: Random position with proper margins based on FINAL size
-        const minX = 60
-        const minY = 80
-        const maxX = Math.max(minX, window.innerWidth - finalWidth - 60)
-        const maxY = Math.max(minY, window.innerHeight - finalHeight - 80)
+        // Desktop: Posición aleatoria garantizando que SIEMPRE quede dentro de la pantalla
+        const maxX = window.innerWidth - finalWidth
+        const maxY = window.innerHeight - finalHeight
         
-        position = {
-          x: Math.floor(Math.random() * (maxX - minX)) + minX,
-          y: Math.floor(Math.random() * (maxY - minY)) + minY
+        // X siempre aleatorio
+        const x = maxX > 0 ? Math.floor(Math.random() * maxX) : 0
+        
+        // Y depende de si es una imagen vertical (alta)
+        let y = 0
+        if (maxY > 0) {
+          // Si la imagen ocupa más del 65% del alto de pantalla, posicionarla arriba
+          const heightRatio = finalHeight / window.innerHeight
+          
+          if (heightRatio > 0.65) {
+            // Imagen muy alta: posición en el rango superior (0 a 20% del maxY)
+            y = Math.floor(Math.random() * (maxY * 0.20))
+          } else {
+            // Imagen normal: posición completamente aleatoria
+            y = Math.floor(Math.random() * maxY)
+          }
+          
+          // Asegurar límites
+          y = Math.max(0, Math.min(y, maxY))
         }
+        
+        position = { x, y }
       }
     }
 
