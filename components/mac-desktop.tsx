@@ -349,14 +349,14 @@ export default function MacDesktop() {
       const chromeHeight = 28
       const maxWidth = isMobile 
         ? Math.min(window.innerWidth * 0.9, 320) 
-        : Math.min(window.innerWidth * 0.45, 500) // Desktop: 45% y 500px max
+        : Math.min(window.innerWidth * 0.35, 400) // Desktop: 35% y 400px max
       
       // Para desktop: si es vertical, limitar más el alto para que siempre quepa
       const maxHeight = isMobile 
         ? Math.min(window.innerHeight * 0.6, 450) 
         : (isVertical 
-            ? Math.min(window.innerHeight - chromeHeight - 30, 600) // Vertical: alto disponible menos chrome y margen
-            : Math.min(window.innerHeight * 0.55, 480)) // Horizontal: 55% o 480px max
+            ? Math.min(window.innerHeight - chromeHeight - 30, 450) // Vertical: 450px max
+            : Math.min(window.innerHeight * 0.5, 380)) // Horizontal: 50% o 380px max
 
       // Escalar para que quepa en los límites
       if (width > maxWidth) {
