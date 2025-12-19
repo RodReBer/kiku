@@ -54,6 +54,55 @@ export default function MacDesktop() {
     window.scrollTo({ top: 0, behavior: 'instant' })
   }, [])
 
+  // Bloquear scroll cuando hay ventanas abiertas (especialmente importante en móvil)
+  const hasOpenWindows = windows.some(w => !w.isMinimized)
+  useEffect(() => {
+    // Función para prevenir scroll en móvil
+    const preventScroll = (e: TouchEvent) => {
+      // Solo prevenir si hay ventanas abiertas
+      if (hasOpenWindows) {
+        e.preventDefault()
+      }
+    }
+
+    if (hasOpenWindows) {
+      // Bloquear scroll del body - método agresivo para móvil
+      document.body.style.overflow = 'hidden'
+      document.body.style.position = 'fixed'
+      document.body.style.width = '100%'
+      document.body.style.height = '100%'
+      document.body.style.touchAction = 'none'
+      document.documentElement.style.overflow = 'hidden'
+      document.documentElement.style.touchAction = 'none'
+
+      // Agregar listener para bloquear touchmove en móvil
+      document.addEventListener('touchmove', preventScroll, { passive: false })
+    } else {
+      // Restaurar scroll
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.width = ''
+      document.body.style.height = ''
+      document.body.style.touchAction = ''
+      document.documentElement.style.overflow = ''
+      document.documentElement.style.touchAction = ''
+
+      document.removeEventListener('touchmove', preventScroll)
+    }
+
+    // Cleanup al desmontar
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.width = ''
+      document.body.style.height = ''
+      document.body.style.touchAction = ''
+      document.documentElement.style.overflow = ''
+      document.documentElement.style.touchAction = ''
+      document.removeEventListener('touchmove', preventScroll)
+    }
+  }, [hasOpenWindows])
+
   // Función para resetear el escritorio (cerrar todas las ventanas)
   const resetDesktop = () => {
     setWindows([])
@@ -341,22 +390,22 @@ export default function MacDesktop() {
       let width = photoDimensions.width
       let height = photoDimensions.height
       const aspectRatio = width / height
-      
+
       // Detectar si es una foto vertical (más alta que ancha)
       const isVertical = height > width
 
       // Límites máximos basados en espacio real disponible
       const chromeHeight = 28
-      const maxWidth = isMobile 
-        ? Math.min(window.innerWidth * 0.9, 320) 
+      const maxWidth = isMobile
+        ? Math.min(window.innerWidth * 0.9, 320)
         : Math.min(window.innerWidth * 0.35, 400) // Desktop: 35% y 400px max
-      
+
       // Para desktop: si es vertical, limitar más el alto para que siempre quepa
-      const maxHeight = isMobile 
-        ? Math.min(window.innerHeight * 0.6, 450) 
-        : (isVertical 
-            ? Math.min(window.innerHeight - chromeHeight - 30, 450) // Vertical: 450px max
-            : Math.min(window.innerHeight * 0.5, 380)) // Horizontal: 50% o 380px max
+      const maxHeight = isMobile
+        ? Math.min(window.innerHeight * 0.6, 450)
+        : (isVertical
+          ? Math.min(window.innerHeight - chromeHeight - 30, 450) // Vertical: 450px max
+          : Math.min(window.innerHeight * 0.5, 380)) // Horizontal: 50% o 380px max
 
       // Escalar para que quepa en los límites
       if (width > maxWidth) {
@@ -372,7 +421,7 @@ export default function MacDesktop() {
       // Minimum size (pero sin exceder máximos)
       const minWidth = Math.min(isMobile ? 250 : 300, maxWidth)
       const minHeight = Math.min(isMobile ? 150 : 200, maxHeight)
-      
+
       width = Math.max(minWidth, width)
       height = Math.max(minHeight, height)
 
@@ -399,16 +448,16 @@ export default function MacDesktop() {
     if (typeof window !== "undefined") {
       if (isMobile) {
         // Márgenes mínimos
-        const margin = 5
+        const margin = 8
         const topMargin = 10
         const bottomMargin = 10
-        
+
         // Límites absolutos donde puede aparecer la ventana
         const minX = margin
         const maxPossibleX = window.innerWidth - finalWidth - margin
-        const minY = topMargin  
+        const minY = topMargin
         const maxPossibleY = window.innerHeight - finalHeight - bottomMargin
-        
+
         // Si la foto no cabe, centrarla
         if (maxPossibleX < minX || maxPossibleY < minY) {
           position = {
@@ -421,7 +470,7 @@ export default function MacDesktop() {
           const x = minX + Math.floor(Math.random() * (maxPossibleX - minX + 1))
           // Generar Y aleatorio entre minY y maxPossibleY  
           const y = minY + Math.floor(Math.random() * (maxPossibleY - minY + 1))
-          
+
           position = { x, y }
         } else {
           // Low quality: Más centradas para que queden tapadas
@@ -429,10 +478,10 @@ export default function MacDesktop() {
           const centerY = (window.innerHeight - finalHeight) / 2
           const rangeX = (maxPossibleX - minX) * 0.30
           const rangeY = (maxPossibleY - minY) * 0.30
-          
+
           const x = Math.floor(centerX + (Math.random() - 0.5) * rangeX)
           const y = Math.floor(centerY + (Math.random() - 0.5) * rangeY)
-          
+
           position = {
             x: Math.max(minX, Math.min(x, maxPossibleX)),
             y: Math.max(minY, Math.min(y, maxPossibleY))
@@ -442,16 +491,16 @@ export default function MacDesktop() {
         // Desktop: Posición aleatoria garantizando que SIEMPRE quede dentro de la pantalla
         const maxX = window.innerWidth - finalWidth
         const maxY = window.innerHeight - finalHeight
-        
+
         // X siempre aleatorio
         const x = maxX > 0 ? Math.floor(Math.random() * maxX) : 0
-        
+
         // Y depende de si es una imagen vertical (alta)
         let y = 0
         if (maxY > 0) {
           // Si la imagen ocupa más del 65% del alto de pantalla, posicionarla arriba
           const heightRatio = finalHeight / window.innerHeight
-          
+
           if (heightRatio > 0.65) {
             // Imagen muy alta: posición en el rango superior (0 a 20% del maxY)
             y = Math.floor(Math.random() * (maxY * 0.20))
@@ -459,11 +508,11 @@ export default function MacDesktop() {
             // Imagen normal: posición completamente aleatoria
             y = Math.floor(Math.random() * maxY)
           }
-          
+
           // Asegurar límites
           y = Math.max(0, Math.min(y, maxY))
         }
-        
+
         position = { x, y }
       }
     }
@@ -915,7 +964,7 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
     }
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768
     const shopContent = <ShopGrid products={products} />
-    
+
     openCenteredWindow("Shop", shopContent, {
       width: isMobile ? Math.min(window.innerWidth * 0.85, 320) : 900,
       height: isMobile ? Math.min(window.innerHeight * 0.7, 500) : 700,
@@ -1335,11 +1384,14 @@ Se vuoi unirti al team creativo, contattaci :)`
         </div>
 
         {/* Nubes interactivas (desktop y mobile) */}
-        <div className="flex-1 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 lg:gap-16 p-0 md:p-8 h-full overflow-hidden relative z-[150]">
+        <div
+          className="flex-1 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 lg:gap-16 p-0 md:p-8 h-full overflow-hidden relative z-[150]"
+          style={{ pointerEvents: hasOpenWindows ? 'none' : 'auto' }}
+        >
           {/* ...existing code for interactive nubes (motion.divs)... */}
           <motion.div
             className="absolute cursor-pointer group nube-pos-1"
-            drag
+            drag={!hasOpenWindows}
             dragElastic={0.1}
             dragMomentum={false}
             dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
@@ -1393,7 +1445,7 @@ Se vuoi unirti al team creativo, contattaci :)`
 
           <motion.div
             className="absolute cursor-pointer group nube-pos-2"
-            drag
+            drag={!hasOpenWindows}
             dragElastic={0.1}
             dragMomentum={false}
             dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
@@ -1453,7 +1505,7 @@ Se vuoi unirti al team creativo, contattaci :)`
 
           <motion.div
             className="absolute cursor-pointer group nube-pos-3 z-[200]"
-            drag
+            drag={!hasOpenWindows}
             dragElastic={0.1}
             dragMomentum={false}
             dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}

@@ -125,6 +125,14 @@ export default function RetroWindow({
       if (isResizing && !isMaximized) {
         e.preventDefault()
 
+        // Límites máximos para que no se pueda estirar más allá de la pantalla
+        const containerBorder = 20 // margen de seguridad
+        const el = windowRef.current
+        const currentX = el ? el.offsetLeft : position.x
+        const currentY = el ? el.offsetTop : position.y
+        const maxWidth = window.innerWidth - currentX - containerBorder
+        const maxHeight = window.innerHeight - currentY - containerBorder
+
         if (preserveAspect && aspectRatio) {
           const deltaX = e.clientX - resizeStart.x
           const deltaY = e.clientY - resizeStart.y
@@ -145,13 +153,23 @@ export default function RetroWindow({
             finalWidth = finalHeight * aspectRatio
           }
 
-          finalWidth = Math.max(300, finalWidth)
-          finalHeight = Math.max(200, finalHeight)
+          finalWidth = Math.max(300, Math.min(finalWidth, maxWidth))
+          finalHeight = Math.max(200, Math.min(finalHeight, maxHeight))
+
+          // Re-aplicar aspect ratio con los límites
+          if (finalWidth / aspectRatio > maxHeight) {
+            finalHeight = maxHeight
+            finalWidth = finalHeight * aspectRatio
+          }
+          if (finalHeight * aspectRatio > maxWidth) {
+            finalWidth = maxWidth
+            finalHeight = finalWidth / aspectRatio
+          }
 
           onResize({ width: finalWidth, height: finalHeight })
         } else {
-          const newWidth = Math.max(300, resizeStart.width + (e.clientX - resizeStart.x))
-          const newHeight = Math.max(200, resizeStart.height + (e.clientY - resizeStart.y))
+          const newWidth = Math.max(300, Math.min(resizeStart.width + (e.clientX - resizeStart.x), maxWidth))
+          const newHeight = Math.max(200, Math.min(resizeStart.height + (e.clientY - resizeStart.y), maxHeight))
           onResize({ width: newWidth, height: newHeight })
         }
       }
@@ -178,6 +196,14 @@ export default function RetroWindow({
       if (isResizing && !isMaximized) {
         e.preventDefault()
 
+        // Límites máximos para que no se pueda estirar más allá de la pantalla
+        const containerBorder = 20 // margen de seguridad
+        const el = windowRef.current
+        const currentX = el ? el.offsetLeft : position.x
+        const currentY = el ? el.offsetTop : position.y
+        const maxWidth = window.innerWidth - currentX - containerBorder
+        const maxHeight = window.innerHeight - currentY - containerBorder
+
         if (preserveAspect && aspectRatio) {
           const deltaX = touch.clientX - resizeStart.x
           const deltaY = touch.clientY - resizeStart.y
@@ -198,13 +224,23 @@ export default function RetroWindow({
             finalWidth = finalHeight * aspectRatio
           }
 
-          finalWidth = Math.max(300, finalWidth)
-          finalHeight = Math.max(200, finalHeight)
+          finalWidth = Math.max(300, Math.min(finalWidth, maxWidth))
+          finalHeight = Math.max(200, Math.min(finalHeight, maxHeight))
+
+          // Re-aplicar aspect ratio con los límites
+          if (finalWidth / aspectRatio > maxHeight) {
+            finalHeight = maxHeight
+            finalWidth = finalHeight * aspectRatio
+          }
+          if (finalHeight * aspectRatio > maxWidth) {
+            finalWidth = maxWidth
+            finalHeight = finalWidth / aspectRatio
+          }
 
           onResize({ width: finalWidth, height: finalHeight })
         } else {
-          const newWidth = Math.max(300, resizeStart.width + (touch.clientX - resizeStart.x))
-          const newHeight = Math.max(200, resizeStart.height + (touch.clientY - resizeStart.y))
+          const newWidth = Math.max(300, Math.min(resizeStart.width + (touch.clientX - resizeStart.x), maxWidth))
+          const newHeight = Math.max(200, Math.min(resizeStart.height + (touch.clientY - resizeStart.y), maxHeight))
           onResize({ width: newWidth, height: newHeight })
         }
       }
