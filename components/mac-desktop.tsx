@@ -32,6 +32,7 @@ interface WindowState {
   aspectRatio?: number;
   preserveAspect?: boolean;
   originalSize?: { width: number; height: number };
+  originalPosition?: { x: number; y: number };
   backgroundTransparent?: boolean;
 }
 
@@ -63,12 +64,33 @@ export default function MacDesktop() {
   // Bloquear scroll cuando hay ventanas abiertas (especialmente importante en móvil)
   const hasOpenWindows = windows.some(w => !w.isMinimized)
   useEffect(() => {
-    // Función para prevenir scroll en móvil
+    // Función para prevenir scroll en móvil - pero permitir scroll dentro de ventanas
     const preventScroll = (e: TouchEvent) => {
       // Solo prevenir si hay ventanas abiertas
-      if (hasOpenWindows) {
-        e.preventDefault()
+      if (!hasOpenWindows) return
+
+      // Verificar si el touch está dentro de un elemento scrolleable (como el Finder)
+      const target = e.target as HTMLElement
+      if (target) {
+        // Buscar si hay un ancestro que sea scrolleable
+        let el: HTMLElement | null = target
+        while (el) {
+          // Si el elemento tiene overflow-auto o overflow-y-auto, permitir scroll
+          const style = window.getComputedStyle(el)
+          const overflowY = style.overflowY
+          const isScrollable = overflowY === 'auto' || overflowY === 'scroll'
+
+          // Si es scrolleable y tiene contenido que scrollear
+          if (isScrollable && el.scrollHeight > el.clientHeight) {
+            // Permitir el scroll natural
+            return
+          }
+          el = el.parentElement
+        }
       }
+
+      // Si no está en un elemento scrolleable, prevenir scroll
+      e.preventDefault()
     }
 
     if (hasOpenWindows) {
@@ -742,18 +764,28 @@ export default function MacDesktop() {
         const newMaximized = !win.isMaximized;
         let newSize = win.size;
         let newPosition = win.position;
-        // Save original size only if we are maximizing and don't have it yet
+        // Save original size and position only if we are maximizing and don't have them yet
         const originalSize = win.originalSize || win.size;
+        const originalPosition = win.originalPosition || win.position;
 
-        if (newMaximized && win.aspectRatio) {
-          const layout = calculateMaximizedLayout(win.aspectRatio);
-          newSize = layout.size;
-          newPosition = layout.position;
+        if (newMaximized) {
+          if (win.aspectRatio) {
+            // Ventanas con aspectRatio: maximizar respetando la proporción
+            const layout = calculateMaximizedLayout(win.aspectRatio);
+            newSize = layout.size;
+            newPosition = layout.position;
+          } else {
+            // Ventanas sin aspectRatio (Finder, Contact, etc): pantalla completa
+            const containerBorder = 10; // padding + border del contenedor
+            const usableWidth = window.innerWidth - containerBorder * 2;
+            const usableHeight = window.innerHeight - containerBorder * 2;
+            newSize = { width: usableWidth, height: usableHeight };
+            newPosition = { x: 0, y: 0 };
+          }
         } else if (!newMaximized && win.originalSize) {
-          // Restore original size when un-maximizing
+          // Restore original size and position when un-maximizing
           newSize = win.originalSize;
-          // Keep current position or maybe we should have saved original position too?
-          // For now, let's just restore size and keep it somewhat centered or where it is.
+          newPosition = originalPosition;
         }
 
         return {
@@ -762,6 +794,7 @@ export default function MacDesktop() {
           size: newSize,
           position: newPosition,
           originalSize: originalSize,
+          originalPosition: originalPosition,
         };
       })
     );
@@ -1095,8 +1128,8 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
               <button
                 onClick={() => setSelectedLang("es")}
                 className={`px-2 py-0.5 ${selectedLang === "es"
-                    ? "bg-[#000080] text-white"
-                    : "bg-gray-300"
+                  ? "bg-[#000080] text-white"
+                  : "bg-gray-300"
                   }`}
               >
                 ES
@@ -1104,8 +1137,8 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
               <button
                 onClick={() => setSelectedLang("en")}
                 className={`px-2 py-0.5 ${selectedLang === "en"
-                    ? "bg-[#000080] text-white"
-                    : "bg-gray-300"
+                  ? "bg-[#000080] text-white"
+                  : "bg-gray-300"
                   }`}
               >
                 EN
@@ -1113,8 +1146,8 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
               <button
                 onClick={() => setSelectedLang("it")}
                 className={`px-2 py-0.5 ${selectedLang === "it"
-                    ? "bg-[#000080] text-white"
-                    : "bg-gray-300"
+                  ? "bg-[#000080] text-white"
+                  : "bg-gray-300"
                   }`}
               >
                 IT
@@ -1221,8 +1254,8 @@ Se vuoi unirti al team creativo, contattaci :)`,
                 <button
                   onClick={() => setSelectedLang("es")}
                   className={`px-3 py-1 text-xs font-bold border-2 ${selectedLang === "es"
-                      ? "bg-[#000080] text-white border-[#000080]"
-                      : "bg-white text-black border-[#808080]"
+                    ? "bg-[#000080] text-white border-[#000080]"
+                    : "bg-white text-black border-[#808080]"
                     }`}
                   style={{ borderStyle: "outset" }}
                 >
@@ -1231,8 +1264,8 @@ Se vuoi unirti al team creativo, contattaci :)`,
                 <button
                   onClick={() => setSelectedLang("en")}
                   className={`px-3 py-1 text-xs font-bold border-2 ${selectedLang === "en"
-                      ? "bg-[#000080] text-white border-[#000080]"
-                      : "bg-white text-black border-[#808080]"
+                    ? "bg-[#000080] text-white border-[#000080]"
+                    : "bg-white text-black border-[#808080]"
                     }`}
                   style={{ borderStyle: "outset" }}
                 >
@@ -1241,8 +1274,8 @@ Se vuoi unirti al team creativo, contattaci :)`,
                 <button
                   onClick={() => setSelectedLang("it")}
                   className={`px-3 py-1 text-xs font-bold border-2 ${selectedLang === "it"
-                      ? "bg-[#000080] text-white border-[#000080]"
-                      : "bg-white text-black border-[#808080]"
+                    ? "bg-[#000080] text-white border-[#000080]"
+                    : "bg-white text-black border-[#808080]"
                     }`}
                   style={{ borderStyle: "outset" }}
                 >
