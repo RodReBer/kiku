@@ -381,13 +381,13 @@ export default function MacDesktop() {
         position = {
           x: Math.floor(
             Math.random() *
-              Math.max(0, window.innerWidth - defaultSize.width - 120) +
-              60
+            Math.max(0, window.innerWidth - defaultSize.width - 120) +
+            60
           ),
           y: Math.floor(
             Math.random() *
-              Math.max(0, window.innerHeight - defaultSize.height - 160) +
-              80
+            Math.max(0, window.innerHeight - defaultSize.height - 160) +
+            80
           ),
         };
       }
@@ -519,12 +519,12 @@ export default function MacDesktop() {
 
       // Ensure minimums (might break aspect slightly if image is tiny, but usability first)
       // Actually better to scale up preserving aspect if too small
-      if (width < minContentWidth) {
-        width = minContentWidth;
+      if (width < minWidth) {
+        width = minWidth;
         height = width / aspectRatio; // h = w / ar
       }
-      if (height < minContentHeight) {
-        height = minContentHeight;
+      if (height < minHeight) {
+        height = minHeight;
         width = height * aspectRatio; // w = h * ar
       }
 
@@ -583,19 +583,10 @@ export default function MacDesktop() {
           const rangeX = (maxPossibleX - minX) * 0.30
           const rangeY = (maxPossibleY - minY) * 0.30
 
-          const x = Math.floor(centerX + (Math.random() - 0.5) * rangeX)
-          const y = Math.floor(centerY + (Math.random() - 0.5) * rangeY)
-
           position = {
-            x: Math.max(
-              0,
-              Math.min(maxX, centerX + (Math.random() - 0.5) * variance)
-            ),
-            y: Math.max(
-              0,
-              Math.min(maxY, centerY + (Math.random() - 0.5) * variance)
-            ),
-          };
+            x: Math.max(0, Math.min(maxX, Math.floor(centerX + (Math.random() - 0.5) * rangeX))),
+            y: Math.max(0, Math.min(maxY, Math.floor(centerY + (Math.random() - 0.5) * rangeY)))
+          }
         }
       } else {
         // Desktop: Posición aleatoria garantizando que SIEMPRE quede dentro de la pantalla
@@ -630,8 +621,8 @@ export default function MacDesktop() {
     // Desktop: usar imagen HD directa, Mobile: usar compresión wsrv.nl
     const displaySrc = isMobile
       ? `https://wsrv.nl/?url=${encodeURIComponent(
-          imagePath
-        )}&w=200&q=30&output=webp`
+        imagePath
+      )}&w=200&q=30&output=webp`
       : imagePath;
 
     // Callback cuando la imagen carga - YA NO REDIMENSIONAMOS si ya teníamos dimensiones
@@ -1103,31 +1094,28 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
             <div className="flex gap-2">
               <button
                 onClick={() => setSelectedLang("es")}
-                className={`px-2 py-0.5 ${
-                  selectedLang === "es"
+                className={`px-2 py-0.5 ${selectedLang === "es"
                     ? "bg-[#000080] text-white"
                     : "bg-gray-300"
-                }`}
+                  }`}
               >
                 ES
               </button>
               <button
                 onClick={() => setSelectedLang("en")}
-                className={`px-2 py-0.5 ${
-                  selectedLang === "en"
+                className={`px-2 py-0.5 ${selectedLang === "en"
                     ? "bg-[#000080] text-white"
                     : "bg-gray-300"
-                }`}
+                  }`}
               >
                 EN
               </button>
               <button
                 onClick={() => setSelectedLang("it")}
-                className={`px-2 py-0.5 ${
-                  selectedLang === "it"
+                className={`px-2 py-0.5 ${selectedLang === "it"
                     ? "bg-[#000080] text-white"
                     : "bg-gray-300"
-                }`}
+                  }`}
               >
                 IT
               </button>
@@ -1232,33 +1220,30 @@ Se vuoi unirti al team creativo, contattaci :)`,
               <div className="flex gap-1">
                 <button
                   onClick={() => setSelectedLang("es")}
-                  className={`px-3 py-1 text-xs font-bold border-2 ${
-                    selectedLang === "es"
+                  className={`px-3 py-1 text-xs font-bold border-2 ${selectedLang === "es"
                       ? "bg-[#000080] text-white border-[#000080]"
                       : "bg-white text-black border-[#808080]"
-                  }`}
+                    }`}
                   style={{ borderStyle: "outset" }}
                 >
                   ES
                 </button>
                 <button
                   onClick={() => setSelectedLang("en")}
-                  className={`px-3 py-1 text-xs font-bold border-2 ${
-                    selectedLang === "en"
+                  className={`px-3 py-1 text-xs font-bold border-2 ${selectedLang === "en"
                       ? "bg-[#000080] text-white border-[#000080]"
                       : "bg-white text-black border-[#808080]"
-                  }`}
+                    }`}
                   style={{ borderStyle: "outset" }}
                 >
                   EN
                 </button>
                 <button
                   onClick={() => setSelectedLang("it")}
-                  className={`px-3 py-1 text-xs font-bold border-2 ${
-                    selectedLang === "it"
+                  className={`px-3 py-1 text-xs font-bold border-2 ${selectedLang === "it"
                       ? "bg-[#000080] text-white border-[#000080]"
                       : "bg-white text-black border-[#808080]"
-                  }`}
+                    }`}
                   style={{ borderStyle: "outset" }}
                 >
                   IT
@@ -1342,11 +1327,11 @@ Se vuoi unirti al team creativo, contattaci :)`,
 
   const top3PhotoIds = isMobile
     ? new Set(
-        photoWindows
-          .sort((a, b) => b.zIndex - a.zIndex)
-          .slice(0, 4)
-          .map((w) => w.id)
-      )
+      photoWindows
+        .sort((a, b) => b.zIndex - a.zIndex)
+        .slice(0, 4)
+        .map((w) => w.id)
+    )
     : new Set(photoWindows.map((w) => w.id)); // Desktop: todas HD
 
   return (
@@ -1703,9 +1688,9 @@ Se vuoi unirti al team creativo, contattaci :)`,
               animate={
                 !isDragging
                   ? {
-                      y: [0, -8, -12, -8, 0],
-                      rotate: [0, 2, 0, -2, 0],
-                    }
+                    y: [0, -8, -12, -8, 0],
+                    rotate: [0, 2, 0, -2, 0],
+                  }
                   : {}
               }
               transition={{
@@ -1782,9 +1767,9 @@ Se vuoi unirti al team creativo, contattaci :)`,
               animate={
                 !isDragging
                   ? {
-                      y: [0, -10, -15, -10, 0],
-                      rotate: [0, -2, 0, 2, 0],
-                    }
+                    y: [0, -10, -15, -10, 0],
+                    rotate: [0, -2, 0, 2, 0],
+                  }
                   : {}
               }
               transition={{
@@ -1839,9 +1824,9 @@ Se vuoi unirti al team creativo, contattaci :)`,
               animate={
                 !isDragging
                   ? {
-                      y: [0, -10, -14, -8, 0],
-                      rotate: [0, -2, 0, 2, 0],
-                    }
+                    y: [0, -10, -14, -8, 0],
+                    rotate: [0, -2, 0, 2, 0],
+                  }
                   : {}
               }
               transition={{

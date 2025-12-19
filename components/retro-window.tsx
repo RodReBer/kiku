@@ -184,18 +184,11 @@ export default function RetroWindow({
             }
           }
 
-          onResize({
-            width: Math.round(finalWidth),
-            height: Math.round(finalHeight),
-          });
-            finalHeight = newHeight
-            finalWidth = finalHeight * aspectRatio
-          }
-
+          // Apply max screen limits while preserving aspect ratio
           finalWidth = Math.max(300, Math.min(finalWidth, maxWidth))
           finalHeight = Math.max(200, Math.min(finalHeight, maxHeight))
 
-          // Re-aplicar aspect ratio con los límites
+          // Re-apply aspect ratio with limits
           if (finalWidth / aspectRatio > maxHeight) {
             finalHeight = maxHeight
             finalWidth = finalHeight * aspectRatio
@@ -205,20 +198,11 @@ export default function RetroWindow({
             finalHeight = finalWidth / aspectRatio
           }
 
-          onResize({ width: finalWidth, height: finalHeight })
+          onResize({ width: Math.round(finalWidth), height: Math.round(finalHeight) })
         } else {
           const newWidth = Math.max(300, Math.min(resizeStart.width + (e.clientX - resizeStart.x), maxWidth))
           const newHeight = Math.max(200, Math.min(resizeStart.height + (e.clientY - resizeStart.y), maxHeight))
           onResize({ width: newWidth, height: newHeight })
-          const newWidth = Math.max(
-            300,
-            resizeStart.width + (e.clientX - resizeStart.x)
-          );
-          const newHeight = Math.max(
-            200,
-            resizeStart.height + (e.clientY - resizeStart.y)
-          );
-          onResize({ width: newWidth, height: newHeight });
         }
       }
     };
@@ -295,18 +279,11 @@ export default function RetroWindow({
             }
           }
 
-          onResize({
-            width: Math.round(finalWidth),
-            height: Math.round(finalHeight),
-          });
-            finalHeight = newHeight
-            finalWidth = finalHeight * aspectRatio
-          }
-
+          // Apply max screen limits while preserving aspect ratio
           finalWidth = Math.max(300, Math.min(finalWidth, maxWidth))
           finalHeight = Math.max(200, Math.min(finalHeight, maxHeight))
 
-          // Re-aplicar aspect ratio con los límites
+          // Re-apply aspect ratio with limits
           if (finalWidth / aspectRatio > maxHeight) {
             finalHeight = maxHeight
             finalWidth = finalHeight * aspectRatio
@@ -316,20 +293,11 @@ export default function RetroWindow({
             finalHeight = finalWidth / aspectRatio
           }
 
-          onResize({ width: finalWidth, height: finalHeight })
+          onResize({ width: Math.round(finalWidth), height: Math.round(finalHeight) })
         } else {
           const newWidth = Math.max(300, Math.min(resizeStart.width + (touch.clientX - resizeStart.x), maxWidth))
           const newHeight = Math.max(200, Math.min(resizeStart.height + (touch.clientY - resizeStart.y), maxHeight))
           onResize({ width: newWidth, height: newHeight })
-          const newWidth = Math.max(
-            300,
-            resizeStart.width + (touch.clientX - resizeStart.x)
-          );
-          const newHeight = Math.max(
-            200,
-            resizeStart.height + (touch.clientY - resizeStart.y)
-          );
-          onResize({ width: newWidth, height: newHeight });
         }
       }
     };
