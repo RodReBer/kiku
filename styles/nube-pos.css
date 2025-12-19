@@ -4,7 +4,7 @@
 
 /* iPhone SE, iPhone 5 (320px - 374px) - Mover a la izquierda */
 @media (max-width: 374px) {
-  .mobile-kikunubes-container {
+  .mobile-kikunubes {
     padding-right: 0;
     margin-right: -20px; /* Mueve 20px a la izquierda */
   }
@@ -12,8 +12,8 @@
 
 /* iPhone 12 mini, 13 mini (375px - 389px) - Ajuste menor */
 @media (min-width: 375px) and (max-width: 389px) {
-  .mobile-kikunubes-container {
-    margin-right: -12px; /* Mueve 12px a la izquierda */
+  .mobile-kikunubes {
+    margin-right: 25px; /* Mueve 12px a la izquierda */
   }
 }
 
@@ -285,10 +285,10 @@
 @media (min-width: 375px) and (max-width: 389px) {
   .nube-pos-2 {
     top: 45%;
-    left: calc(53% - 75px);
+    left: calc(53% - 70px);
   }
   .nube-2-mobile-size {
-    width: 170px;
+    width: 183px;
     height: auto;
   }
 }
@@ -382,7 +382,7 @@
 /* iPhone 12 mini, 13 mini (375px - 389px) */
 @media (min-width: 375px) and (max-width: 389px) {
   .nube-pos-3 {
-    bottom: 4.5%;
+    bottom: 7%;
     left: calc(50% - 120px);
   }
   .nube-3-mobile-size {

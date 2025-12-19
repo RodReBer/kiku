@@ -24,6 +24,7 @@ export interface Project {
   status: "active" | "archived"
   coverImage?: string
   coverImageThumb?: string
+  order?: number
   createdAt?: Date
   updatedAt?: Date
 }
@@ -83,8 +84,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
           };
         }) as Project[];
 
-        setProjects(projectsData);
-        console.log("Projects set in state:", projectsData.length);
+        // Sort projects by order (ascending), fallback to createdAt (descending)
+        const sortedProjects = projectsData.sort((a, b) => {
+          const orderA = a.order ?? Number.MAX_SAFE_INTEGER
+          const orderB = b.order ?? Number.MAX_SAFE_INTEGER
+          if (orderA !== orderB) return orderA - orderB
+          return (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0)
+        })
+
+        setProjects(sortedProjects);
+        console.log("Projects set in state:", sortedProjects.length);
         setLoading(false);
       },
       (err) => {
@@ -212,6 +221,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
         updatedAt: doc.data().updatedAt?.toDate(),
       })) as Project[]
 
+      // Sort projects by order
+      const sortedProjects = projectsData.sort((a, b) => {
+        const orderA = a.order ?? Number.MAX_SAFE_INTEGER
+        const orderB = b.order ?? Number.MAX_SAFE_INTEGER
+        if (orderA !== orderB) return orderA - orderB
+        return (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0)
+      })
+
       const productsData = productsSnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -219,7 +236,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         updatedAt: doc.data().updatedAt?.toDate(),
       })) as Product[]
 
-      setProjects(projectsData)
+      setProjects(sortedProjects)
       setProducts(productsData)
       setError(null)
     } catch (err) {
