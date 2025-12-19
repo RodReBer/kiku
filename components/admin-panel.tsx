@@ -56,6 +56,7 @@ export default function AdminPanel() {
     category: "photography",
     photos: [],
     coverImage: "",
+    order: 0,
   })
 
   const [newProduct, setNewProduct] = useState<Partial<Product>>({
@@ -181,6 +182,7 @@ export default function AdminPanel() {
         coverImage: coverImageUrl,
         coverImageThumb: coverImageThumbUrl,
         photos,
+        order: newProject.order || 0,
       } as Omit<Project, "id">)
 
       toast({
@@ -194,6 +196,7 @@ export default function AdminPanel() {
         category: "photography",
         photos: [],
         coverImage: "",
+        order: 0,
       })
       setSelectedFiles([])
       setCoverImageFile(null)
@@ -352,6 +355,16 @@ export default function AdminPanel() {
                         </SelectContent>
                       </Select>
                     </div>
+                    <div>
+                      <label className="block text-purple-200 text-sm font-medium mb-2">Orden (Menor número = Primero)</label>
+                      <Input
+                        type="number"
+                        placeholder="Ej: 1"
+                        value={newProject.order || ""}
+                        onChange={(e) => setNewProject({ ...newProject, order: Number(e.target.value) })}
+                        className="bg-white/20 border-white/30 text-white placeholder-purple-300"
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -481,6 +494,9 @@ export default function AdminPanel() {
                           </Badge>
                           <Badge variant="outline" className="border-purple-400 text-purple-200">
                             {project.category}
+                          </Badge>
+                          <Badge variant="outline" className="border-blue-400 text-blue-200">
+                            Orden: {project.order || 0}
                           </Badge>
                           <Badge
                             variant={project.status === "active" ? "default" : "secondary"}
@@ -877,6 +893,16 @@ function ProjectEditForm({
               <SelectItem value="folder">Carpeta</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm text-purple-200">Orden</label>
+          <Input
+            type="number"
+            value={formData.order || 0}
+            onChange={(e) => setFormData({ ...formData, order: Number(e.target.value) })}
+            className="bg-white/20 border-white/30 text-white placeholder-purple-300"
+          />
         </div>
 
         <div className="space-y-2">

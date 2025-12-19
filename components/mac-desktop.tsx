@@ -1,245 +1,302 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect, useRef } from "react"
-import Image from "next/image"
-import { motion, AnimatePresence } from "framer-motion"
-import RetroWindow from "./retro-window"
-import Finder from "./finder"
-import DrawingApp from "./drawing-app"
-import { PhotoWindowContent } from "./photo-window-content"
-import ShopGrid from "./shop-grid"
-import DesignCarousel from "./design-carousel"
+import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import RetroWindow from "./retro-window";
+import Finder from "./finder";
+import DrawingApp from "./drawing-app";
+import { PhotoWindowContent } from "./photo-window-content";
+import ShopGrid from "./shop-grid";
+import DesignCarousel from "./design-carousel";
 
-import "../styles/nube-pos.css"
-import { useData } from "@/context/data-context"
+import "../styles/nube-pos.css";
+import { useData } from "@/context/data-context";
 
 interface FileItem {
-  id: string
-  name: string
-  type: "file" | "folder" | "project"
-  category: "design" | "photography" | "video" | "general"
+  id: string;
+  name: string;
+  type: "file" | "folder" | "project";
+  category: "design" | "photography" | "video" | "general";
 }
 
 interface WindowState {
-  id: string
-  title: string
-  content: React.ReactNode
-  isMinimized: boolean
-  isMaximized: boolean
-  position: { x: number; y: number }
-  size: { width: number; height: number }
-  zIndex: number
-  aspectRatio?: number
-  preserveAspect?: boolean
-  originalSize?: { width: number; height: number }
-  backgroundTransparent?: boolean
+  id: string;
+  title: string;
+  content: React.ReactNode;
+  isMinimized: boolean;
+  isMaximized: boolean;
+  position: { x: number; y: number };
+  size: { width: number; height: number };
+  zIndex: number;
+  aspectRatio?: number;
+  preserveAspect?: boolean;
+  originalSize?: { width: number; height: number };
+  backgroundTransparent?: boolean;
 }
 
 export default function MacDesktop() {
-  const { projects, products } = useData()
-  const [windows, setWindows] = useState<WindowState[]>([])
+  const { projects, products } = useData();
+  const [windows, setWindows] = useState<WindowState[]>([]);
   // Usar ref para zIndex garantiza incrementos atómicos sincrónicos durante el efecto cascada
-  const nextZIndexRef = useRef(3000)
-  const [nextZIndex, setNextZIndex] = useState(3000) // Base alto para ventanas (por encima de UI)
-  const [isDragging, setIsDragging] = useState(false)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [designCarousel, setDesignCarousel] = useState<{ images: string[], projectName: string } | null>(null)
-  const imageCache = useRef<Map<string, { width: number; height: number }>>(new Map())
-  const openImagesRef = useRef<Set<string>>(new Set()) // Track de imágenes abiertas
-  const windowToImageRef = useRef<Map<string, string>>(new Map()) // windowId -> imagePath
-  const mobileWindowOffsetRef = useRef({ x: 0, y: 0 }) // Offset incremental para mobile
+  const nextZIndexRef = useRef(3000);
+  const [nextZIndex, setNextZIndex] = useState(3000); // Base alto para ventanas (por encima de UI)
+  const [isDragging, setIsDragging] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [designCarousel, setDesignCarousel] = useState<{
+    images: string[];
+    projectName: string;
+  } | null>(null);
+  const imageCache = useRef<Map<string, { width: number; height: number }>>(
+    new Map()
+  );
+  const openImagesRef = useRef<Set<string>>(new Set()); // Track de imágenes abiertas
+  const windowToImageRef = useRef<Map<string, string>>(new Map()); // windowId -> imagePath
+  const mobileWindowOffsetRef = useRef({ x: 0, y: 0 }); // Offset incremental para mobile
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Scroll hacia arriba al montar el componente
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' })
-  }, [])
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, []);
 
   // Función para resetear el escritorio (cerrar todas las ventanas)
   const resetDesktop = () => {
-    setWindows([])
-    setNextZIndex(3000)
-    openImagesRef.current.clear() // Limpiar tracking de imágenes
-    windowToImageRef.current.clear() // Limpiar mapa window-imagen
-    mobileWindowOffsetRef.current = { x: 0, y: 0 } // Reset offset mobile
-  }
+    setWindows([]);
+    setNextZIndex(3000);
+    openImagesRef.current.clear(); // Limpiar tracking de imágenes
+    windowToImageRef.current.clear(); // Limpiar mapa window-imagen
+    mobileWindowOffsetRef.current = { x: 0, y: 0 }; // Reset offset mobile
+  };
 
   // Función para obtener dimensiones de imagen/video - OPTIMIZADA con cache
-  const getImageDimensions = (src: string): Promise<{ width: number; height: number }> => {
+  const getImageDimensions = (
+    src: string
+  ): Promise<{ width: number; height: number }> => {
     // Verificar si ya tenemos las dimensiones en cache
     if (imageCache.current.has(src)) {
-      return Promise.resolve(imageCache.current.get(src)!)
+      return Promise.resolve(imageCache.current.get(src)!);
     }
 
     // Detectar si es un video por la extensión
-    const isVideo = /\.(mp4|webm|ogg|mov)(\?|$)/i.test(src)
+    const isVideo = /\.(mp4|webm|ogg|mov)(\?|$)/i.test(src);
 
     return new Promise((resolve) => {
       if (isVideo) {
         // Para videos, usar elemento video
-        const video = document.createElement('video')
-        video.preload = "metadata"
+        const video = document.createElement("video");
+        video.preload = "metadata";
 
         video.onloadedmetadata = function () {
           try {
-            let width = video.videoWidth || 800
-            let height = video.videoHeight || 600
+            let width = video.videoWidth || 800;
+            let height = video.videoHeight || 600;
 
             // Calcular dimensiones para móvil y desktop
-            const isMobile = typeof window !== "undefined" && window.innerWidth < 768
-            const maxWidth = isMobile ? Math.min(300, window.innerWidth * 0.9) : Math.min(800, window.innerWidth * 0.8)
-            const maxHeight = isMobile ? Math.min(400, window.innerHeight * 0.6) : Math.min(600, window.innerHeight * 0.8)
+            const isMobile =
+              typeof window !== "undefined" && window.innerWidth < 768;
+            const maxWidth = isMobile
+              ? Math.min(300, window.innerWidth * 0.9)
+              : Math.min(800, window.innerWidth * 0.8);
+            const maxHeight = isMobile
+              ? Math.min(400, window.innerHeight * 0.6)
+              : Math.min(600, window.innerHeight * 0.8);
 
             // Escalar si es necesario
             if (width > maxWidth) {
-              height = (height * maxWidth) / width
-              width = maxWidth
+              height = (height * maxWidth) / width;
+              width = maxWidth;
             }
 
             if (height > maxHeight) {
-              width = (width * maxHeight) / height
-              height = maxHeight
+              width = (width * maxHeight) / height;
+              height = maxHeight;
             }
 
             // Tamaño mínimo
-            width = Math.max(isMobile ? 250 : 300, width)
-            height = Math.max(isMobile ? 150 : 200, height)
+            width = Math.max(isMobile ? 250 : 300, width);
+            height = Math.max(isMobile ? 150 : 200, height);
 
-            const dimensions = { width: Math.round(width), height: Math.round(height) }
+            const dimensions = {
+              width: Math.round(width),
+              height: Math.round(height),
+            };
             // Guardar en cache
-            imageCache.current.set(src, dimensions)
-            resolve(dimensions)
+            imageCache.current.set(src, dimensions);
+            resolve(dimensions);
           } catch (error) {
-            console.error("Error processing video dimensions:", error)
-            resolve({ width: 640, height: 480 })
+            console.error("Error processing video dimensions:", error);
+            resolve({ width: 640, height: 480 });
           } finally {
             // Limpiar el video
-            video.src = ''
+            video.src = "";
           }
-        }
+        };
 
         video.onerror = () => {
-          video.src = ''
-          resolve({ width: 640, height: 480 })
-        }
+          video.src = "";
+          resolve({ width: 640, height: 480 });
+        };
 
-        video.src = src
+        video.src = src;
       } else {
         // Para imágenes, usar Image
-        const img = new window.Image()
-        img.crossOrigin = "anonymous"
+        const img = new window.Image();
+        img.crossOrigin = "anonymous";
 
         img.onload = function () {
           try {
-            const imgElement = this as HTMLImageElement
-            let width = imgElement.naturalWidth || imgElement.width || 500
-            let height = imgElement.naturalHeight || imgElement.height || 400
+            const imgElement = this as HTMLImageElement;
+            let width = imgElement.naturalWidth || imgElement.width || 500;
+            let height = imgElement.naturalHeight || imgElement.height || 400;
 
             // Calcular dimensiones para móvil y desktop
-            const isMobile = typeof window !== "undefined" && window.innerWidth < 768
-            const maxWidth = isMobile ? Math.min(300, window.innerWidth * 0.9) : Math.min(800, window.innerWidth * 0.8)
-            const maxHeight = isMobile ? Math.min(400, window.innerHeight * 0.6) : Math.min(600, window.innerHeight * 0.8)
+            const isMobile =
+              typeof window !== "undefined" && window.innerWidth < 768;
+            const maxWidth = isMobile
+              ? Math.min(300, window.innerWidth * 0.9)
+              : Math.min(800, window.innerWidth * 0.8);
+            const maxHeight = isMobile
+              ? Math.min(400, window.innerHeight * 0.6)
+              : Math.min(600, window.innerHeight * 0.8);
 
             // Escalar si es necesario
             if (width > maxWidth) {
-              height = (height * maxWidth) / width
-              width = maxWidth
+              height = (height * maxWidth) / width;
+              width = maxWidth;
             }
 
             if (height > maxHeight) {
-              width = (width * maxHeight) / height
-              height = maxHeight
+              width = (width * maxHeight) / height;
+              height = maxHeight;
             }
 
             // Tamaño mínimo
-            width = Math.max(isMobile ? 250 : 300, width)
-            height = Math.max(isMobile ? 150 : 200, height)
+            width = Math.max(isMobile ? 250 : 300, width);
+            height = Math.max(isMobile ? 150 : 200, height);
 
-            const dimensions = { width: Math.round(width), height: Math.round(height) }
+            const dimensions = {
+              width: Math.round(width),
+              height: Math.round(height),
+            };
             // Guardar en cache
-            imageCache.current.set(src, dimensions)
-            resolve(dimensions)
+            imageCache.current.set(src, dimensions);
+            resolve(dimensions);
           } catch (error) {
-            console.error("Error processing image dimensions:", error)
-            resolve({ width: 400, height: 300 })
+            console.error("Error processing image dimensions:", error);
+            resolve({ width: 400, height: 300 });
           }
-        }
+        };
 
         img.onerror = () => {
-          resolve({ width: 400, height: 300 })
-        }
+          resolve({ width: 400, height: 300 });
+        };
 
-        img.src = src
+        img.src = src;
       }
-    })
-  }
+    });
+  };
 
   const calculateMaximizedLayout = (aspectRatio: number) => {
-    const screenWidth = window.innerWidth
-    const screenHeight = window.innerHeight
-    const containerBorder = 10 // padding 3px + border 7px del contenedor
-    const usableWidth = screenWidth - containerBorder * 2
-    const usableHeight = screenHeight - containerBorder * 2
-    const chromeHeight = 28 // header de la ventana
-    const chromeWidth = 4 // 2px borders laterales de la ventana
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    const containerBorder = 10; // padding 3px + border 7px del contenedor
+    const usableWidth = screenWidth - containerBorder * 2;
+    const usableHeight = screenHeight - containerBorder * 2;
+    const chromeHeight = 28; // header de la ventana
+    const chromeWidth = 4; // 2px borders laterales de la ventana
 
-    let targetHeight = usableHeight
-    let contentHeight = targetHeight - chromeHeight
-    let contentWidth = contentHeight * aspectRatio
-    let targetWidth = contentWidth + chromeWidth
+    let targetHeight = usableHeight;
+    let contentHeight = targetHeight - chromeHeight;
+    let contentWidth = contentHeight * aspectRatio;
+    let targetWidth = contentWidth + chromeWidth;
 
     // Si excede el ancho util, ajustar por ancho
     if (targetWidth > usableWidth) {
-      targetWidth = usableWidth
-      contentWidth = targetWidth - chromeWidth
-      contentHeight = contentWidth / aspectRatio
-      targetHeight = contentHeight + chromeHeight
+      targetWidth = usableWidth;
+      contentWidth = targetWidth - chromeWidth;
+      contentHeight = contentWidth / aspectRatio;
+      targetHeight = contentHeight + chromeHeight;
     }
 
-    targetWidth = Math.ceil(targetWidth)
-    targetHeight = Math.ceil(targetHeight)
+    targetWidth = Math.ceil(targetWidth);
+    targetHeight = Math.ceil(targetHeight);
 
     return {
       size: { width: targetWidth, height: targetHeight },
       position: {
         x: Math.max(0, (usableWidth - targetWidth) / 2),
-        y: Math.max(0, (usableHeight - targetHeight) / 2)
-      }
-    }
-  }
+        y: Math.max(0, (usableHeight - targetHeight) / 2),
+      },
+    };
+  };
 
-  const handleImageLoad = (id: string, dimensions?: { width: number; height: number }) => {
-    if (!dimensions) return
+  const handleImageLoad = (
+    id: string,
+    dimensions?: { width: number; height: number }
+  ) => {
+    if (!dimensions) return;
 
     setWindows((prev) =>
       prev.map((win) => {
-        if (win.id !== id) return win
+        if (win.id !== id) return win;
 
-        const newAspectRatio = dimensions.width / dimensions.height
-        let newSize = win.size
-        let newPosition = win.position
+        const newAspectRatio = dimensions.width / dimensions.height;
+        let newSize = win.size;
+        let newPosition = win.position;
+        const chromeHeight = 28; // header height
 
         // If window is already maximized, recalculate layout with new aspect ratio
         if (win.isMaximized) {
-          const layout = calculateMaximizedLayout(newAspectRatio)
-          newSize = layout.size
-          newPosition = layout.position
+          const layout = calculateMaximizedLayout(newAspectRatio);
+          newSize = layout.size;
+          newPosition = layout.position;
         } else {
-          // Adjust height to match aspect ratio, keeping width constant
-          // Keep original position - no jumping after load
-          const newHeight = Math.round(win.size.width / newAspectRatio)
-          newSize = { ...win.size, height: newHeight }
-          // newPosition stays as win.position - no recalculation
+          // Calculate new dimensions based on image aspect ratio
+          const isMobile =
+            typeof window !== "undefined" && window.innerWidth < 768;
+          const maxWidth = isMobile
+            ? window.innerWidth * 0.9
+            : window.innerWidth * 0.4;
+          const maxHeight = isMobile
+            ? window.innerHeight * 0.6
+            : window.innerHeight * 0.7;
+
+          let targetWidth = dimensions.width;
+          let targetHeight = dimensions.height;
+
+          // Scale down if too large
+          if (targetWidth > maxWidth) {
+            targetHeight = (targetHeight * maxWidth) / targetWidth;
+            targetWidth = maxWidth;
+          }
+          if (targetHeight > maxHeight) {
+            targetWidth = (targetWidth * maxHeight) / targetHeight;
+            targetHeight = maxHeight;
+          }
+
+          // Minimum size
+          const minWidth = isMobile ? 200 : 250;
+          const minHeight = isMobile ? 150 : 180;
+          targetWidth = Math.max(minWidth, targetWidth);
+          targetHeight = Math.max(minHeight, targetHeight);
+
+          newSize = {
+            width: Math.round(targetWidth),
+            height: Math.round(targetHeight) + chromeHeight,
+          };
+          // Keep original position - no jumping
         }
 
         return {
           ...win,
           aspectRatio: newAspectRatio,
           size: newSize,
-          position: newPosition
-        }
+          position: newPosition,
+        };
       })
-    )
-  }
+    );
+  };
 
   const createWindow = (
     id: string,
@@ -248,43 +305,52 @@ export default function MacDesktop() {
     centered = false,
     customSize?: { width: number; height: number },
     customPosition?: { x: number; y: number },
-    preserveAspect = false
+    preserveAspect = false,
+    aspectRatio?: number
   ) => {
-    const isMobile = typeof window !== "undefined" && window.innerWidth < 768
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
     const defaultSize = customSize || {
       width: isMobile ? Math.min(350, window.innerWidth * 0.95) : 800,
       height: isMobile ? Math.min(500, window.innerHeight * 0.8) : 600,
-    }
+    };
 
-    let position = customPosition || { x: 10, y: 60 }
+    let position = customPosition || { x: 10, y: 60 };
 
     if (typeof window !== "undefined" && !customPosition) {
       if (centered || (isMobile && !customPosition)) {
         // El contenedor tiene border-[7px] a cada lado, más padding p-[3px] del padre
         // Total: 3px padding + 7px border = 10px a cada lado
-        const borderOffset = 10 * 2 // 20px total (10px cada lado)
-        const availableWidth = window.innerWidth - borderOffset
-        const centeredX = Math.max(0, (availableWidth - defaultSize.width) / 2)
+        const borderOffset = 10 * 2; // 20px total (10px cada lado)
+        const availableWidth = window.innerWidth - borderOffset;
+        const centeredX = Math.max(0, (availableWidth - defaultSize.width) / 2);
         position = {
           x: centeredX,
           y: Math.max(40, (window.innerHeight - defaultSize.height) / 2),
-        }
+        };
       } else {
         // En desktop no centrado, posición aleatoria para efecto cascada
         position = {
-          x: Math.floor(Math.random() * Math.max(0, window.innerWidth - defaultSize.width - 120) + 60),
-          y: Math.floor(Math.random() * Math.max(0, window.innerHeight - defaultSize.height - 160) + 80),
-        }
+          x: Math.floor(
+            Math.random() *
+              Math.max(0, window.innerWidth - defaultSize.width - 120) +
+              60
+          ),
+          y: Math.floor(
+            Math.random() *
+              Math.max(0, window.innerHeight - defaultSize.height - 160) +
+              80
+          ),
+        };
       }
     }
 
     // Incrementar Z-Index atómicamente usando Ref para evitar duplicados en actualizaciones rápidas
-    nextZIndexRef.current += 1
-    const newZIndex = nextZIndexRef.current
+    nextZIndexRef.current += 1;
+    const newZIndex = nextZIndexRef.current;
 
     // Sincronizar estado visual (opcional, pero útil para reactividad si algo depende de ello)
     // Usamos el callback form en el useEffect o aquí directamente pero sin depender del estado anterior
-    setNextZIndex(newZIndex)
+    setNextZIndex(newZIndex);
 
     const newWindow: WindowState = {
       id,
@@ -296,16 +362,22 @@ export default function MacDesktop() {
       size: defaultSize,
       zIndex: newZIndex,
       preserveAspect,
-    }
+      aspectRatio,
+    };
 
-    setWindows((prev) => [...prev, newWindow])
-  }
+    setWindows((prev) => [...prev, newWindow]);
+  };
 
-  const openCenteredWindow = (title: string, content: React.ReactNode, size?: { width: number; height: number }) => {
-    const windowId = `window-${Date.now()}-${Math.random()}`
-    createWindow(windowId, title, content, true, size)
-  }
+  const openCenteredWindow = (
+    title: string,
+    content: React.ReactNode,
+    size?: { width: number; height: number }
+  ) => {
+    const windowId = `window-${Date.now()}-${Math.random()}`;
+    createWindow(windowId, title, content, true, size);
+  };
 
+  // Función para crear una ventana de foto con su propia carga independiente
   // Función para crear una ventana de foto con su propia carga independiente
   const createPhotoWindow = (
     imagePath: string,
@@ -315,168 +387,149 @@ export default function MacDesktop() {
   ) => {
     // Verificar si ya está abierta
     if (openImagesRef.current.has(imagePath)) {
-      console.log(`Imagen ya abierta: ${imagePath}`)
-      return
+      console.log(`Imagen ya abierta: ${imagePath}`);
+      return;
     }
 
     // Marcar como abierta
-    openImagesRef.current.add(imagePath)
+    openImagesRef.current.add(imagePath);
 
-    const windowId = `photo-${Date.now()}-${index}`
+    const windowId = `photo-${Date.now()}-${index}`;
 
     // Guardar relación para limpiar al cerrar
-    windowToImageRef.current.set(windowId, imagePath)
+    windowToImageRef.current.set(windowId, imagePath);
 
-    const isMobile = typeof window !== "undefined" && window.innerWidth < 768
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
     // Determinar si esta foto será HD en móvil (primeras 4)
-    const willBeHighQuality = isMobile ? index < 4 : true
+    const willBeHighQuality = isMobile ? index < 4 : true;
+
+    // Constants for Window Chrome (Header + Borders)
+    const CHROME_HEIGHT = 32; // 28px header + 2px top + 2px bottom
+    const CHROME_WIDTH = 4; // 2px left + 2px right
 
     // Use dimensions from Firebase if available, otherwise calculate
-    let finalWidth: number
-    let finalHeight: number
+    let finalWidth: number;
+    let finalHeight: number;
+    let calculatedAspectRatio: number | undefined;
+
+    // Definir límites máximos estrictos reduzidos (45% de la pantalla en desktop)
+    const maxScreenW = typeof window !== "undefined" ? window.innerWidth : 1000;
+    const maxScreenH = typeof window !== "undefined" ? window.innerHeight : 800;
+
+    // El área disponible para el CONTENIDO (restando chrome)
+    const maxContentWidth = Math.min(
+      isMobile ? maxScreenW * 0.9 : maxScreenW * 0.45,
+      isMobile ? 320 : 600 // Cap absoluto reducido de 1200 a 600
+    );
+    const maxContentHeight = Math.min(
+      isMobile ? maxScreenH * 0.6 : maxScreenH * 0.6,
+      isMobile ? 450 : 600 // Cap absoluto reducido
+    );
 
     if (photoDimensions && photoDimensions.width && photoDimensions.height) {
       // Calculate scaled dimensions based on original aspect ratio
-      let width = photoDimensions.width
-      let height = photoDimensions.height
-      const aspectRatio = width / height
-      
-      // Detectar si es una foto vertical (más alta que ancha)
-      const isVertical = height > width
+      let width = photoDimensions.width;
+      let height = photoDimensions.height;
+      const aspectRatio = width / height;
+      calculatedAspectRatio = aspectRatio;
 
-      // Límites máximos basados en espacio real disponible
-      const chromeHeight = 28
-      const maxWidth = isMobile 
-        ? Math.min(window.innerWidth * 0.9, 320) 
-        : Math.min(window.innerWidth * 0.35, 400) // Desktop: 35% y 400px max
-      
-      // Para desktop: si es vertical, limitar más el alto para que siempre quepa
-      const maxHeight = isMobile 
-        ? Math.min(window.innerHeight * 0.6, 450) 
-        : (isVertical 
-            ? Math.min(window.innerHeight - chromeHeight - 30, 450) // Vertical: 450px max
-            : Math.min(window.innerHeight * 0.5, 380)) // Horizontal: 50% o 380px max
-
-      // Escalar para que quepa en los límites
-      if (width > maxWidth) {
-        height = maxWidth / aspectRatio
-        width = maxWidth
+      // Escalar si excede el ancho máximo
+      if (width > maxContentWidth) {
+        width = maxContentWidth;
+        height = width / aspectRatio;
       }
 
-      if (height > maxHeight) {
-        width = maxHeight * aspectRatio
-        height = maxHeight
+      // Escalar si (aún) excede el alto máximo
+      if (height > maxContentHeight) {
+        height = maxContentHeight;
+        width = height * aspectRatio;
       }
 
-      // Minimum size (pero sin exceder máximos)
-      const minWidth = Math.min(isMobile ? 250 : 300, maxWidth)
-      const minHeight = Math.min(isMobile ? 150 : 200, maxHeight)
-      
-      width = Math.max(minWidth, width)
-      height = Math.max(minHeight, height)
+      // Minimum size content constraints
+      const minContentWidth = isMobile ? 200 : 250;
+      const minContentHeight = isMobile ? 150 : 180;
 
-      // Verificar una vez más que no excede máximos después del mínimo
-      if (height > maxHeight) {
-        height = maxHeight
-        width = height * aspectRatio
+      // Ensure minimums (might break aspect slightly if image is tiny, but usability first)
+      // Actually better to scale up preserving aspect if too small
+      if (width < minContentWidth) {
+        width = minContentWidth;
+        height = width / aspectRatio; // h = w / ar
       }
-      if (width > maxWidth) {
-        width = maxWidth
-        height = width / aspectRatio
+      if (height < minContentHeight) {
+        height = minContentHeight;
+        width = height * aspectRatio; // w = h * ar
       }
 
-      finalWidth = Math.round(width)
-      finalHeight = Math.round(height) + chromeHeight
+      finalWidth = Math.round(width) + CHROME_WIDTH;
+      finalHeight = Math.round(height) + CHROME_HEIGHT;
     } else {
-      // Fallback to default sizes if no dimensions provided
-      finalWidth = isMobile ? 300 : 500
-      finalHeight = (isMobile ? 250 : 400) + 28
+      // Fallback sizes if no dimensions provided
+      // Intentar un 4:3 default razonable
+      const defaultW = isMobile ? 300 : 500;
+      const defaultH = isMobile ? 225 : 375;
+
+      finalWidth = defaultW + CHROME_WIDTH;
+      finalHeight = defaultH + CHROME_HEIGHT;
+      calculatedAspectRatio = defaultW / defaultH;
     }
 
     // Calculate position based on FINAL size to prevent jumping
-    let position = { x: 10, y: 40 }
+    let position = { x: 10, y: 40 };
     if (typeof window !== "undefined") {
+      // Límites donde puede empezar la ventana para no salirse
+      // X: 0 a (ScreenWidth - WindowWidth)
+      // Y: 0 a (ScreenHeight - WindowHeight)
+      const maxX = Math.max(0, maxScreenW - finalWidth);
+      const maxY = Math.max(0, maxScreenH - finalHeight);
+
       if (isMobile) {
-        // Márgenes mínimos
-        const margin = 5
-        const topMargin = 10
-        const bottomMargin = 10
-        
-        // Límites absolutos donde puede aparecer la ventana
-        const minX = margin
-        const maxPossibleX = window.innerWidth - finalWidth - margin
-        const minY = topMargin  
-        const maxPossibleY = window.innerHeight - finalHeight - bottomMargin
-        
-        // Si la foto no cabe, centrarla
-        if (maxPossibleX < minX || maxPossibleY < minY) {
+        // En móvil intentar centrar primero si no hay overlap excesivo
+        if (willBeHighQuality) {
+          // Random dentro de bounds seguros
           position = {
-            x: Math.max(0, Math.floor((window.innerWidth - finalWidth) / 2)),
-            y: Math.max(topMargin, Math.floor((window.innerHeight - finalHeight) / 2))
-          }
-        } else if (willBeHighQuality) {
-          // HD: Posición COMPLETAMENTE aleatoria por TODO el rectángulo de la pantalla
-          // Generar X aleatorio entre minX y maxPossibleX
-          const x = minX + Math.floor(Math.random() * (maxPossibleX - minX + 1))
-          // Generar Y aleatorio entre minY y maxPossibleY  
-          const y = minY + Math.floor(Math.random() * (maxPossibleY - minY + 1))
-          
-          position = { x, y }
+            x: Math.floor(Math.random() * maxX),
+            y: Math.floor(Math.random() * maxY),
+          };
         } else {
-          // Low quality: Más centradas para que queden tapadas
-          const centerX = (window.innerWidth - finalWidth) / 2
-          const centerY = (window.innerHeight - finalHeight) / 2
-          const rangeX = (maxPossibleX - minX) * 0.30
-          const rangeY = (maxPossibleY - minY) * 0.30
-          
-          const x = Math.floor(centerX + (Math.random() - 0.5) * rangeX)
-          const y = Math.floor(centerY + (Math.random() - 0.5) * rangeY)
-          
+          // Low quality centeredish
+          const centerX = maxX / 2;
+          const centerY = maxY / 2;
+          const variance = 20;
           position = {
-            x: Math.max(minX, Math.min(x, maxPossibleX)),
-            y: Math.max(minY, Math.min(y, maxPossibleY))
-          }
+            x: Math.max(
+              0,
+              Math.min(maxX, centerX + (Math.random() - 0.5) * variance)
+            ),
+            y: Math.max(
+              0,
+              Math.min(maxY, centerY + (Math.random() - 0.5) * variance)
+            ),
+          };
         }
       } else {
-        // Desktop: Posición aleatoria garantizando que SIEMPRE quede dentro de la pantalla
-        const maxX = window.innerWidth - finalWidth
-        const maxY = window.innerHeight - finalHeight
-        
-        // X siempre aleatorio
-        const x = maxX > 0 ? Math.floor(Math.random() * maxX) : 0
-        
-        // Y depende de si es una imagen vertical (alta)
-        let y = 0
-        if (maxY > 0) {
-          // Si la imagen ocupa más del 65% del alto de pantalla, posicionarla arriba
-          const heightRatio = finalHeight / window.innerHeight
-          
-          if (heightRatio > 0.65) {
-            // Imagen muy alta: posición en el rango superior (0 a 20% del maxY)
-            y = Math.floor(Math.random() * (maxY * 0.20))
-          } else {
-            // Imagen normal: posición completamente aleatoria
-            y = Math.floor(Math.random() * maxY)
-          }
-          
-          // Asegurar límites
-          y = Math.max(0, Math.min(y, maxY))
-        }
-        
-        position = { x, y }
+        // Desktop: Posición aleatoria COMPLETAMENTE SEGURA dentro de la pantalla
+        const x = Math.floor(Math.random() * maxX);
+        const y = Math.floor(Math.random() * maxY);
+
+        position = { x, y };
       }
     }
 
     // Desktop: usar imagen HD directa, Mobile: usar compresión wsrv.nl
     const displaySrc = isMobile
-      ? `https://wsrv.nl/?url=${encodeURIComponent(imagePath)}&w=200&q=30&output=webp`
-      : imagePath
+      ? `https://wsrv.nl/?url=${encodeURIComponent(
+          imagePath
+        )}&w=200&q=30&output=webp`
+      : imagePath;
 
-    // Callback cuando la imagen carga - solo actualiza dimensiones
+    // Callback cuando la imagen carga - YA NO REDIMENSIONAMOS si ya teníamos dimensiones
     const handlePhotoLoaded = (dims?: { width: number; height: number }) => {
-      handleImageLoad(windowId, dims)
-    }
+      // Solo redimensionar si era necesario (ej. no teníamos dimensiones iniciales)
+      if (!photoDimensions && dims) {
+        handleImageLoad(windowId, dims);
+      }
+    };
 
     const content = (
       <PhotoWindowContent
@@ -488,7 +541,7 @@ export default function MacDesktop() {
         isMaximized={false}
         onLoad={handlePhotoLoaded}
       />
-    )
+    );
 
     // Crear la ventana con tamaño y posición finales
     createWindow(
@@ -498,75 +551,105 @@ export default function MacDesktop() {
       false,
       { width: finalWidth, height: finalHeight },
       position,
-      true
-    )
-  }
+      true,
+      calculatedAspectRatio
+    );
+  };
 
   // Efecto cascada visual - abre ventanas con delay fijo para percepción fluida
-  const openVirusEffect = (photos: Array<{ url: string; width?: number; height?: number }>, projectName: string) => {
+  const openVirusEffect = (
+    photos: Array<{ url: string; width?: number; height?: number }>,
+    projectName: string
+  ) => {
     // Validar URLs
-    const validPhotos = photos.filter(p => typeof p.url === 'string' && p.url.trim() !== '')
+    const validPhotos = photos.filter(
+      (p) => typeof p.url === "string" && p.url.trim() !== ""
+    );
 
     // Filtrar las que ya están abiertas
-    const photosToOpen = validPhotos.filter(p => !openImagesRef.current.has(p.url))
+    const photosToOpen = validPhotos.filter(
+      (p) => !openImagesRef.current.has(p.url)
+    );
 
-    console.log(`🎬 Abriendo ${photosToOpen.length} imágenes para "${projectName}"`)
+    console.log(
+      `🎬 Abriendo ${photosToOpen.length} imágenes para "${projectName}"`
+    );
 
     if (photosToOpen.length === 0 && validPhotos.length > 0) {
-      console.log('Todas las imágenes ya están abiertas')
-      return
+      console.log("Todas las imágenes ya están abiertas");
+      return;
     }
 
     if (validPhotos.length === 0) {
       const content = (
         <div className="w-full h-full flex items-center justify-center p-6 bg-gray-100">
           <div className="text-center">
-            <h3 className="font-bold mb-4 text-black">No hay imágenes disponibles</h3>
-            <p className="text-gray-700">No se encontraron URLs válidas para este proyecto.</p>
-            <p className="text-gray-500 text-sm mt-2">Proyecto: {projectName}</p>
+            <h3 className="font-bold mb-4 text-black">
+              No hay imágenes disponibles
+            </h3>
+            <p className="text-gray-700">
+              No se encontraron URLs válidas para este proyecto.
+            </p>
+            <p className="text-gray-500 text-sm mt-2">
+              Proyecto: {projectName}
+            </p>
           </div>
         </div>
-      )
-      openCenteredWindow(`${projectName} - Sin imágenes`, content)
-      return
+      );
+      openCenteredWindow(`${projectName} - Sin imágenes`, content);
+      return;
     }
 
     // Delay entre cada ventana (ms) - más corto para apertura fluida
-    const isMobile = typeof window !== "undefined" && window.innerWidth < 768
-    const delayBetween = isMobile ? 150 : 120
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    const delayBetween = isMobile ? 150 : 120;
+
+    // En móvil: abrir primero las de baja calidad (índices 4+) y al final las HD (índices 0-3)
+    // para que las HD queden encima tapando las de baja calidad
+    const orderedPhotos =
+      isMobile && photosToOpen.length > 4
+        ? [...photosToOpen.slice(4), ...photosToOpen.slice(0, 4)] // Primero 4+, luego 0-3
+        : photosToOpen;
 
     // Abrir cada ventana con un delay fijo - las imágenes cargan en paralelo
-    photosToOpen.forEach((photo, index) => {
+    orderedPhotos.forEach((photo, displayIndex) => {
+      // Encontrar el índice original para determinar si es HD
+      const originalIndex = photosToOpen.indexOf(photo);
+
       setTimeout(() => {
-        console.log(`📷 Abriendo ventana ${index + 1}/${photosToOpen.length}`)
+        console.log(
+          `📷 Abriendo ventana ${displayIndex + 1}/${orderedPhotos.length}`
+        );
         createPhotoWindow(
           photo.url,
           projectName,
-          index,
-          photo.width && photo.height ? { width: photo.width, height: photo.height } : undefined
-        )
-      }, index * delayBetween)
-    })
-  }
+          originalIndex, // Usar índice original para determinar HD/baja calidad
+          photo.width && photo.height
+            ? { width: photo.width, height: photo.height }
+            : undefined
+        );
+      }, displayIndex * delayBetween);
+    });
+  };
 
   const handleMaximizeWindow = (id: string) => {
     setWindows((prev) =>
       prev.map((win) => {
-        if (win.id !== id) return win
+        if (win.id !== id) return win;
 
-        const newMaximized = !win.isMaximized
-        let newSize = win.size
-        let newPosition = win.position
+        const newMaximized = !win.isMaximized;
+        let newSize = win.size;
+        let newPosition = win.position;
         // Save original size only if we are maximizing and don't have it yet
-        const originalSize = win.originalSize || win.size
+        const originalSize = win.originalSize || win.size;
 
         if (newMaximized && win.aspectRatio) {
-          const layout = calculateMaximizedLayout(win.aspectRatio)
-          newSize = layout.size
-          newPosition = layout.position
+          const layout = calculateMaximizedLayout(win.aspectRatio);
+          newSize = layout.size;
+          newPosition = layout.position;
         } else if (!newMaximized && win.originalSize) {
           // Restore original size when un-maximizing
-          newSize = win.originalSize
+          newSize = win.originalSize;
           // Keep current position or maybe we should have saved original position too?
           // For now, let's just restore size and keep it somewhat centered or where it is.
         }
@@ -577,107 +660,127 @@ export default function MacDesktop() {
           size: newSize,
           position: newPosition,
           originalSize: originalSize,
-        }
+        };
       })
-    )
-  }
+    );
+  };
 
   const handleFolderClick = (folder: FileItem) => {
     // Buscar el proyecto en Firebase
-    const project = projects.find((p) => p.id === folder.id)
-    console.log("Proyecto seleccionado:", project)
+    const project = projects.find((p) => p.id === folder.id);
+    console.log("Proyecto seleccionado:", project);
 
     if (project && project.photos && project.photos.length > 0) {
       // Si es diseño, abrir en modo fullscreen con carrusel
-      if (project.category === 'design') {
-        const imageUrls = project.photos.map(p => p.url)
+      if (project.category === "design") {
+        const imageUrls = project.photos.map((p) => p.url);
         setDesignCarousel({
           images: imageUrls,
-          projectName: project.name
-        })
-        return
+          projectName: project.name,
+        });
+        return;
       }
 
       // Pasar objetos de foto con dimensiones si están disponibles
-      const photoData = project.photos.map(p => ({
+      const photoData = project.photos.map((p) => ({
         url: p.url,
         width: p.width,
-        height: p.height
-      }))
-      console.log("Fotos a abrir:", photoData)
+        height: p.height,
+      }));
+      console.log("Fotos a abrir:", photoData);
+
+      // Invertir el array para que las fotos se muestren en orden inverso
+      const reversedPhotoData = [...photoData].reverse();
 
       // Abrir efecto cascada con las fotos y sus dimensiones
-      openVirusEffect(
-        photoData,
-        project.name
-      )
+      openVirusEffect(reversedPhotoData, project.name);
     } else {
-      console.log("Proyecto sin fotos o no encontrado:", folder.name)
+      console.log("Proyecto sin fotos o no encontrado:", folder.name);
 
       // Mostrar una alerta si no hay fotos
-      const windowId = `error-${Date.now()}`
+      const windowId = `error-${Date.now()}`;
       const content = (
         <div className="w-full h-full flex items-center justify-center p-6 bg-gray-100">
           <div className="text-center">
-            <h3 className="font-bold mb-4 text-black">No hay contenido disponible</h3>
-            <p className="text-gray-700">No se encontraron fotos para este proyecto.</p>
+            <h3 className="font-bold mb-4 text-black">
+              No hay contenido disponible
+            </h3>
+            <p className="text-gray-700">
+              No se encontraron fotos para este proyecto.
+            </p>
             <p className="text-gray-500 text-sm mt-2">ID: {folder.id}</p>
           </div>
         </div>
-      )
-      openCenteredWindow(`${folder.name} - Sin contenido`, content)
+      );
+      openCenteredWindow(`${folder.name} - Sin contenido`, content);
     }
-  }
+  };
 
   const handleFileClick = (file: FileItem) => {
-    console.log("Archivo clickeado:", file.name)
-  }
+    console.log("Archivo clickeado:", file.name);
+  };
 
   const handleDesignFolderClick = () => {
     // Prevent duplicate windows
-    if (windows.some(w => w.title === "Explorador KIKU")) {
-      console.log("Design explorer already open")
-      return
+    if (windows.some((w) => w.title === "Explorador KIKU")) {
+      console.log("Design explorer already open");
+      return;
     }
-    const isMobile = typeof window !== "undefined" && window.innerWidth < 768
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
     // Configuramos el finder para mostrar específicamente la categoría de diseño
     const FinderWithDesignCategory = () => {
-      const [initialCategory] = useState<"design" | "photography" | "general" | "all">("design");
-      return <Finder onFileClick={handleFileClick} onFolderClick={handleFolderClick} initialCategory={initialCategory} />;
+      const [initialCategory] = useState<
+        "design" | "photography" | "general" | "all"
+      >("design");
+      return (
+        <Finder
+          onFileClick={handleFileClick}
+          onFolderClick={handleFolderClick}
+          initialCategory={initialCategory}
+        />
+      );
     };
 
     openCenteredWindow("Explorador KIKU ", <FinderWithDesignCategory />, {
       width: isMobile ? Math.min(window.innerWidth - 20, 350) : 900,
       height: isMobile ? Math.min(window.innerHeight - 100, 500) : 700,
-    })
-  }
+    });
+  };
 
   const handleVideoFolderClick = () => {
     // Prevent duplicate windows
-    if (windows.some(w => w.title === "Explorador KIKU")) {
-      console.log("Video explorer already open")
-      return
+    if (windows.some((w) => w.title === "Explorador KIKU")) {
+      console.log("Video explorer already open");
+      return;
     }
-    const isMobile = typeof window !== "undefined" && window.innerWidth < 768
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
     // Configuramos el finder para mostrar específicamente la categoría de video
     const FinderWithVideoCategory = () => {
-      const [initialCategory] = useState<"design" | "photography" | "video" | "general" | "all">("video");
-      return <Finder onFileClick={handleFileClick} onFolderClick={handleFolderClick} initialCategory={initialCategory} />;
+      const [initialCategory] = useState<
+        "design" | "photography" | "video" | "general" | "all"
+      >("video");
+      return (
+        <Finder
+          onFileClick={handleFileClick}
+          onFolderClick={handleFolderClick}
+          initialCategory={initialCategory}
+        />
+      );
     };
 
     openCenteredWindow("Explorador KIKU", <FinderWithVideoCategory />, {
       width: isMobile ? Math.min(window.innerWidth - 20, 350) : 900,
       height: isMobile ? Math.min(window.innerHeight - 100, 500) : 700,
-    })
-  }
+    });
+  };
 
   const handleContactFolderClick = () => {
     // Prevent duplicate windows
-    if (windows.some(w => w.title === "Contacto")) {
-      console.log("Contact window already open")
-      return
+    if (windows.some((w) => w.title === "Contacto")) {
+      console.log("Contact window already open");
+      return;
     }
-    const isMobile = typeof window !== "undefined" && window.innerWidth < 768
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
     const contactContent = (
       <div className="p-4 md:p-6 bg-[#c0c0c0] h-full font-sans overflow-hidden">
         <div className="mx-auto h-full overflow-y-auto">
@@ -685,29 +788,46 @@ export default function MacDesktop() {
             📧 Contact Form
           </div>
 
-          <form className="space-y-2" onSubmit={(e) => {
-            e.preventDefault()
-            const formData = new FormData(e.currentTarget)
-            const from = formData.get('from')
-            const email = formData.get('email')
-            const message = formData.get('message')
+          <form
+            className="space-y-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const from = formData.get("from");
+              const email = formData.get("email");
+              const message = formData.get("message");
 
-            // Crear mailto link
-            const subject = `Message from ${from}`
-            const body = `From: ${from}\nEmail: ${email}\n\nMessage:\n${message}`
-            window.location.href = `mailto:kiku.creamm@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-          }}>
+              // Crear mailto link
+              const subject = `Message from ${from}`;
+              const body = `From: ${from}\nEmail: ${email}\n\nMessage:\n${message}`;
+              window.location.href = `mailto:kiku.creamm@gmail.com?subject=${encodeURIComponent(
+                subject
+              )}&body=${encodeURIComponent(body)}`;
+            }}
+          >
             {/* Sending to */}
-            <div className="bg-white border-2 border-[#808080] p-2" style={{ borderStyle: "inset" }}>
-              <label className="block text-xs font-bold mb-1 text-black">Sending to:</label>
+            <div
+              className="bg-white border-2 border-[#808080] p-2"
+              style={{ borderStyle: "inset" }}
+            >
+              <label className="block text-xs font-bold mb-1 text-black">
+                Sending to:
+              </label>
               <div className="bg-[#fff] border border-[#000] px-2 py-1">
-                <span className="text-sm text-black font-mono">kiku.creamm@gmail.com</span>
+                <span className="text-sm text-black font-mono">
+                  kiku.creamm@gmail.com
+                </span>
               </div>
             </div>
 
             {/* From */}
-            <div className="bg-white border-2 border-[#808080] p-2" style={{ borderStyle: "inset" }}>
-              <label className="block text-xs font-bold mb-1 text-black">From:</label>
+            <div
+              className="bg-white border-2 border-[#808080] p-2"
+              style={{ borderStyle: "inset" }}
+            >
+              <label className="block text-xs font-bold mb-1 text-black">
+                From:
+              </label>
               <input
                 type="text"
                 name="from"
@@ -719,8 +839,13 @@ export default function MacDesktop() {
             </div>
 
             {/* Email */}
-            <div className="bg-white border-2 border-[#808080] p-3" style={{ borderStyle: "inset" }}>
-              <label className="block text-xs font-bold mb-1 text-black">Email:</label>
+            <div
+              className="bg-white border-2 border-[#808080] p-3"
+              style={{ borderStyle: "inset" }}
+            >
+              <label className="block text-xs font-bold mb-1 text-black">
+                Email:
+              </label>
               <input
                 type="email"
                 name="email"
@@ -732,8 +857,13 @@ export default function MacDesktop() {
             </div>
 
             {/* Message */}
-            <div className="bg-white border-2 border-[#808080] p-2" style={{ borderStyle: "inset" }}>
-              <label className="block text-xs font-bold mb-1 text-black">Message:</label>
+            <div
+              className="bg-white border-2 border-[#808080] p-2"
+              style={{ borderStyle: "inset" }}
+            >
+              <label className="block text-xs font-bold mb-1 text-black">
+                Message:
+              </label>
               <textarea
                 name="message"
                 required
@@ -765,34 +895,34 @@ export default function MacDesktop() {
           </form>
         </div>
       </div>
-    )
+    );
     openCenteredWindow("Contacto", contactContent, {
       width: isMobile ? Math.min(window.innerWidth * 0.85, 320) : 600,
       height: isMobile ? Math.min(window.innerHeight * 0.7, 500) : 650,
-    })
-  }
+    });
+  };
 
   const handleDrawingAppOpen = () => {
     // Prevent duplicate windows
-    if (windows.some(w => w.title === "KIKU Paint")) {
-      console.log("Drawing app already open")
-      return
+    if (windows.some((w) => w.title === "KIKU Paint")) {
+      console.log("Drawing app already open");
+      return;
     }
-    const isMobile = typeof window !== "undefined" && window.innerWidth < 768
-    const drawingContent = <DrawingApp />
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    const drawingContent = <DrawingApp />;
     openCenteredWindow("KIKU Paint", drawingContent, {
       width: isMobile ? Math.min(window.innerWidth * 0.85, 320) : 1000,
       height: isMobile ? Math.min(window.innerHeight * 0.65, 450) : 700,
-    })
-  }
+    });
+  };
 
   const handleAboutClick = () => {
     // Prevent duplicate windows
-    if (windows.some(w => w.title === "About")) {
-      console.log("About window already open")
-      return
+    if (windows.some((w) => w.title === "About")) {
+      console.log("About window already open");
+      return;
     }
-    const isMobile = typeof window !== "undefined" && window.innerWidth < 768
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
     const aboutTexts = {
       es: `Kiku Cream es un estudio creativo multidisciplinario fundado en 2023. Su nombre proviene de la palabra japonesa kiku (菊), que significa crisantemo —una flor asociada con el sol y adoptada como emblema de la familia imperial japonesa. Simboliza poder, luz y fortaleza, pero también evoca la idea de la belleza en transición: aquella que cambia, se transforma, envejece, se quiebra y, a veces, se desvanece. En Kiku Cream no buscamos la belleza clásica; perseguimos una estética transparente, honesta, cruda y emocional.
@@ -815,42 +945,44 @@ Kiku incarna l'essenza del nostro approccio creativo: un linguaggio visivo guida
 
 Offriamo servizi di direzione creativa e produzione integrale, oltre a design grafico, fotografia, editing e correzione del colore. Ogni progetto è affrontato con una mentalità trasversale, combinando concetto e forma per creare opere visive che comunichino, sfidino e trasformino.
 
-Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano un'identità visiva solida, coerente e con uno scopo preciso. Se il tuo progetto richiede una direzione creativa con intenzione e presenza, siamo pronti a costruirla insieme.`
-    }
+Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano un'identità visiva solida, coerente e con uno scopo preciso. Se il tuo progetto richiede una direzione creativa con intenzione e presenza, siamo pronti a costruirla insieme.`,
+    };
 
     const AboutTerminal = () => {
-      const [selectedLang, setSelectedLang] = useState<'es' | 'en' | 'it'>('es')
-      const [displayedText, setDisplayedText] = useState('')
-      const [isTyping, setIsTyping] = useState(false)
-      const [showCursor, setShowCursor] = useState(true)
+      const [selectedLang, setSelectedLang] = useState<"es" | "en" | "it">(
+        "es"
+      );
+      const [displayedText, setDisplayedText] = useState("");
+      const [isTyping, setIsTyping] = useState(false);
+      const [showCursor, setShowCursor] = useState(true);
 
       useEffect(() => {
         // Cursor parpadeante
         const cursorInterval = setInterval(() => {
-          setShowCursor(prev => !prev)
-        }, 530)
-        return () => clearInterval(cursorInterval)
-      }, [])
+          setShowCursor((prev) => !prev);
+        }, 530);
+        return () => clearInterval(cursorInterval);
+      }, []);
 
       useEffect(() => {
         // Efecto de escritura
-        setIsTyping(true)
-        setDisplayedText('')
-        const text = aboutTexts[selectedLang]
-        let currentIndex = 0
+        setIsTyping(true);
+        setDisplayedText("");
+        const text = aboutTexts[selectedLang];
+        let currentIndex = 0;
 
         const typingInterval = setInterval(() => {
           if (currentIndex < text.length) {
-            setDisplayedText(text.substring(0, currentIndex + 1))
-            currentIndex++
+            setDisplayedText(text.substring(0, currentIndex + 1));
+            currentIndex++;
           } else {
-            setIsTyping(false)
-            clearInterval(typingInterval)
+            setIsTyping(false);
+            clearInterval(typingInterval);
           }
-        }, 15) // Velocidad de escritura (15ms por carácter = relativamente rápido)
+        }, 15); // Velocidad de escritura (15ms por carácter = relativamente rápido)
 
-        return () => clearInterval(typingInterval)
-      }, [selectedLang])
+        return () => clearInterval(typingInterval);
+      }, [selectedLang]);
 
       return (
         <div className="h-full bg-black p-4 font-mono text-sm overflow-hidden flex flex-col">
@@ -859,20 +991,32 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
             <span>C:\KIKU\about.exe</span>
             <div className="flex gap-2">
               <button
-                onClick={() => setSelectedLang('es')}
-                className={`px-2 py-0.5 ${selectedLang === 'es' ? 'bg-[#000080] text-white' : 'bg-gray-300'}`}
+                onClick={() => setSelectedLang("es")}
+                className={`px-2 py-0.5 ${
+                  selectedLang === "es"
+                    ? "bg-[#000080] text-white"
+                    : "bg-gray-300"
+                }`}
               >
                 ES
               </button>
               <button
-                onClick={() => setSelectedLang('en')}
-                className={`px-2 py-0.5 ${selectedLang === 'en' ? 'bg-[#000080] text-white' : 'bg-gray-300'}`}
+                onClick={() => setSelectedLang("en")}
+                className={`px-2 py-0.5 ${
+                  selectedLang === "en"
+                    ? "bg-[#000080] text-white"
+                    : "bg-gray-300"
+                }`}
               >
                 EN
               </button>
               <button
-                onClick={() => setSelectedLang('it')}
-                className={`px-2 py-0.5 ${selectedLang === 'it' ? 'bg-[#000080] text-white' : 'bg-gray-300'}`}
+                onClick={() => setSelectedLang("it")}
+                className={`px-2 py-0.5 ${
+                  selectedLang === "it"
+                    ? "bg-[#000080] text-white"
+                    : "bg-gray-300"
+                }`}
               >
                 IT
               </button>
@@ -882,54 +1026,57 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
           {/* Terminal content */}
           <div className="flex-1 overflow-y-auto">
             <div className="text-white mb-2">
-              <span className="text-yellow-400">kiku@cream:~$</span> cat about.txt
+              <span className="text-yellow-400">kiku@cream:~$</span> cat
+              about.txt
             </div>
             <div className="text-white whitespace-pre-wrap leading-relaxed">
               {displayedText}
-              {isTyping && showCursor && <span className="bg-white text-black">_</span>}
+              {isTyping && showCursor && (
+                <span className="bg-white text-black">_</span>
+              )}
               {!isTyping && showCursor && <span className="text-white">█</span>}
             </div>
           </div>
 
           {/* Footer */}
           <div className="text-gray-500 text-xs mt-2 border-t border-gray-700 pt-2">
-            {isTyping ? '⌨️  Typing...' : '✓ Complete'}
+            {isTyping ? "⌨️  Typing..." : "✓ Complete"}
           </div>
         </div>
-      )
-    }
+      );
+    };
 
-    const aboutContent = <AboutTerminal />
+    const aboutContent = <AboutTerminal />;
     openCenteredWindow("About", aboutContent, {
       width: isMobile ? Math.min(window.innerWidth * 0.85, 320) : 700,
       height: isMobile ? Math.min(window.innerHeight * 0.7, 500) : 600,
-    })
-    setIsMenuOpen(false)
-  }
+    });
+    setIsMenuOpen(false);
+  };
 
   const handleShopClick = () => {
     // Prevent duplicate windows
-    if (windows.some(w => w.title === "Shop")) {
-      console.log("Shop window already open")
-      return
+    if (windows.some((w) => w.title === "Shop")) {
+      console.log("Shop window already open");
+      return;
     }
-    const isMobile = typeof window !== "undefined" && window.innerWidth < 768
-    const shopContent = <ShopGrid products={products} />
-    
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    const shopContent = <ShopGrid products={products} />;
+
     openCenteredWindow("Shop", shopContent, {
       width: isMobile ? Math.min(window.innerWidth * 0.85, 320) : 900,
       height: isMobile ? Math.min(window.innerHeight * 0.7, 500) : 700,
-    })
-    setIsMenuOpen(false)
-  }
+    });
+    setIsMenuOpen(false);
+  };
 
   const handleJoinClick = () => {
     // Prevent duplicate windows
-    if (windows.some(w => w.title === "Únete a Nosotros")) {
-      console.log("Join window already open")
-      return
+    if (windows.some((w) => w.title === "Únete a Nosotros")) {
+      console.log("Join window already open");
+      return;
     }
-    const isMobile = typeof window !== "undefined" && window.innerWidth < 768
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
     const joinTexts = {
       es: {
@@ -938,7 +1085,7 @@ Collaboriamo con marchi, progetti artistici e piattaforme editoriali che cercano
 
 En Kiku Cream estamos formando un equipo inicial y buscamos personas con visión, ganas de crecer y que disfruten del trabajo en equipo.
 
-Si quieres sumarte al equipo creativo, contáctanos :)`
+Si quieres sumarte al equipo creativo, contáctanos :)`,
       },
       en: {
         title: "Join the team!",
@@ -946,7 +1093,7 @@ Si quieres sumarte al equipo creativo, contáctanos :)`
 
 At Kiku Cream, we are forming an initial team and looking for people with vision, a desire to grow, and who enjoy working in a team.
 
-If you want to join the creative team, contact us :)`
+If you want to join the creative team, contact us :)`,
       },
       it: {
         title: "Unisciti al team!",
@@ -954,12 +1101,14 @@ If you want to join the creative team, contact us :)`
 
 In Kiku Cream stiamo formando il team iniziale e cerchiamo persone con visione, voglia di crescere e che amino lavorare in team.
 
-Se vuoi unirti al team creativo, contattaci :)`
-      }
-    }
+Se vuoi unirti al team creativo, contattaci :)`,
+      },
+    };
 
     const JoinContent = () => {
-      const [selectedLang, setSelectedLang] = useState<'es' | 'en' | 'it'>('es')
+      const [selectedLang, setSelectedLang] = useState<"es" | "en" | "it">(
+        "es"
+      );
 
       return (
         <div className="p-6 md:p-8 bg-[#c0c0c0] h-full overflow-y-auto font-sans">
@@ -971,22 +1120,34 @@ Se vuoi unirti al team creativo, contattaci :)`
               </div>
               <div className="flex gap-1">
                 <button
-                  onClick={() => setSelectedLang('es')}
-                  className={`px-3 py-1 text-xs font-bold border-2 ${selectedLang === 'es' ? 'bg-[#000080] text-white border-[#000080]' : 'bg-white text-black border-[#808080]'}`}
+                  onClick={() => setSelectedLang("es")}
+                  className={`px-3 py-1 text-xs font-bold border-2 ${
+                    selectedLang === "es"
+                      ? "bg-[#000080] text-white border-[#000080]"
+                      : "bg-white text-black border-[#808080]"
+                  }`}
                   style={{ borderStyle: "outset" }}
                 >
                   ES
                 </button>
                 <button
-                  onClick={() => setSelectedLang('en')}
-                  className={`px-3 py-1 text-xs font-bold border-2 ${selectedLang === 'en' ? 'bg-[#000080] text-white border-[#000080]' : 'bg-white text-black border-[#808080]'}`}
+                  onClick={() => setSelectedLang("en")}
+                  className={`px-3 py-1 text-xs font-bold border-2 ${
+                    selectedLang === "en"
+                      ? "bg-[#000080] text-white border-[#000080]"
+                      : "bg-white text-black border-[#808080]"
+                  }`}
                   style={{ borderStyle: "outset" }}
                 >
                   EN
                 </button>
                 <button
-                  onClick={() => setSelectedLang('it')}
-                  className={`px-3 py-1 text-xs font-bold border-2 ${selectedLang === 'it' ? 'bg-[#000080] text-white border-[#000080]' : 'bg-white text-black border-[#808080]'}`}
+                  onClick={() => setSelectedLang("it")}
+                  className={`px-3 py-1 text-xs font-bold border-2 ${
+                    selectedLang === "it"
+                      ? "bg-[#000080] text-white border-[#000080]"
+                      : "bg-white text-black border-[#808080]"
+                  }`}
                   style={{ borderStyle: "outset" }}
                 >
                   IT
@@ -995,64 +1156,87 @@ Se vuoi unirti al team creativo, contattaci :)`
             </div>
 
             {/* Contenido */}
-            <div className="bg-white border-2 border-[#808080] p-6 " style={{ borderStyle: "inset" }}>
+            <div
+              className="bg-white border-2 border-[#808080] p-6 "
+              style={{ borderStyle: "inset" }}
+            >
               <p className="text-black whitespace-pre-wrap leading-relaxed text-sm">
                 {joinTexts[selectedLang].content}
               </p>
             </div>
 
             {/* Footer con botón de contacto */}
-            <div className="mt-4 bg-[#dfdfdf] border-2 border-[#808080] p-4 w-full " style={{ borderStyle: "groove" }}>
+            <div
+              className="mt-4 bg-[#dfdfdf] border-2 border-[#808080] p-4 w-full "
+              style={{ borderStyle: "groove" }}
+            >
               <p className="text-black font-bold text-sm mb-2">Contacto:</p>
               <p className="text-xs text-gray-700">Instagram: @kiku.cream</p>
-              <p className="text-xs text-gray-700">Email: kiku.creamm@gmail.com</p>
+              <p className="text-xs text-gray-700">
+                Email: kiku.creamm@gmail.com
+              </p>
             </div>
           </div>
         </div>
-      )
-    }
+      );
+    };
 
-    const joinContent = <JoinContent />
+    const joinContent = <JoinContent />;
     openCenteredWindow("Únete a Nosotros", joinContent, {
       width: isMobile ? Math.min(window.innerWidth * 0.85, 320) : 550,
       height: isMobile ? Math.min(window.innerHeight * 0.7, 500) : 520,
-    })
-    setIsMenuOpen(false)
-  }
+    });
+    setIsMenuOpen(false);
+  };
 
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen)
-  }
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   const updateWindow = (id: string, updates: Partial<WindowState>) => {
-    setWindows((prev) => prev.map((window) => (window.id === id ? { ...window, ...updates } : window)))
-  }
+    setWindows((prev) =>
+      prev.map((window) =>
+        window.id === id ? { ...window, ...updates } : window
+      )
+    );
+  };
 
   const closeWindow = (id: string) => {
     // Limpiar el tracking de imagen usando el mapa
-    const imagePath = windowToImageRef.current.get(id)
+    const imagePath = windowToImageRef.current.get(id);
     if (imagePath) {
-      openImagesRef.current.delete(imagePath)
-      windowToImageRef.current.delete(id)
+      openImagesRef.current.delete(imagePath);
+      windowToImageRef.current.delete(id);
     }
-    setWindows((prev) => prev.filter((window) => window.id !== id))
-  }
+    setWindows((prev) => prev.filter((window) => window.id !== id));
+  };
 
   const bringToFront = (id: string) => {
-    nextZIndexRef.current += 1
-    const newZIndex = nextZIndexRef.current
+    nextZIndexRef.current += 1;
+    const newZIndex = nextZIndexRef.current;
 
-    setWindows((prev) => prev.map((window) => (window.id === id ? { ...window, zIndex: newZIndex } : window)))
-    setNextZIndex(newZIndex)
-  }
+    setWindows((prev) =>
+      prev.map((window) =>
+        window.id === id ? { ...window, zIndex: newZIndex } : window
+      )
+    );
+    setNextZIndex(newZIndex);
+  };
 
   // Desktop: Todas las fotos en HD. Mobile: Solo las top 2 por z-index
-  const photoWindows = windows.filter(w => w.id && w.id.startsWith('photo-') && !w.isMinimized)
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768
+  const photoWindows = windows.filter(
+    (w) => w.id && w.id.startsWith("photo-") && !w.isMinimized
+  );
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   const top3PhotoIds = isMobile
-    ? new Set(photoWindows.sort((a, b) => b.zIndex - a.zIndex).slice(0, 4).map(w => w.id))
-    : new Set(photoWindows.map(w => w.id)) // Desktop: todas HD
+    ? new Set(
+        photoWindows
+          .sort((a, b) => b.zIndex - a.zIndex)
+          .slice(0, 4)
+          .map((w) => w.id)
+      )
+    : new Set(photoWindows.map((w) => w.id)); // Desktop: todas HD
 
   return (
     <div className="h-screen w-full bg-white p-[3px] box-border overflow-hidden">
@@ -1130,41 +1314,54 @@ Se vuoi unirti al team creativo, contattaci :)`
                     onClick={handleAboutClick}
                     className="w-full text-left py-3 px-4 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group border border-transparent hover:border-black"
                   >
-                    <span className="text-white group-hover:text-black text-xl transition-colors">▶</span>
+                    <span className="text-white group-hover:text-black text-xl transition-colors">
+                      ▶
+                    </span>
                     <span>About</span>
                   </button>
                   <button
                     onClick={() => {
-                      handleContactFolderClick()
-                      setIsMenuOpen(false)
+                      handleContactFolderClick();
+                      setIsMenuOpen(false);
                     }}
                     className="w-full text-left py-3 px-4 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group border border-transparent hover:border-black"
                   >
-                    <span className="text-white group-hover:text-black text-xl transition-colors">▶</span>
+                    <span className="text-white group-hover:text-black text-xl transition-colors">
+                      ▶
+                    </span>
                     <span>Contacto</span>
                   </button>
                   <button
                     onClick={() => {
-                      window.open('https://www.instagram.com/kiku.cream/', '_blank')
-                      setIsMenuOpen(false)
+                      window.open(
+                        "https://www.instagram.com/kiku.cream/",
+                        "_blank"
+                      );
+                      setIsMenuOpen(false);
                     }}
                     className="w-full text-left py-3 px-4 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group border border-transparent hover:border-black"
                   >
-                    <span className="text-white group-hover:text-black text-xl transition-colors">▶</span>
+                    <span className="text-white group-hover:text-black text-xl transition-colors">
+                      ▶
+                    </span>
                     <span>Instagram</span>
                   </button>
                   <button
                     onClick={handleShopClick}
                     className="w-full text-left py-3 px-4 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group border border-transparent hover:border-black"
                   >
-                    <span className="text-white group-hover:text-black text-xl transition-colors">▶</span>
+                    <span className="text-white group-hover:text-black text-xl transition-colors">
+                      ▶
+                    </span>
                     <span>Shop</span>
                   </button>
                   <button
                     onClick={handleJoinClick}
                     className="w-full text-left py-3 px-4 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-lg tracking-tight flex items-center gap-3 group border border-transparent hover:border-black"
                   >
-                    <span className="text-white group-hover:text-black text-xl transition-colors">▶</span>
+                    <span className="text-white group-hover:text-black text-xl transition-colors">
+                      ▶
+                    </span>
                     <span>Únete a Nosotros</span>
                   </button>
                 </div>
@@ -1197,31 +1394,46 @@ Se vuoi unirti al team creativo, contattaci :)`
                     onClick={handleAboutClick}
                     className="w-full text-left py-2 px-2 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-sm tracking-tight flex items-center gap-2 group border border-transparent hover:border-black"
                   >
-                    <svg className="w-4 h-4 text-white group-hover:text-black transition-colors flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                    <svg
+                      className="w-4 h-4 text-white group-hover:text-black transition-colors flex-shrink-0"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
                       <path d="M7 4l10 8-10 8z" />
                     </svg>
                     <span>About</span>
                   </button>
                   <button
                     onClick={() => {
-                      handleContactFolderClick()
-                      setIsMenuOpen(false)
+                      handleContactFolderClick();
+                      setIsMenuOpen(false);
                     }}
                     className="w-full text-left py-2 px-2 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-sm tracking-tight flex items-center gap-2 group border border-transparent hover:border-black"
                   >
-                    <svg className="w-4 h-4 text-white group-hover:text-black transition-colors flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                    <svg
+                      className="w-4 h-4 text-white group-hover:text-black transition-colors flex-shrink-0"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
                       <path d="M7 4l10 8-10 8z" />
                     </svg>
                     <span>Contacto</span>
                   </button>
                   <button
                     onClick={() => {
-                      window.open('https://www.instagram.com/kiku.cream/', '_blank')
-                      setIsMenuOpen(false)
+                      window.open(
+                        "https://www.instagram.com/kiku.cream/",
+                        "_blank"
+                      );
+                      setIsMenuOpen(false);
                     }}
                     className="w-full text-left py-2 px-2 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-sm tracking-tight flex items-center gap-2 group border border-transparent hover:border-black"
                   >
-                    <svg className="w-4 h-4 text-white group-hover:text-black transition-colors flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                    <svg
+                      className="w-4 h-4 text-white group-hover:text-black transition-colors flex-shrink-0"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
                       <path d="M7 4l10 8-10 8z" />
                     </svg>
                     <span>Instagram</span>
@@ -1230,7 +1442,11 @@ Se vuoi unirti al team creativo, contattaci :)`
                     onClick={handleShopClick}
                     className="w-full text-left py-2 px-2 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-sm tracking-tight flex items-center gap-2 group border border-transparent hover:border-black"
                   >
-                    <svg className="w-4 h-4 text-white group-hover:text-black transition-colors flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                    <svg
+                      className="w-4 h-4 text-white group-hover:text-black transition-colors flex-shrink-0"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
                       <path d="M7 4l10 8-10 8z" />
                     </svg>
                     <span>Shop</span>
@@ -1239,7 +1455,11 @@ Se vuoi unirti al team creativo, contattaci :)`
                     onClick={handleJoinClick}
                     className="w-full text-left py-2 px-2 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-xl font-black text-sm tracking-tight flex items-center gap-2 group border border-transparent hover:border-black"
                   >
-                    <svg className="w-4 h-4 text-white group-hover:text-black transition-colors flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                    <svg
+                      className="w-4 h-4 text-white group-hover:text-black transition-colors flex-shrink-0"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
                       <path d="M7 4l10 8-10 8z" />
                     </svg>
                     <span>Únete a Nosotros</span>
@@ -1278,28 +1498,34 @@ Se vuoi unirti al team creativo, contattaci :)`
           />
         </div>
         {/* Papelera Móvil - Centrada abajo, solo si hay ventanas y no son Contact o Drawing */}
-        {windows.length > 0 && !windows.some(w => w.title === "Contacto" || w.title === "KIKU Paint" || w.title === "Únete a Nosotros" || w.title === "About") && (
-          <div
-            className="md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-[9999] cursor-pointer"
-            onClick={(e) => {
-              e.stopPropagation()
-              e.preventDefault()
-              resetDesktop()
-            }}
-          >
-            <Image
-              src="/escritorio-celu/basura.svg"
-              alt="Papelera"
-              width={50}
-              height={50}
-              className="w-[40px] h-auto object-contain hover:scale-105 transition-transform"
-            />
-          </div>
-        )}
+        {windows.length > 0 &&
+          !windows.some(
+            (w) =>
+              w.title === "Contacto" ||
+              w.title === "KIKU Paint" ||
+              w.title === "Únete a Nosotros" ||
+              w.title === "About"
+          ) && (
+            <div
+              className="md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-[9999] cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                resetDesktop();
+              }}
+            >
+              <Image
+                src="/escritorio-celu/basura.svg"
+                alt="Papelera"
+                width={50}
+                height={50}
+                className="w-[40px] h-auto object-contain hover:scale-105 transition-transform"
+              />
+            </div>
+          )}
 
         {/* Container móvil con nubes.svg y botones - nubes SVG arriba en el DOM */}
         <div className="md:hidden absolute -bottom-1 right-1 flex flex-col items-end gap-0 pointer-events-none">
-
           <Image
             src="/escritorio-celu/nubes.svg"
             alt="Fondo nubes móvil"
@@ -1335,11 +1561,15 @@ Se vuoi unirti al team creativo, contattaci :)`
         </div>
 
         {/* Nubes interactivas (desktop y mobile) */}
-        <div className="flex-1 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 lg:gap-16 p-0 md:p-8 h-full overflow-hidden relative z-[150]">
+        <div
+          ref={containerRef}
+          className="flex-1 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 lg:gap-16 p-0 md:p-8 h-full overflow-hidden relative z-[150]"
+        >
           {/* ...existing code for interactive nubes (motion.divs)... */}
           <motion.div
             className="absolute cursor-pointer group nube-pos-1"
             drag
+            dragConstraints={containerRef}
             dragElastic={0.1}
             dragMomentum={false}
             dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
@@ -1360,10 +1590,14 @@ Se vuoi unirti al team creativo, contattaci :)`
           >
             <motion.div
               initial={{ y: 0, rotate: 0 }}
-              animate={!isDragging ? {
-                y: [0, -8, -12, -8, 0],
-                rotate: [0, 2, 0, -2, 0],
-              } : {}}
+              animate={
+                !isDragging
+                  ? {
+                      y: [0, -8, -12, -8, 0],
+                      rotate: [0, 2, 0, -2, 0],
+                    }
+                  : {}
+              }
               transition={{
                 duration: 4,
                 repeat: Infinity,
@@ -1394,6 +1628,7 @@ Se vuoi unirti al team creativo, contattaci :)`
           <motion.div
             className="absolute cursor-pointer group nube-pos-2"
             drag
+            dragConstraints={containerRef}
             dragElastic={0.1}
             dragMomentum={false}
             dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
@@ -1404,26 +1639,45 @@ Se vuoi unirti al team creativo, contattaci :)`
             onClick={() => {
               if (!isDragging) {
                 // Open photography file explorer
-                if (windows.some(w => w.title === "Explorador KIKU")) {
-                  return
+                if (windows.some((w) => w.title === "Explorador KIKU")) {
+                  return;
                 }
-                const isMobile = typeof window !== "undefined" && window.innerWidth < 768
+                const isMobile =
+                  typeof window !== "undefined" && window.innerWidth < 768;
                 const FinderWithPhotoCategory = () => {
-                  return <Finder onFileClick={handleFileClick} onFolderClick={handleFolderClick} initialCategory="photography" />;
+                  return (
+                    <Finder
+                      onFileClick={handleFileClick}
+                      onFolderClick={handleFolderClick}
+                      initialCategory="photography"
+                    />
+                  );
                 };
-                openCenteredWindow("Explorador KIKU - Fotografía", <FinderWithPhotoCategory />, {
-                  width: isMobile ? Math.min(window.innerWidth - 20, 350) : 900,
-                  height: isMobile ? Math.min(window.innerHeight - 100, 500) : 700,
-                })
+                openCenteredWindow(
+                  "Explorador KIKU - Fotografía",
+                  <FinderWithPhotoCategory />,
+                  {
+                    width: isMobile
+                      ? Math.min(window.innerWidth - 20, 350)
+                      : 900,
+                    height: isMobile
+                      ? Math.min(window.innerHeight - 100, 500)
+                      : 700,
+                  }
+                );
               }
             }}
           >
             <motion.div
               initial={{ y: 0, rotate: 0 }}
-              animate={!isDragging ? {
-                y: [0, -10, -15, -10, 0],
-                rotate: [0, -2, 0, 2, 0],
-              } : {}}
+              animate={
+                !isDragging
+                  ? {
+                      y: [0, -10, -15, -10, 0],
+                      rotate: [0, -2, 0, 2, 0],
+                    }
+                  : {}
+              }
               transition={{
                 duration: 5,
                 repeat: Infinity,
@@ -1454,6 +1708,7 @@ Se vuoi unirti al team creativo, contattaci :)`
           <motion.div
             className="absolute cursor-pointer group nube-pos-3 z-[200]"
             drag
+            dragConstraints={containerRef}
             dragElastic={0.1}
             dragMomentum={false}
             dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
@@ -1473,10 +1728,14 @@ Se vuoi unirti al team creativo, contattaci :)`
           >
             <motion.div
               initial={{ y: 0, rotate: 0 }}
-              animate={!isDragging ? {
-                y: [0, -10, -14, -8, 0],
-                rotate: [0, -2, 0, 2, 0],
-              } : {}}
+              animate={
+                !isDragging
+                  ? {
+                      y: [0, -10, -14, -8, 0],
+                      rotate: [0, -2, 0, 2, 0],
+                    }
+                  : {}
+              }
               transition={{
                 duration: 4.5,
                 repeat: Infinity,
@@ -1509,10 +1768,10 @@ Se vuoi unirti al team creativo, contattaci :)`
         <div
           className="hidden md:block absolute bottom-4 right-4 z-[9999] cursor-pointer group"
           onClick={(e) => {
-            e.stopPropagation()
-            e.preventDefault()
+            e.stopPropagation();
+            e.preventDefault();
             // Cerrar todas las ventanas
-            resetDesktop()
+            resetDesktop();
           }}
         >
           <Image
@@ -1528,18 +1787,22 @@ Se vuoi unirti al team creativo, contattaci :)`
         <AnimatePresence>
           {windows.map((win) => {
             // Determinar si esta ventana debe ser HD
-            const isPhoto = win.id.startsWith('photo-')
-            const shouldBeHighQuality = isPhoto && top3PhotoIds.has(win.id)
+            const isPhoto = win.id.startsWith("photo-");
+            const shouldBeHighQuality = isPhoto && top3PhotoIds.has(win.id);
 
             // Inyectar prop isHighQuality si es ventana de foto
-            let windowContent = win.content
+            let windowContent = win.content;
             if (isPhoto && React.isValidElement(windowContent)) {
-              windowContent = React.cloneElement(windowContent as React.ReactElement, {
-                isHighQuality: shouldBeHighQuality
-              } as any)
+              windowContent = React.cloneElement(
+                windowContent as React.ReactElement,
+                {
+                  isHighQuality: shouldBeHighQuality,
+                } as any
+              );
             }
 
-            const isMobile = typeof window !== "undefined" && window.innerWidth < 768
+            const isMobile =
+              typeof window !== "undefined" && window.innerWidth < 768;
 
             return (
               <RetroWindow
@@ -1552,9 +1815,13 @@ Se vuoi unirti al team creativo, contattaci :)`
                 size={win.size}
                 zIndex={win.zIndex}
                 onClose={() => closeWindow(win.id)}
-                onMinimize={() => updateWindow(win.id, { isMinimized: !win.isMinimized })}
+                onMinimize={() =>
+                  updateWindow(win.id, { isMinimized: !win.isMinimized })
+                }
                 onMaximize={() => handleMaximizeWindow(win.id)}
-                onMove={(newPosition) => updateWindow(win.id, { position: newPosition })}
+                onMove={(newPosition) =>
+                  updateWindow(win.id, { position: newPosition })
+                }
                 onResize={(newSize) => updateWindow(win.id, { size: newSize })}
                 onFocus={() => bringToFront(win.id)}
                 preserveAspect={win.preserveAspect}
@@ -1563,7 +1830,7 @@ Se vuoi unirti al team creativo, contattaci :)`
               >
                 {windowContent}
               </RetroWindow>
-            )
+            );
           })}
         </AnimatePresence>
       </div>
@@ -1577,5 +1844,5 @@ Se vuoi unirti al team creativo, contattaci :)`
         />
       )}
     </div>
-  )
+  );
 }

@@ -18,7 +18,7 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "v0.dev",
+        hostname: "rodrigorey.info",
         port: "",
         pathname: "/placeholder.svg",
       },
